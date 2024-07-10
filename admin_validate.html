@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validate Ticket</title>
+    <link rel="stylesheet" href="styles_admins.css">
+</head>
+<body>
+    <nav>
+        <a href="admin_home.html">View Student</a>
+        <a href="admin_stops.html">Bus Stops</a>
+    </nav>
+    
+    <div class="admin-container">
+        <div id="validate-ticket-section" class="section">
+            <h2>Validate Ticket</h2>
+            <form>
+                <label for="ticket-id">Ticket ID</label>
+                <input type="text" id="ticket-id" name="ticket-id" required>
+                
+                <button type="submit">Validate</button>
+            </form>
+            <div id="status">
+                <p>✔️ Status</p>
+                <p>❌ Status</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

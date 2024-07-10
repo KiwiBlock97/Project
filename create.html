@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <link rel="stylesheet" href="styles_cs.css">
+</head>
+<body>
+    <div class="create-account-container">
+        <h1>Create Account</h1>
+        <form>
+            <label for="photo">Photo</label>
+            <input type="file" id="photo" name="photo" accept="image/*" required>
+            
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required>
+            
+            <label for="admission-id">Admission Number</label>
+            <input type="text" id="admission-number" name="admission-number" required>
+            
+            <label for="department">Department</label>
+            <select id="department" name="department" required>
+                <option value="computer-engineering">Computer Engineering</option>
+                <option value="civil-engineering">Civil Engineering</option>
+                <option value="electrical-electronics-engineering">Electrical and Electronics Engineering</option>
+                <option value="electronics-engineering">Electronics Engineering</option>
+                <option value="mechanical-engineering">Mechanical Engineering</option>
+            </select>
+            
+            <button type="submit">Create Account</button>
+        </form>
+    </div>
+</body>
+</html>
+
