@@ -1,35 +1,92 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .table-container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        .photo-cell {
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            background-color: #f9f9f9;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        td:first-child {
+            font-weight: bold;
+            background-color: #e9e9e9;
+        }
+    </style>
+</head>
+
 <body>
-<div>
-<table border=1>
-<tr>
-<td colspan=2>Photo</td>
-</tr>
-<tr>
-<td>Name</td>
-<td>ABCD</td>
-</tr>
-<tr>
-<td>Department</td>
-<td>CT</td>
-</tr>
-<tr>
-<td>Admission No</td>
-<td>1234</td>
-</tr>
-<tr>
-<td>Validity</td>
-<td>18-07-2024</td>
-</tr>
-<tr>
-<td>From/To</td>
-<td>Periya</td>
-</tr>
-<tr>
-<td>Ticket Id</td>
-<td>5tyhjjuirg</td>
-</tr>
-</table>
-</div>
+    <div class="table-container">
+        <table>
+            <tr>
+                <td colspan="2" class="photo-cell"><img height="200px" src="/static/images/elephant-2380009_1280.jpg"></td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td>ABCD</td>
+            </tr>
+            <tr>
+                <td>Department</td>
+                <td>CT</td>
+            </tr>
+            <tr>
+                <td>Admission No</td>
+                <td>1234</td>
+            </tr>
+            <tr>
+                <td>Validity</td>
+                <td>18-07-2024</td>
+            </tr>
+            <tr>
+                <td>From/To</td>
+                <td>Periya</td>
+            </tr>
+            <tr>
+                <td>Ticket Id</td>
+                <td>5tyhjjuirg</td>
+            </tr>
+        </table>
+    </div>
 </body>
+
 </html>
