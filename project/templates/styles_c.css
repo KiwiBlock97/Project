@@ -29,6 +29,7 @@ body {
 
 .create-account-container input[type="text"],
 .create-account-container input[type="file"],
+.create-account-container input[type="password"],
 .create-account-container select {
     width: calc(100% - 20px); /* Adjusted width to decrease from right */
     padding: 10px 10px 10px 20px; /* Increased left padding */

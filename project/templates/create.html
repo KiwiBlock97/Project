@@ -9,12 +9,18 @@
 <body>
     <div class="create-account-container">
         <h1>Create Account</h1>
-        <form>
+        <form method="post" action="/api/create" enctype="multipart/form-data">
             <label for="photo">Photo</label>
             <input type="file" id="photo" name="photo" accept="image/*" required>
             
             <label for="name">Name</label>
             <input type="text" id="name" name="name" required>
+
+            <label for="password">password</label>
+            <input type="password" id="pass" name="pass" required>
+
+            <label for="cnf-password">Confirm password</label>
+            <input type="password" id="cnf-pass" name="cnf-pass" required>
             
             <label for="admission-id">Admission Number</label>
             <input type="text" id="admission-number" name="admission-number" required>
