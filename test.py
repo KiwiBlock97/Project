@@ -34,13 +34,12 @@ class MySQLConnection:
                     return "exist"
                 raise
 
-    def auth_user(self, email, password):
+    def get_user(self, email, password):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
                 cursor.execute("select AdmissionId from student where Email=%s and Pass=%s", (email, password))
                 result=cursor.fetchone()
-                print(result)
                 if result:
                     return result[0], "Student"
                 cursor.execute("select Email from admin where Email=%s and Pass=%s", (email, password))
@@ -53,36 +52,9 @@ class MySQLConnection:
             finally:
                 cursor.close()
     
-    def get_user(self, email, user_type):
-        if self.connection.is_connected():
-            try:
-                cursor=self.connection.cursor()
-                print(email, user_type)
-                if user_type=="Admin":
-                    cursor.execute("select * from student where Email=%s", (email,))
-                elif user_type=="Student":
-                    cursor.execute("select * from admin where Email=%s", (email,))
-                result=cursor.fetchone()
-                print(result)
-                return result
-            except Exception as e:
-                print(e)
-            finally:
-                cursor.close()
-
-    def get_pass(self, admid):
-        if self.connection.is_connected():
-            try:
-                cursor=self.connection.cursor()
-                cursor.execute("select * from pass where AdmissionId=%s", (admid,))
-                result=cursor.fetchone()
-                return result
-            except Exception as e:
-                print(e)
-            finally:
-                cursor.close()
-
     def close_connection(self):
         if self.connection.is_connected():
             self.connection.close()
             print("MySQL connection is closed")
+db=MySQLConnection()
+print(db.get_user("akku@mail.com", "123456780"))

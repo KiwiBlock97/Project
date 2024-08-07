@@ -1,8 +1,13 @@
 from pathlib import Path
 
 import aiohttp_jinja2
-from aiohttp import web
 import jinja2
+
+# from cryptography import fernet
+from aiohttp import web
+from aiohttp_session import setup
+from aiohttp_session.cookie_storage import EncryptedCookieStorage
+from aiohttp_session import SimpleCookieStorage
 
 from project.routes import init_routes
 
@@ -19,11 +24,17 @@ def init_jinja2(app: web.Application) -> None:
         loader=jinja2.FileSystemLoader(str(path / 'templates'))
     )
 
+def init_session(app: web.Application) -> None:
+    # fernet_key = fernet.Fernet.generate_key()
+    # f = fernet.Fernet(fernet_key)
+    setup(app, SimpleCookieStorage())
+
 
 def init_app() -> web.Application:
     app = web.Application()
 
     init_jinja2(app)
+    init_session(app)
     init_routes(app)
 
     return app

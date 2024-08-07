@@ -27,6 +27,7 @@ body {
     text-align: left;
 }
 
+.create-account-container input[type="email"],
 .create-account-container input[type="text"],
 .create-account-container input[type="file"],
 .create-account-container input[type="password"],
