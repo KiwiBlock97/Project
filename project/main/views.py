@@ -1,12 +1,14 @@
 import os
 import pathlib
 from typing import Dict
+import uuid
 
 import aiohttp_jinja2
 import markdown2
 from aiohttp import web, MultipartReader
 from aiohttp_session import get_session
 from project.utils.database import MySQLConnection
+from project.utils.timeformat import get_readable_time
 db=MySQLConnection()
 routes = web.RouteTableDef()
 
@@ -35,7 +37,7 @@ async def create_account2(request: web.Request):
     else:
         with open(f"photo/{admission_number}", "wb") as f:
             f.write(photo.file.read())
-        return web.HTTPTemporaryRedirect("/login")
+        return web.HTTPFound("/login")
     
 @routes.route("*", "/login")
 async def login(request: web.Request):
@@ -46,17 +48,16 @@ async def login(request: web.Request):
         return aiohttp_jinja2.render_template("login.html", request, {})
     Resp, Type = db.auth_user(email, password)
     session = await get_session(request)
-    session["Test"]="Testing"
 
     if Resp==None:
         return web.Response(body="Invalid Email or Password")
     session["email"]=email
     session["type"]=Type
     if Type=="Admin":
-        return web.HTTPTemporaryRedirect("/static/admin_home.html")
+        return web.HTTPFound("/static/admin_home.html")
     elif Type=="Student":
         session["admid"]=Resp
-        return web.HTTPTemporaryRedirect("/student")
+        return web.HTTPSeeOther("/student",)
 
 @routes.get("/photo")
 async def login(request: web.Request):
@@ -69,12 +70,13 @@ async def login(request: web.Request):
 @routes.get("/student")
 async def login(request: web.Request):
     session = await get_session(request)
-    print(session)
     email = session.get("email", None)
     user_type = session.get("type", None)
     if (not email) or user_type!="Student":
         return web.HTTPTemporaryRedirect("/login")
     user = db.get_user(email, "Student")
+    if not user:
+        return web.HTTPFound("/login")
     bus_pass = db.get_pass(user[0])
     if not bus_pass:
         return web.HTTPTemporaryRedirect("/student/apply")
@@ -82,7 +84,57 @@ async def login(request: web.Request):
         "name": user[1],
         "department": user[4],
         "admission": user[0],
-        "validity": bus_pass[3],
-        "from": user[2],
-        "ticketid": user[4],
+        "validity": get_readable_time(bus_pass[2]),
+        "from": bus_pass[1],
+        "ticketid": bus_pass[3],
     })
+
+@routes.route("*", "/student/apply")
+async def apply_pass(request: web.Request):
+    session = await get_session(request)
+    email = session.get("email", None)
+    data=await request.post()
+    print(data)
+    if not email:
+        return web.HTTPTemporaryRedirect("/login")
+    user = db.get_user(email, "Student")
+    if not user:
+        return web.HTTPTemporaryRedirect("/signup")
+    if not (data):
+        return aiohttp_jinja2.render_template("student_apply.html", request, {
+            "name": user[1],
+            "department": user[4],
+            "adm_no": user[0],
+        })
+    uuid4 = uuid.uuid4()
+    admid=int(user[0])
+    place=data.get("from-to")
+    validity=int(data.get("validity"))
+    valid=validity*86400
+    db.create_pass(admid, place, valid, str(uuid4))
+    return web.HTTPFound("/student")
+
+@routes.route("*", "/student/renew")
+async def apply_pass(request: web.Request):
+    session = await get_session(request)
+    if not session.get("email", None):
+        return web.HTTPFound("/login")
+    email = session.get("email", None)
+    user=db.get_user(email,"Student")
+    if not user:
+        return web.HTTPFound("/signup")
+    bus_pass=db.get_pass(user[0])
+    if not bus_pass:
+        return web.HTTPFound("/student/apply")
+    data=await request.post()
+    validity=data.get("validity", None)
+    if not validity:
+        return aiohttp_jinja2.render_template("student_renew.html", request, {
+            "name": user[1],
+            "department": user[4],
+            "place": bus_pass[1],
+            "adm_no": user[0] 
+        })
+    valid=int(bus_pass[2])+(int(validity)*86400)
+    db.extend_pass(valid, bus_pass[3])
+    return web.HTTPSeeOther("/student")

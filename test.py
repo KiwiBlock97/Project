@@ -57,4 +57,3 @@ class MySQLConnection:
             self.connection.close()
             print("MySQL connection is closed")
 db=MySQLConnection()
-print(db.get_user("akku@mail.com", "123456780"))

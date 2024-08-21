@@ -1,4 +1,5 @@
 import mysql.connector
+from time import time
 from mysql.connector import Error
 
 class MySQLConnection:
@@ -59,9 +60,9 @@ class MySQLConnection:
                 cursor=self.connection.cursor()
                 print(email, user_type)
                 if user_type=="Admin":
-                    cursor.execute("select * from student where Email=%s", (email,))
-                elif user_type=="Student":
                     cursor.execute("select * from admin where Email=%s", (email,))
+                elif user_type=="Student":
+                    cursor.execute("select * from student where Email=%s", (email,))
                 result=cursor.fetchone()
                 print(result)
                 return result
@@ -77,6 +78,28 @@ class MySQLConnection:
                 cursor.execute("select * from pass where AdmissionId=%s", (admid,))
                 result=cursor.fetchone()
                 return result
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def create_pass(self, admid: int, place: str, validity: int, uuid4:str):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("insert into pass values(%s,%s,%s,%s)", (admid, place, time()+validity, uuid4))
+                self.connection.commit()
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def extend_pass(self, validity: int, UKey: str):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("update pass set Validity=%s where UKey=%s", (validity, UKey))
+                self.connection.commit()
             except Exception as e:
                 print(e)
             finally:

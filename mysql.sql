@@ -16,7 +16,6 @@ CREATE TABLE admin(
 );
 
 CREATE TABLE pass(
-    PassID INT AUTO_INCREMENT PRIMARY KEY,
     AdmissionId INT,
     FromPlace VARCHAR(20),
     Validity INT,
