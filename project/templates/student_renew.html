@@ -79,18 +79,34 @@ button[type="submit"]:hover {
             
             <div class="form-group">
                 <label for="validity">Validity:</label>
-                <input type="number" id="validity" name="validity">
+                <input onchange="update_price()" type="number" id="validity" name="validity">
             </div>
             
             <div class="form-group">
                 <label for="admin-no">Admin No:</label>
                 <p id="admin-no" name="admin-no">{{adm_no}}</p>
             </div>
+            <div class="form-group">
+                <label for="ticket-price">Ticket Price:</label>
+                <p id="ticket-price" value="{{price}}" name="ticket-price">{{price}}</p>
+            </div>
             
             <div class="form-group">
-                <button type="submit">Pay ₹</button>
+                <button type="submit" id="pay" style="display: none;">Pay ₹</button>
             </div>
         </form>
     </div>
+    <script>
+        function update_price(){
+            var price = document.getElementById("ticket-price").getAttribute("value");
+            var validity = document.getElementById("validity").value
+            var pay = document.getElementById("pay")
+            if (price && validity){
+                amount=price*validity
+                pay.innerHTML=`Pay ₹${amount}`
+                pay.style.display="block"
+            }
+        }
+    </script>
 </body>
 </html>

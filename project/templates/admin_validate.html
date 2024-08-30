@@ -8,8 +8,8 @@
 </head>
 <body>
     <nav>
-        <a href="admin_home.html">View Student</a>
-        <a href="admin_stops.html">Bus Stops</a>
+        <a href="/admin">View Student</a>
+        <a href="/admin/stops">Bus Stops</a>
     </nav>
     
     <div class="admin-container">
@@ -22,8 +22,11 @@
                 <button type="submit">Validate</button>
             </form>
             <div id="status">
-                <p>✔️ Status</p>
-                <p>❌ Status</p>
+                {% if valid %}
+                    <p>✔️ Ticket is Valid</p>
+                {% elif invalid %}
+                    <p>❌ Ticket is Invalid</p>
+                {% endif %}
             </div>
         </div>
     </div>

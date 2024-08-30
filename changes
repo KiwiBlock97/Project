@@ -1,1 +1,5 @@
-User Login and Student dashboard
+Removed unwanted imports
+Load Bus stop location and price from database when purchasing a ticket
+Created Admin dashboard (/admin)
+Show List of student with Student Name and Department in Admin dashboard
+Created Page to validate bus pass using key (/admin/validate)

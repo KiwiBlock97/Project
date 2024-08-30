@@ -1,0 +1,7 @@
+aiohttp
+aiohttp_session[secure]
+aiohttp-jinja2
+aiohttp-devtools
+aiohttp-debugtoolbar
+create-aio-app
+mysql-connector-python

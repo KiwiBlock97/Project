@@ -39,12 +39,12 @@ class MySQLConnection:
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("select AdmissionId from student where Email=%s and Pass=%s", (email, password))
+                cursor.execute("select AdmissionId from student where Email=%s and Password=%s", (email, password))
                 result=cursor.fetchone()
                 print(result)
                 if result:
                     return result[0], "Student"
-                cursor.execute("select Email from admin where Email=%s and Pass=%s", (email, password))
+                cursor.execute("select Email from admin where Email=%s and Password=%s", (email, password))
                 result=cursor.fetchone()
                 if result:
                     return result[0], "Admin"
@@ -71,11 +71,14 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
-    def get_pass(self, admid):
+    def get_pass(self, admid:int=None, key: str=None):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("select * from pass where AdmissionId=%s", (admid,))
+                if admid:
+                    cursor.execute("select * from pass where AdmissionId=%s", (admid,))
+                elif key:
+                    cursor.execute("select * from pass where UKey=%s", (key,))
                 result=cursor.fetchone()
                 return result
             except Exception as e:
@@ -100,6 +103,59 @@ class MySQLConnection:
                 cursor=self.connection.cursor()
                 cursor.execute("update pass set Validity=%s where UKey=%s", (validity, UKey))
                 self.connection.commit()
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def get_place(self, place: str=None, price: int=None):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                if place:
+                    cursor.execute("select * from place where Place=%s", (place,))
+                    result=cursor.fetchone()
+                elif price:
+                    cursor.execute("select * from place where Price=%s", (price,))
+                    result=cursor.fetchone()
+                else:
+                    cursor.execute("select * from place")
+                    result=cursor.fetchall()
+                return result
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def remove_place(self, place:str):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("delete from place where place=%s", (place,))
+                self.connection.commit()
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def add_place(self, place:str, price: int):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("insert into place values(%s, %s)", (place, price))
+                self.connection.commit()
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def get_students(self):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("select * from student")
+                result=cursor.fetchall()
+                return result
             except Exception as e:
                 print(e)
             finally:

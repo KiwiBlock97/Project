@@ -8,8 +8,8 @@
 </head>
 <body>
     <nav>
-        <a href="admin_validate.html">Validate Ticket</a>
-        <a href="admin_stops.html">Bus Stops</a>
+        <a href="/admin/validate">Validate Ticket</a>
+        <a href="/admin/stops">Bus Stops</a>
     </nav>
     
     <div class="admin-container">
@@ -23,14 +23,12 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for row in students %}
                     <tr>
-                        <td>Name 1</td>
-                        <td>Computer Engineering</td>
+                        <td>{{row[1]}}</td>
+                        <td>{{row[5]}}</td>
                     </tr>
-                    <tr>
-                        <td>Name 2</td>
-                        <td>Civil Engineering</td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

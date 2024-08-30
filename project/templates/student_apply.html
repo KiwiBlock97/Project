@@ -74,19 +74,17 @@ button[type="submit"]:hover {
             
             <div class="form-group">
                 <label for="from-to">From/To:</label>
-                <select id="from-to" name="from-to" required>
-                    <option value="">Select Destination</option>
-                    <option value="Place1">Place 1</option>
-                    <option value="Place2">Place 2</option>
-                    <option value="Place3">Place 3</option>
-                    <option value="Place4">Place 4</option>
+                <select id="from-to" name="from-to" onchange="update_price()" required>
+                    {% for row in place %}
+                    <option price={{ row[1] }} value= {{ row[0] }}> {{ row[0] }} </option>
+                    {% endfor %}
                     <!-- Add more options as needed -->
                 </select>
             </div>
             
             <div class="form-group">
                 <label for="validity">Validity:</label>
-                <input type="text" id="validity" name="validity" required>
+                <input type="text" id="validity" name="validity" onchange="update_price()" required>
             </div>
             
             <div class="form-group">
@@ -95,9 +93,23 @@ button[type="submit"]:hover {
             </div>
             
             <div class="form-group">
-                <button type="submit">Pay ₹</button>
+                <button type="submit" id="pay" style="display: none;">Pay ₹</button>
             </div>
         </form>
     </div>
+    <script>
+        function update_price(){
+            var selectElement = document.getElementById("from-to");
+            var selectedOption = selectElement.options[selectElement.selectedIndex];
+            var price = selectedOption.getAttribute("price");
+            var validity = document.getElementById("validity").value
+            var pay = document.getElementById("pay")
+            if (price && validity){
+                amount=price*validity
+                pay.innerHTML=`Pay ₹${amount}`
+                pay.style.display="block"
+            }
+        }
+    </script>
 </body>
 </html>
