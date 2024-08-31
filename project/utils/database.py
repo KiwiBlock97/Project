@@ -2,22 +2,21 @@ import mysql.connector
 from time import time
 from mysql.connector import Error
 
+from project.utils.vars import Var
+
 class MySQLConnection:
     def __init__(self):
         self.connection = None
-        self.host_name = "localhost"
-        self.user_name = "root"
-        self.user_password = "mysql"
-        self.db_name = "bus"
         self.connect_to_db()
 
     def connect_to_db(self):
         try:
             self.connection = mysql.connector.connect(
-                host=self.host_name,
-                user=self.user_name,
-                passwd=self.user_password,
-                database=self.db_name
+                host=Var.DB_HOST,
+                user=Var.DB_USERNAME,
+                passwd=Var.DB_PASSWORD,
+                database=Var.DB_NAME,
+                port=Var.DB_PORT
             )
             print("Connection to MySQL DB successful")
         except Error as e:

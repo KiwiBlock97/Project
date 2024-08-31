@@ -3,10 +3,12 @@ from cashfree_pg.api_client import Cashfree
 from cashfree_pg.models.customer_details import CustomerDetails
 from cashfree_pg.models.order_meta import OrderMeta
 
-Cashfree.XClientId = "TEST10244234e9fe257518c2ddd5090843244201"
-Cashfree.XClientSecret = "cfsk_ma_test_735c83fb1b89df45df8c8b8b757ef3b8_420df7eb"
+from project.utils.vars import Var
+
+Cashfree.XClientId = Var.CF_CLIENTID
+Cashfree.XClientSecret = Var.CF_CLIENTSECRET
 Cashfree.XEnvironment = Cashfree.SANDBOX
-x_api_version = "2023-08-01"
+x_api_version = Var.CF_VERSION
 def create_order(admid: str, phone: str, name: str, email: str, uuid4: str, amount: int):
     customerDetails = CustomerDetails(customer_id=admid, customer_phone=phone)
     customerDetails.customer_name = name
@@ -14,7 +16,7 @@ def create_order(admid: str, phone: str, name: str, email: str, uuid4: str, amou
     createOrderRequest = CreateOrderRequest(order_id=uuid4, order_amount=amount, order_currency="INR", customer_details=customerDetails)
 
     orderMeta = OrderMeta()
-    orderMeta.return_url = "http://localhost:8000/order/checkout?order_id={order_id}"
+    orderMeta.return_url = Var.URL+"/order/checkout?order_id={order_id}"
     orderMeta.payment_methods = "cc,dc,upi"
     createOrderRequest.order_meta = orderMeta
 
