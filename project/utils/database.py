@@ -41,7 +41,6 @@ class MySQLConnection:
                 cursor=self.connection.cursor()
                 cursor.execute("select AdmissionId from student where Email=%s and Password=%s", (email, password))
                 result=cursor.fetchone()
-                print(result)
                 if result:
                     return result[0], "Student"
                 cursor.execute("select Email from admin where Email=%s and Password=%s", (email, password))
@@ -58,13 +57,11 @@ class MySQLConnection:
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                print(email, user_type)
                 if user_type=="Admin":
                     cursor.execute("select * from admin where Email=%s", (email,))
                 elif user_type=="Student":
                     cursor.execute("select * from student where Email=%s", (email,))
                 result=cursor.fetchone()
-                print(result)
                 return result
             except Exception as e:
                 print(e)
@@ -156,6 +153,40 @@ class MySQLConnection:
                 cursor.execute("select * from student")
                 result=cursor.fetchall()
                 return result
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def create_order(self, OrderId:str, email: str, place: str, validity: int, renew: int, ukey:str, status: str):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("insert into pass_order values(%s, %s, %s, %s, %s, %s, %s, %s)", (OrderId, email, place, validity, renew, ukey, time(), status))
+                self.connection.commit()
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def get_order(self, OrderId:str):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("select * from pass_order where OrderID=%s", (OrderId,))
+                result=cursor.fetchone()
+                return result
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def modify_order(self, OrderId:str, Status):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("update pass_order set Status=%s where OrderID=%s", (Status, OrderId,))
+                self.connection.commit()
             except Exception as e:
                 print(e)
             finally:

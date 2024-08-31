@@ -30,11 +30,20 @@ CREATE TABLE place(
 
 SET GLOBAL event_scheduler = ON;
 
+DELIMITER //
+
 CREATE EVENT IF NOT EXISTS auto_remove_expired_records
-ON SCHEDULE EVERY 1 MINUTE 
+ON SCHEDULE EVERY 1 MINUTE
 DO
+BEGIN
   DELETE FROM pass
   WHERE Validity <= UNIX_TIMESTAMP();
+
+  DELETE FROM pass_order
+  WHERE Time + 3600 <= UNIX_TIMESTAMP() AND Status IS NULL;
+END;
+//
+
 
 -- SET GLOBAL event_scheduler = OFF; 
 -- ALTER EVENT auto_remove_expired_records DISABLE;  -- Temporarily disable

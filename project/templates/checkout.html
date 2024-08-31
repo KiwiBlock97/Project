@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Cashfree Checkout Integration</title>
+        <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    </head>
+    <body>
+        <table border="1">
+            <tr>
+                <td>Name</td>
+                <td><p>{{name}}</p></td>
+            </tr>
+            <tr>
+                <td>Department</td>
+                <td><p>{{department}}</p></td>
+            </tr>
+            <tr>
+                <td>From/To</td>
+                <td><p>{{place}}</p></td>
+            </tr>
+            <tr>
+                <td>Validity</td>
+                <td>{{validity}}</td>
+            </tr>
+            <tr>
+                <td>Admin No</td>
+                <td>{{adm_no}}</td>
+            </tr>
+            <tr>
+                <td>Renew</td>
+                <td>{{renew}}</td>
+            </tr>
+        <tr>
+            <td colspan="2"><button id="renderBtn">Pay ${{price}}</button></td>
+        </tr>
+        </table>
+        <script>
+            const cashfree = Cashfree({
+                mode: "sandbox",
+            });
+            document.getElementById("renderBtn").addEventListener("click", () => {
+                let checkoutOptions = {
+                    paymentSessionId: "{{ sessionid }}",
+                    redirectTarget: "_self",
+                };
+                cashfree.checkout(checkoutOptions);
+            });
+        </script>
+    </body>
+</html>

@@ -5,3 +5,4 @@ aiohttp-devtools
 aiohttp-debugtoolbar
 create-aio-app
 mysql-connector-python
+cashfree_pg
