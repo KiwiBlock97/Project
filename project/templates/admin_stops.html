@@ -8,8 +8,8 @@
 </head>
 <body>
     <nav>
-        <a href="admin_home.html">View Student</a>
-        <a href="admin_stops.html">Bus Stops</a>
+        <a href="/admin">View Student</a>
+        <a href="admin/stops">Bus Stops</a>
     </nav>
     
     <div class="admin-container">
@@ -21,17 +21,23 @@
                     <td><p>Fair</p></td>
                     <td><p>Remove Stop</p></td>
                 </tr>
+                {% for row in places %}
                 <tr>
-                    <!-- Existing Bus Stop Data  -->
-                    <td><p>Kasaragod</p></td>
-                    <td><p>500</p></td>
-                    <td><input type="button" value="Remove❌"></td>
-                    <!-- End -->
+                    <td><p>{{row[0]}}</p></td>
+                    <td><p>{{row[1]}}</p></td>
+                    <td><form method="post">
+                        <input type="hidden" value="{{row[0]}}" name="place">
+                        <input type="hidden" value="{{row[1]}}" name="price">
+                        <button type="submit" value="delete" name="method">Remove❌</button>
+                    </form></td>
                 </tr>
+                {% endfor %}
                 <tr>
-                    <td><input type="text" placeholder="Stop Name"></td>
-                    <td><input type="number" placeholder="Price"></td>
-                    <td><input type="submit" value="Add"></td>
+                    <form method="post">
+                    <td><input type="text" placeholder="Stop Name" name="place"></td>
+                    <td><input type="number" placeholder="Price" name="price"></td>
+                    <td><button type="submit" value="add" name="method">Add</button></td>
+                    </form>
                 </tr>
             </table>
         </div>

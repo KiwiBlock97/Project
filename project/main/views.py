@@ -184,6 +184,45 @@ async def admin_login(request: web.Request):
         "invalid": (not status)
     })
 
+@routes.get("/admin/stops")
+async def admin_stops_get(request: web.Request):
+    session = await get_session(request)
+    email = session.get("email", None)
+    user_type = session.get("type", None)
+    if (not email) or user_type!="Admin":
+        return web.HTTPSeeOther("/login")
+    user = db.get_user(email, "Admin")
+    if not user:
+        return web.HTTPSeeOther("/login")
+    stops=db.get_place()
+    return aiohttp_jinja2.render_template("admin_stops.html", request, {
+        "places": stops
+        })
+    
+@routes.post("/admin/stops")
+async def admin_stops_post(request: web.Request):
+    session = await get_session(request)
+    email = session.get("email", None)
+    user_type = session.get("type", None)
+    if (not email) or user_type!="Admin":
+        return web.HTTPSeeOther("/login")
+    user = db.get_user(email, "Admin")
+    if not user:
+        return web.HTTPSeeOther("/login")
+    data=await request.post()
+    method=data.get("method", None)
+    place=data.get("place")
+    price=data.get("price")
+    print(data, price.isdigit())
+    if method=="add" and price.isdigit():
+        db.add_place(place, int(price))
+        return web.HTTPSeeOther("/admin/stops")
+    elif method=="delete":
+        db.remove_place(place)
+        return web.HTTPSeeOther("/admin/stops")
+    else:
+        return web.HTTPBadRequest()
+
 @routes.get("/logout")
 async def logout(request: web.Request):
     session = await get_session(request)
