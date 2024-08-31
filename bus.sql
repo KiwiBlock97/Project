@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 30, 2024 at 06:53 PM
+-- Generation Time: Aug 31, 2024 at 02:23 PM
 -- Server version: 8.0.39-0ubuntu0.24.04.2
 -- PHP Version: 8.3.6
 
@@ -47,18 +47,28 @@ INSERT INTO `admin` (`Email`, `Name`, `Password`) VALUES
 --
 
 CREATE TABLE `pass` (
-  `AdmissionId` int DEFAULT NULL,
+  `AdmissionId` int NOT NULL,
   `FromPlace` varchar(20) DEFAULT NULL,
   `Validity` int DEFAULT NULL,
-  `UKey` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+  `UKey` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `pass`
+-- Table structure for table `pass_order`
 --
 
-INSERT INTO `pass` (`AdmissionId`, `FromPlace`, `Validity`, `UKey`) VALUES
-(9999, 'Cherkala', 1725907404, '3e544a86-5c14-43f0-8c9d-9aa2856142f1');
+CREATE TABLE `pass_order` (
+  `OrderID` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `Place` varchar(20) NOT NULL,
+  `Validity` int NOT NULL,
+  `Type` tinyint NOT NULL,
+  `UKey` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `Time` int UNSIGNED NOT NULL,
+  `Status` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -99,7 +109,7 @@ CREATE TABLE `student` (
 --
 
 INSERT INTO `student` (`AdmissionId`, `Name`, `Email`, `Photo`, `Department`, `Password`) VALUES
-(9999, 'Deekshith', 'test@mail.com', '9999', 'computer-engineering', '1234');
+(9030, 'Akash', 'akash@mail.com', '9030', 'computer-engineering', '1234');
 
 --
 -- Indexes for dumped tables
@@ -115,7 +125,13 @@ ALTER TABLE `admin`
 -- Indexes for table `pass`
 --
 ALTER TABLE `pass`
-  ADD KEY `AdmissionId` (`AdmissionId`);
+  ADD PRIMARY KEY (`AdmissionId`);
+
+--
+-- Indexes for table `pass_order`
+--
+ALTER TABLE `pass_order`
+  ADD PRIMARY KEY (`OrderID`);
 
 --
 -- Indexes for table `place`
@@ -138,6 +154,20 @@ ALTER TABLE `student`
 --
 ALTER TABLE `pass`
   ADD CONSTRAINT `pass_ibfk_1` FOREIGN KEY (`AdmissionId`) REFERENCES `student` (`AdmissionId`);
+
+DELIMITER $$
+--
+-- Events
+--
+CREATE DEFINER=`root`@`localhost` EVENT `auto_remove_expired_records` ON SCHEDULE EVERY 1 MINUTE STARTS '2024-08-31 19:42:06' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
+  DELETE FROM pass
+  WHERE Validity <= UNIX_TIMESTAMP();
+
+  DELETE FROM pass_order
+  WHERE Time + 3600 <= UNIX_TIMESTAMP() AND Status IS NULL;
+END$$
+
+DELIMITER ;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
