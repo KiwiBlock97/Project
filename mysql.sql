@@ -23,8 +23,8 @@ CREATE TABLE `pass` (
   `FromPlace` varchar(20) NOT NULL,
   `Validity` int NOT NULL,
   `UKey` varchar(255) NOT NULL,
-  FOREIGN KEY (`AdmissionId`) REFERENCES `student` (`AdmissionId`),
-  FOREIGN KEY (`FromPlace`) REFERENCES `place` (`Place`)
+  FOREIGN KEY (`AdmissionId`) REFERENCES `student` (`AdmissionId`) ON DELETE CASCADE,
+  FOREIGN KEY (`FromPlace`) REFERENCES `place` (`Place`) ON DELETE CASCADE
 );
 
 CREATE TABLE `pass_order` (
@@ -36,8 +36,8 @@ CREATE TABLE `pass_order` (
   `UKey` varchar(255) DEFAULT NULL,
   `Time` int UNSIGNED NOT NULL,
   `Status` varchar(30) DEFAULT NULL,
-  FOREIGN KEY (`email`) REFERENCES `student` (`Email`),
-  FOREIGN KEY (`Place`) REFERENCES `place` (`Place`)
+  FOREIGN KEY (`email`) REFERENCES `student` (`Email`) ON DELETE CASCADE,
+  FOREIGN KEY (`Place`) REFERENCES `place` (`Place`) ON DELETE CASCADE
 );
 
 

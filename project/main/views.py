@@ -13,14 +13,13 @@ routes = web.RouteTableDef()
 
 @aiohttp_jinja2.template('index.html')
 async def index(request: web.Request) -> Dict[str, str]:
-    files = os.listdir("project/templates")
-    return {"files": files}
+    return {}
 
 @routes.get("/signup")
 async def create_account(request: web.Request):
     return aiohttp_jinja2.render_template("create.html", request, {})
 
-@routes.post("/api/create")
+@routes.post("/signup")
 async def create_account2(request: web.Request):
     data=await request.post()
     admission_number=data["admission-number"]
@@ -37,17 +36,20 @@ async def create_account2(request: web.Request):
         with open(f"photo/{admission_number}", "wb") as f:
             f.write(photo.file.read())
         return web.HTTPSeeOther("/login")
-    
-@routes.route("*", "/login")
+
+@routes.get("/login")
+async def login_get(request: web.Request):
+    return aiohttp_jinja2.render_template("login.html", request, {})
+
+@routes.post("/login")
 async def login(request: web.Request):
     data=await request.post()
     email=data.get("email")
     password=data.get("password")
     if not (email or password):
-        return aiohttp_jinja2.render_template("login.html", request, {})
+        return web.HTTPSeeOther("/login")
     Resp, Type = db.auth_user(email, password)
     session = await get_session(request)
-
     if Resp==None:
         return web.Response(body="Invalid Email or Password")
     session["email"]=email
@@ -88,11 +90,10 @@ async def login(request: web.Request):
         "ticketid": bus_pass[3],
     })
 
-@routes.route("*", "/student/apply")
+@routes.get("/student/apply")
 async def apply_pass(request: web.Request):
     session = await get_session(request)
     email = session.get("email", None)
-    data=await request.post()
     if not email:
         return web.HTTPSeeOther("/login")
     user = db.get_user(email, "Student")
@@ -106,7 +107,7 @@ async def apply_pass(request: web.Request):
         "place": place
     })
 
-@routes.route("*", "/student/renew")
+@routes.get("/student/renew")
 async def apply_pass(request: web.Request):
     session = await get_session(request)
     if not session.get("email", None):

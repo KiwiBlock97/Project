@@ -52,12 +52,23 @@
             font-weight: bold;
             background-color: #e9e9e9;
         }
+        @media print {
+            body {
+              visibility: hidden;
+            }
+            .pass {
+              visibility: visible;
+              position: absolute;
+              left: 0;
+              top: 0;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="table-container">
-        <table>
+        <table class="pass">
             <tr>
                 <td colspan="2" class="photo-cell"><img height="200px" src="/photo"></td>
             </tr>
@@ -85,8 +96,12 @@
                 <td>Ticket Id</td>
                 <td>{{ticketid}}</td>
             </tr>
+        </table>
+        <table>
             <tr>
                 <td colspan="2"><a href="/student/renew">Extend Pass</a></td>
+                <td><a href="/logout">Logout</a></td>
+                <td><button onclick="window.print()">Print ticket</button></td>
             </tr>
         </table>
     </div>
