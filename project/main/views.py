@@ -63,7 +63,10 @@ async def login(request: web.Request):
 @routes.get("/photo")
 async def login(request: web.Request):
     session = await get_session(request)
-    admid=session["admid"]
+    user_type = session.get("type", None)
+    admid=session.get("admid")
+    if user_type=="Admin":
+        admid=request.rel_url.query.get("id")
     if admid:
         return web.FileResponse(f"photo/{admid}")
     return web.HTTPNotFound
@@ -75,7 +78,7 @@ async def login(request: web.Request):
     user_type = session.get("type", None)
     if (not email) or user_type!="Student":
         return web.HTTPSeeOther("/login")
-    user = db.get_user(email, "Student")
+    user = db.get_user(email=email, user_type="Student")
     if not user:
         return web.HTTPSeeOther("/login")
     bus_pass = db.get_pass(user[0])
@@ -96,7 +99,7 @@ async def apply_pass(request: web.Request):
     email = session.get("email", None)
     if not email:
         return web.HTTPSeeOther("/login")
-    user = db.get_user(email, "Student")
+    user = db.get_user(email=email, user_type="Student")
     if not user:
         return web.HTTPSeeOther("/signup")
     place=db.get_place()
@@ -113,7 +116,7 @@ async def apply_pass(request: web.Request):
     if not session.get("email", None):
         return web.HTTPSeeOther("/login")
     email = session.get("email", None)
-    user=db.get_user(email,"Student")
+    user=db.get_user(email=email, user_type="Student")
     if not user:
         return web.HTTPSeeOther("/signup")
     bus_pass=db.get_pass(user[0])
@@ -136,7 +139,7 @@ async def admin_login(request: web.Request):
     user_type = session.get("type", None)
     if (not email) or user_type!="Admin":
         return web.HTTPSeeOther("/login")
-    user = db.get_user(email, "Admin")
+    user = db.get_user(email=email, user_type="Admin")
     if not user:
         return web.HTTPSeeOther("/login")
     students=db.get_students()
@@ -151,7 +154,7 @@ async def admin_login(request: web.Request):
     user_type = session.get("type", None)
     if (not email) or user_type!="Admin":
         return web.HTTPSeeOther("/login")
-    user = db.get_user(email, "Admin")
+    user = db.get_user(email=email, user_type="Admin")
     if not user:
         return web.HTTPSeeOther("/login")
     key=request.rel_url.query.get("ticket-id", None)
@@ -177,7 +180,7 @@ async def admin_stops_get(request: web.Request):
     user_type = session.get("type", None)
     if (not email) or user_type!="Admin":
         return web.HTTPSeeOther("/login")
-    user = db.get_user(email, "Admin")
+    user = db.get_user(email=email, user_type="Admin")
     if not user:
         return web.HTTPSeeOther("/login")
     stops=db.get_place()
@@ -192,7 +195,7 @@ async def admin_stops_post(request: web.Request):
     user_type = session.get("type", None)
     if (not email) or user_type!="Admin":
         return web.HTTPSeeOther("/login")
-    user = db.get_user(email, "Admin")
+    user = db.get_user(email=email, user_type="Admin")
     if not user:
         return web.HTTPSeeOther("/login")
     data=await request.post()
@@ -221,7 +224,7 @@ async def apply_pass(request: web.Request):
     data=await request.post()
     if not email:
         return web.HTTPSeeOther("/login")
-    user = db.get_user(email, "Student")
+    user = db.get_user(email=email, user_type="Student")
     if not user:
         return web.HTTPSeeOther("/signup")
     if not (data):
@@ -266,7 +269,7 @@ async def checkout(request: web.Request):
         if order[7]=="SUCCESS":
             return web.HTTPSeeOther("/student")
         db.modify_order(order_id, str(resp.payment_status))
-        user=db.get_user(order[1], "Student")
+        user=db.get_user(email=order[1], user_type="Student")
         place=db.get_place(place=order[2])
         validity=int(order[3])
         valid=validity*86400
@@ -283,3 +286,37 @@ async def checkout(request: web.Request):
         # [PENDING, USER_DROPPED, FAILED]
     else:
         return web.HTTPBadRequest()
+    
+@routes.post("/admin/remove")
+async def admin_remove(request: web.Request):
+    session = await get_session(request)
+    email = session.get("email", None)
+    user_type = session.get("type", None)
+    if (not email) or user_type!="Admin":
+        return web.HTTPSeeOther("/login")
+    user = db.get_user(email=email, user_type="Admin")
+    if not user:
+        return web.HTTPSeeOther("/login")
+    data=await request.post()
+    admid=data.get("admid")
+    if not admid:
+        return web.HTTPMethodNotAllowed()
+    db.remove_student(int(admid))
+    return web.HTTPSeeOther("/admin")
+
+@routes.get("/admin/details")
+async def admin_details(request: web.Request):
+    session = await get_session(request)
+    user_type = session.get("type", None)
+    if user_type!="Admin":
+        return web.HTTPSeeOther("/login")
+    admid=request.rel_url.query.get("id")
+    if not admid:
+        return web.HTTPBadRequest()
+    user=db.get_user(admid=admid)
+    return aiohttp_jinja2.render_template("admin_student.html", request, {
+        "AdmissionId": user[0],
+        "Name": user[1],
+        "Email": user[2],
+        "Department": user[4]
+    })

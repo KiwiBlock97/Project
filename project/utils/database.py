@@ -52,11 +52,13 @@ class MySQLConnection:
             finally:
                 cursor.close()
     
-    def get_user(self, email, user_type):
+    def get_user(self, email: str = None, admid: int = None, user_type: str = None):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                if user_type=="Admin":
+                if admid:
+                    cursor.execute("select * from student where AdmissionId=%s", (admid,))
+                elif user_type=="Admin":
                     cursor.execute("select * from admin where Email=%s", (email,))
                 elif user_type=="Student":
                     cursor.execute("select * from student where Email=%s", (email,))
@@ -185,6 +187,17 @@ class MySQLConnection:
             try:
                 cursor=self.connection.cursor()
                 cursor.execute("update pass_order set Status=%s where OrderID=%s", (Status, OrderId,))
+                self.connection.commit()
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def remove_student(self, admission_number):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("delete from student where AdmissionId=%s", (admission_number, ))
                 self.connection.commit()
             except Exception as e:
                 print(e)
