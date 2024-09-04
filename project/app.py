@@ -31,7 +31,7 @@ def init_session(app: web.Application) -> None:
 
 
 def init_app() -> web.Application:
-    app = web.Application()
+    app = web.Application(client_max_size=10485760)
 
     init_jinja2(app)
     init_session(app)

@@ -76,7 +76,7 @@ async def login(request: web.Request):
     session = await get_session(request)
     email = session.get("email", None)
     user_type = session.get("type", None)
-    if (not email) or user_type!="Student":
+    if user_type!="Student":
         return web.HTTPSeeOther("/login")
     user = db.get_user(email=email, user_type="Student")
     if not user:
@@ -97,7 +97,8 @@ async def login(request: web.Request):
 async def apply_pass(request: web.Request):
     session = await get_session(request)
     email = session.get("email", None)
-    if not email:
+    user_type = session.get("type", None)
+    if user_type!="Student":
         return web.HTTPSeeOther("/login")
     user = db.get_user(email=email, user_type="Student")
     if not user:
@@ -113,9 +114,10 @@ async def apply_pass(request: web.Request):
 @routes.get("/student/renew")
 async def apply_pass(request: web.Request):
     session = await get_session(request)
-    if not session.get("email", None):
-        return web.HTTPSeeOther("/login")
     email = session.get("email", None)
+    user_type = session.get("type", None)
+    if user_type!="Student":
+        return web.HTTPSeeOther("/login")
     user=db.get_user(email=email, user_type="Student")
     if not user:
         return web.HTTPSeeOther("/signup")
@@ -137,10 +139,7 @@ async def admin_login(request: web.Request):
     session = await get_session(request)
     email = session.get("email", None)
     user_type = session.get("type", None)
-    if (not email) or user_type!="Admin":
-        return web.HTTPSeeOther("/login")
-    user = db.get_user(email=email, user_type="Admin")
-    if not user:
+    if user_type!="Admin":
         return web.HTTPSeeOther("/login")
     students=db.get_students()
     return aiohttp_jinja2.render_template("admin_home.html", request, {
@@ -150,12 +149,8 @@ async def admin_login(request: web.Request):
 @routes.get("/admin/validate")
 async def admin_login(request: web.Request):
     session = await get_session(request)
-    email = session.get("email", None)
     user_type = session.get("type", None)
-    if (not email) or user_type!="Admin":
-        return web.HTTPSeeOther("/login")
-    user = db.get_user(email=email, user_type="Admin")
-    if not user:
+    if user_type!="Admin":
         return web.HTTPSeeOther("/login")
     key=request.rel_url.query.get("ticket-id", None)
     if not key:
@@ -176,12 +171,8 @@ async def admin_login(request: web.Request):
 @routes.get("/admin/stops")
 async def admin_stops_get(request: web.Request):
     session = await get_session(request)
-    email = session.get("email", None)
     user_type = session.get("type", None)
-    if (not email) or user_type!="Admin":
-        return web.HTTPSeeOther("/login")
-    user = db.get_user(email=email, user_type="Admin")
-    if not user:
+    if user_type!="Admin":
         return web.HTTPSeeOther("/login")
     stops=db.get_place()
     return aiohttp_jinja2.render_template("admin_stops.html", request, {
@@ -191,12 +182,8 @@ async def admin_stops_get(request: web.Request):
 @routes.post("/admin/stops")
 async def admin_stops_post(request: web.Request):
     session = await get_session(request)
-    email = session.get("email", None)
     user_type = session.get("type", None)
-    if (not email) or user_type!="Admin":
-        return web.HTTPSeeOther("/login")
-    user = db.get_user(email=email, user_type="Admin")
-    if not user:
+    if user_type!="Admin":
         return web.HTTPSeeOther("/login")
     data=await request.post()
     method=data.get("method", None)
@@ -293,9 +280,6 @@ async def admin_remove(request: web.Request):
     email = session.get("email", None)
     user_type = session.get("type", None)
     if (not email) or user_type!="Admin":
-        return web.HTTPSeeOther("/login")
-    user = db.get_user(email=email, user_type="Admin")
-    if not user:
         return web.HTTPSeeOther("/login")
     data=await request.post()
     admid=data.get("admid")

@@ -20,26 +20,43 @@
             <input type="email" id="email" name="email" required>
 
             <label for="password">password</label>
-            <input type="password" id="pass" name="pass" required>
+            <input type="password" id="pass" name="pass" onchange="check_pass()" required>
 
             <label for="cnf-password">Confirm password</label>
-            <input type="password" id="cnf-pass" name="cnf-pass" required>
+            <input type="password" id="cnf-pass" name="cnf-pass" onchange="check_pass()" required>
             
-            <label for="admission-id">Admission Number</label>
+            <label for="admission-number">Admission Number</label>
             <input type="text" id="admission-number" name="admission-number" required>
             
             <label for="department">Department</label>
             <select id="department" name="department" required>
-                <option value="computer-engineering">Computer Engineering</option>
-                <option value="civil-engineering">Civil Engineering</option>
-                <option value="electrical-electronics-engineering">Electrical and Electronics Engineering</option>
-                <option value="electronics-engineering">Electronics Engineering</option>
-                <option value="mechanical-engineering">Mechanical Engineering</option>
+                <option value="Computer Engineering">Computer Engineering</option>
+                <option value="Civil Engineering">Civil Engineering</option>
+                <option value="Electrical Electronics Engineering">Electrical and Electronics Engineering</option>
+                <option value="Electronics Engineering">Electronics Engineering</option>
+                <option value="Mechanical Engineering">Mechanical Engineering</option>
             </select>
             
-            <button type="submit">Create Account</button>
+            <button type="button" id="submit">Create Account</button>
         </form>
     </div>
+    <script>
+        function check_pass(){
+            var pass = document.getElementById("pass").value;
+            var cnf_pass = document.getElementById("cnf-pass").value;
+            if (pass && cnf_pass){
+                if(pass == cnf_pass){
+                    document.getElementById("cnf-pass").style.borderColor = "green";
+                    document.getElementById("pass").style.borderColor = "green";
+                    document.getElementById("submit").type="submit";
+                }
+                else{
+                    document.getElementById("pass").style.borderColor = "red";
+                    alert("Passwords do not match");
+                }
+            }
+        }
+    </script>
 </body>
 </html>
 
