@@ -77,7 +77,7 @@ class MySQLConnection:
                     cursor.execute("select * from pass where AdmissionId=%s", (admid,))
                 elif key:
                     cursor.execute("select * from pass where UKey=%s", (key,))
-                result=cursor.fetchone()
+                result=cursor.fetchall()
                 return result
             except Exception as e:
                 print(e)

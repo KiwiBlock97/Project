@@ -23,10 +23,41 @@
                 <button type="submit">Validate</button>
             </form>
             <div id="status">
-                {% if valid %}
-                    <p>✔️ Ticket is Valid</p>
-                {% elif invalid %}
-                    <p>❌ Ticket is Invalid</p>
+                {% if key %}
+                    {% if ticket %}
+                        <table class="pass">
+                            <tr>
+                                <td>Photo</td>
+                                <td class="photo-cell"><img height="200px" src="/photo?id={{ticket[0]}}"></td>
+                            </tr>
+                            <tr>
+                                <td>Name</td>
+                                <td>{{user[1]}}</td>
+                            </tr>
+                            <tr>
+                                <td>Department</td>
+                                <td>{{user[4]}}</td>
+                            </tr>
+                            <tr>
+                                <td>Admission No</td>
+                                <td>{{ticket[0]}}</td>
+                            </tr>
+                            <tr>
+                                <td>Validity</td>
+                                <td>{{validity}}</td>
+                            </tr>
+                            <tr>
+                                <td>From/To</td>
+                                <td>{{ticket[1]}}</td>
+                            </tr>
+                            <tr>
+                                <td>Ticket Id</td>
+                                <td>{{ticket[3]}}</td>
+                            </tr>
+                        </table>
+                    {% else %}
+                        <p>❌ Ticket is Invalid</p>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>

@@ -64,6 +64,12 @@
             }
         }
     </style>
+    <script>
+        function print_ticket(key){
+            var table=document.getElementById(key).style.visibility: "visible";
+            window.print()
+        }
+    </script>
 </head>
 
 <body>
@@ -84,24 +90,32 @@
                 <td>Admission No</td>
                 <td>{{admission}}</td>
             </tr>
-            <tr>
-                <td>Validity</td>
-                <td>{{validity}}</td>
-            </tr>
-            <tr>
-                <td>From/To</td>
-                <td>{{from}}</td>
-            </tr>
-            <tr>
-                <td>Ticket Id</td>
-                <td>{{ticketid}}</td>
-            </tr>
         </table>
+        <h4>Tickets</h4>
+        {% for ticket in bus_pass %}
+            <table id="{{ticket[3]}}">
+                <tr>
+                    <td>Validity</td>
+                    <td>{{get_readable_time(ticket[2])}}</td>
+                </tr>
+                <tr>
+                    <td>From/To</td>
+                    <td>{{ticket[1]}}</td>
+                </tr>
+                <tr>
+                    <td>Ticket Id</td>
+                    <td>{{ticket[3]}}</td>
+                </tr>
+                <tr>
+                    <td colspan=2><button onclick="print_ticket(key={{ticket[3]}})">Print ticket</button></td>
+                </tr>
+            <table>
+        {% endfor %}
+        <h4></h4>
         <table>
             <tr>
                 <td colspan="2"><a href="/student/renew">Extend Pass</a></td>
                 <td><a href="/logout">Logout</a></td>
-                <td><button onclick="window.print()">Print ticket</button></td>
             </tr>
         </table>
     </div>

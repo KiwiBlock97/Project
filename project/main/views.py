@@ -88,9 +88,8 @@ async def login(request: web.Request):
         "name": user[1],
         "department": user[4],
         "admission": user[0],
-        "validity": get_readable_time(bus_pass[2]),
-        "from": bus_pass[1],
-        "ticketid": bus_pass[3],
+        "bus_pass": bus_pass,
+        "get_readable_time": get_readable_time
     })
 
 @routes.get("/student/apply")
@@ -155,17 +154,18 @@ async def admin_login(request: web.Request):
     key=request.rel_url.query.get("ticket-id", None)
     if not key:
         return aiohttp_jinja2.render_template("admin_validate.html", request, {
-            "valid": False,
-            "invalid": False
+            "key": None
         })
     bus_pass=db.get_pass(key=key)
     if bus_pass:
-        status=True
+        user = db.get_user(admid=bus_pass[0])
     else:
-        status=False
+        user=None
     return aiohttp_jinja2.render_template("admin_validate.html", request, {
-        "valid": status,
-        "invalid": (not status)
+        "key": key,
+        "ticket": bus_pass,
+        "user": user,
+        "validity": get_readable_time(bus_pass[2]),
     })
 
 @routes.get("/admin/stops")
