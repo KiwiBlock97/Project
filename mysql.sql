@@ -19,10 +19,10 @@ CREATE TABLE `place` (
 );
 
 CREATE TABLE `pass` (
-  `AdmissionId` int PRIMARY KEY NOT NULL,
+  `AdmissionId` int NOT NULL,
   `FromPlace` varchar(20) NOT NULL,
   `Validity` int NOT NULL,
-  `UKey` varchar(255) NOT NULL,
+  `UKey` varchar(255) PRIMARY KEY NOT NULL,
   FOREIGN KEY (`AdmissionId`) REFERENCES `student` (`AdmissionId`) ON DELETE CASCADE,
   FOREIGN KEY (`FromPlace`) REFERENCES `place` (`Place`) ON DELETE CASCADE
 );
@@ -43,7 +43,9 @@ CREATE TABLE `pass_order` (
 
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` EVENT `auto_remove_expired_records` ON SCHEDULE EVERY 1 MINUTE STARTS '2024-08-31 19:42:06' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
+CREATE EVENT `auto_remove_expired_records`
+ON SCHEDULE EVERY 1 MINUTE
+  ENABLE DO BEGIN
   DELETE FROM pass
   WHERE Validity <= UNIX_TIMESTAMP();
 

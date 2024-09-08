@@ -15,12 +15,12 @@ routes = web.RouteTableDef()
 async def index(request: web.Request) -> Dict[str, str]:
     return {}
 
-@routes.get("/signup")
-async def create_account(request: web.Request):
+@routes.get("/signup", name="signup")
+async def get_create_account(request: web.Request):
     return aiohttp_jinja2.render_template("create.html", request, {})
 
-@routes.post("/signup")
-async def create_account2(request: web.Request):
+@routes.post("/signup", name="signup_post")
+async def post_create_account2(request: web.Request):
     data=await request.post()
     admission_number=data["admission-number"]
     name=data["name"]
@@ -37,12 +37,12 @@ async def create_account2(request: web.Request):
             f.write(photo.file.read())
         return web.HTTPSeeOther("/login")
 
-@routes.get("/login")
+@routes.get("/login", name="login")
 async def login_get(request: web.Request):
     return aiohttp_jinja2.render_template("login.html", request, {})
 
-@routes.post("/login")
-async def login(request: web.Request):
+@routes.post("/login", name="login_post")
+async def login_post(request: web.Request):
     data=await request.post()
     email=data.get("email")
     password=data.get("password")
@@ -60,8 +60,8 @@ async def login(request: web.Request):
         session["admid"]=Resp
         return web.HTTPSeeOther("/student",)
 
-@routes.get("/photo")
-async def login(request: web.Request):
+@routes.get("/photo", name="photo")
+async def get_photo(request: web.Request):
     session = await get_session(request)
     user_type = session.get("type", None)
     admid=session.get("admid")
@@ -71,8 +71,8 @@ async def login(request: web.Request):
         return web.FileResponse(f"photo/{admid}")
     return web.HTTPNotFound
 
-@routes.get("/student")
-async def login(request: web.Request):
+@routes.get("/student", name="student_home")
+async def student_home(request: web.Request):
     session = await get_session(request)
     email = session.get("email", None)
     user_type = session.get("type", None)
@@ -92,8 +92,8 @@ async def login(request: web.Request):
         "get_readable_time": get_readable_time
     })
 
-@routes.get("/student/apply")
-async def apply_pass(request: web.Request):
+@routes.get("/student/apply", name="student_apply")
+async def student_apply(request: web.Request):
     session = await get_session(request)
     email = session.get("email", None)
     user_type = session.get("type", None)
@@ -110,18 +110,19 @@ async def apply_pass(request: web.Request):
         "place": place
     })
 
-@routes.get("/student/renew")
-async def apply_pass(request: web.Request):
+@routes.get("/student/renew", name="student_renew")
+async def student_renew(request: web.Request):
     session = await get_session(request)
     email = session.get("email", None)
     user_type = session.get("type", None)
-    if user_type!="Student":
+    key=request.rel_url.query.get("key")
+    if not key:
+        return web.HTTPBadRequest()
+    elif user_type!="Student":
         return web.HTTPSeeOther("/login")
-    user=db.get_user(email=email, user_type="Student")
-    if not user:
+    elif not (user:=db.get_user(email=email, user_type="Student")):
         return web.HTTPSeeOther("/signup")
-    bus_pass=db.get_pass(user[0])
-    if not bus_pass:
+    elif not (bus_pass:=db.get_pass(key=key)):
         return web.HTTPSeeOther("/student/apply")
     place=db.get_place(bus_pass[1])
     return aiohttp_jinja2.render_template("student_renew.html", request, {
@@ -133,8 +134,8 @@ async def apply_pass(request: web.Request):
         "ukey": bus_pass[3]
     })
 
-@routes.get("/admin")
-async def admin_login(request: web.Request):
+@routes.get("/admin", name="admin_home")
+async def admin_home(request: web.Request):
     session = await get_session(request)
     email = session.get("email", None)
     user_type = session.get("type", None)
@@ -145,8 +146,8 @@ async def admin_login(request: web.Request):
         "students": students
     })
 
-@routes.get("/admin/validate")
-async def admin_login(request: web.Request):
+@routes.get("/admin/validate", name="admin_validate")
+async def admin_validate(request: web.Request):
     session = await get_session(request)
     user_type = session.get("type", None)
     if user_type!="Admin":
@@ -165,10 +166,10 @@ async def admin_login(request: web.Request):
         "key": key,
         "ticket": bus_pass,
         "user": user,
-        "validity": get_readable_time(bus_pass[2]),
+        "validity": get_readable_time(bus_pass[2] if bus_pass else 0),
     })
 
-@routes.get("/admin/stops")
+@routes.get("/admin/stops", name="admin_stops")
 async def admin_stops_get(request: web.Request):
     session = await get_session(request)
     user_type = session.get("type", None)
@@ -179,7 +180,7 @@ async def admin_stops_get(request: web.Request):
         "places": stops
         })
     
-@routes.post("/admin/stops")
+@routes.post("/admin/stops", name="admin_stops_post")
 async def admin_stops_post(request: web.Request):
     session = await get_session(request)
     user_type = session.get("type", None)
@@ -198,26 +199,24 @@ async def admin_stops_post(request: web.Request):
     else:
         return web.HTTPBadRequest()
 
-@routes.get("/logout")
+@routes.get("/logout", name="logout")
 async def logout(request: web.Request):
     session = await get_session(request)
     session.invalidate()
     return web.HTTPSeeOther("/login")
 
-@routes.post("/order/confirm")
-async def apply_pass(request: web.Request):
+@routes.post("/order/confirm", name="order_confirm")
+async def order_confirm(request: web.Request):
     session = await get_session(request)
     email = session.get("email", None)
     data=await request.post()
     if not email:
         return web.HTTPSeeOther("/login")
-    user = db.get_user(email=email, user_type="Student")
-    if not user:
+    elif not (user:=db.get_user(email=email, user_type="Student")):
         return web.HTTPSeeOther("/signup")
-    if not (data):
+    elif not (data):
         return web.HTTPSeeOther("/student")
-    ukey=data.get("ukey", None)
-    if ukey:
+    elif ukey:=data.get("ukey", None):
         buspass=db.get_pass(key=ukey)
         place=buspass[1]
     else:
@@ -245,16 +244,21 @@ async def apply_pass(request: web.Request):
         })
     return web.HTTPServerError()
 
-@routes.get("/order/checkout")
+@routes.get("/order/checkout", name="checkout")
 async def checkout(request: web.Request):
     order_id=request.rel_url.query.get("order_id")
     if not order_id:
         return web.HTTPMethodNotAllowed()
     resp=(fetch_payment(order_id))[0]
+    print(resp)
     if resp.payment_status=="SUCCESS":
         order=db.get_order(order_id)
-        if order[7]=="SUCCESS":
-            return web.HTTPSeeOther("/student")
+        if order[7] in ["SUCCESS", "PROCESSED"]:
+            return aiohttp_jinja2.render_template("status.html", request, {
+                "status": resp.payment_status,
+                "payment_id": resp.cf_payment_id,
+                "order_id": resp.order_id
+            })
         db.modify_order(order_id, str(resp.payment_status))
         user=db.get_user(email=order[1], user_type="Student")
         place=db.get_place(place=order[2])
@@ -262,14 +266,22 @@ async def checkout(request: web.Request):
         valid=validity*86400
         if order[4]==0:
             db.create_pass(user[0], place[0], valid, order_id)
+            db.modify_order(order_id, "PROCESSED")
         elif order[4]==1:
-            bus_pass=db.get_pass(user[0])
-            valid=int(bus_pass[2])+valid
             db.extend_pass(valid, order[5])
-        return web.HTTPSeeOther("/student")
+            db.modify_order(order_id, "PROCESSED")
+        return aiohttp_jinja2.render_template("status.html", request, {
+            "status": resp.payment_status,
+            "payment_id": resp.cf_payment_id,
+            "order_id": resp.order_id
+        })
     elif resp.payment_status:
         db.modify_order(order_id, str(resp.payment_status))
-        return web.HTTPBadRequest(reason=f"payment {resp.payment_status}")
+        return aiohttp_jinja2.render_template("status.html", request, {
+            "status": resp.payment_status,
+            "payment_id": resp.cf_payment_id,
+            "order_id": resp.order_id
+        })
         # [PENDING, USER_DROPPED, FAILED]
     else:
         return web.HTTPBadRequest()

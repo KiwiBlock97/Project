@@ -75,9 +75,10 @@ class MySQLConnection:
                 cursor=self.connection.cursor()
                 if admid:
                     cursor.execute("select * from pass where AdmissionId=%s", (admid,))
+                    result=cursor.fetchall()
                 elif key:
                     cursor.execute("select * from pass where UKey=%s", (key,))
-                result=cursor.fetchall()
+                    result=cursor.fetchone()
                 return result
             except Exception as e:
                 print(e)
@@ -99,7 +100,10 @@ class MySQLConnection:
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("update pass set Validity=%s where UKey=%s", (validity, UKey))
+                cursor.execute("select * from pass where UKey=%s", (UKey,))
+                result=cursor.fetchone()
+                valid=int(result[2])+validity
+                cursor.execute("update pass set Validity=%s where UKey=%s", (valid, UKey))
                 self.connection.commit()
             except Exception as e:
                 print(e)
