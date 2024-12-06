@@ -3,25 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <title>Login</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
 </head>
 <body>
-    <div class="login-container">
+    <header>
         <h1>Login</h1>
-        <form method="post">
-            <label for="email">E-Mail</label>
+    </header>
+    <div class="container">
+        <form action="/login" method="post">
+            <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
             
-            <label for="password">Password</label>
+            <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
             
-            <button type="submit">Login</button>
+            <button type="submit" class="btn">Login</button>
         </form>
-        <div class="create-account">
-            <p>Don't have an account? <a href="signup">Create Account</a></p>
-        </div>
+        <p class="text-center">
+            Don't have an account? <a href="signup">Create one here</a>.
+        </p>
     </div>
+    <!-- <footer>
+        <p>&copy; 2024 Bus Pass System. All rights reserved.</p>
+    </footer> -->
 </body>
 </html>
-
