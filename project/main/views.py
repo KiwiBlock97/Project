@@ -309,10 +309,17 @@ async def admin_details(request: web.Request):
     admid=request.rel_url.query.get("id")
     if not admid:
         return web.HTTPBadRequest()
+    ticket=request.rel_url.query.get("pass")
+    if ticket:
+        db.remove_pass(uuid4=ticket)
     user=db.get_user(admid=admid)
+    bus_pass = db.get_pass(user[0])
+
     return aiohttp_jinja2.render_template("admin_student.html", request, {
         "AdmissionId": user[0],
         "Name": user[1],
         "Email": user[2],
-        "Department": user[4]
+        "Department": user[4],
+        "bus_pass": bus_pass,
+        "get_readable_time": get_readable_time
     })

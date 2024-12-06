@@ -208,6 +208,17 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
+    def remove_pass(self, uuid4:str):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("delete from pass where UKey=%s", (uuid4, ))
+                self.connection.commit()
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
     def close_connection(self):
         if self.connection.is_connected():
             self.connection.close()
