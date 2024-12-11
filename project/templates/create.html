@@ -5,6 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Account</title>
     <link rel="stylesheet" href="/static/styles_c.css">
+    <style>
+        .type-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .type-container label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .type-container div {
+            display: flex;
+            justify-content: start;
+            gap: 20px;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
     <div class="create-account-container">
@@ -12,22 +34,37 @@
         <form method="post" action="/signup" enctype="multipart/form-data">
             <label for="photo">Photo</label>
             <input type="file" id="photo" name="photo" accept="image/*" required>
-            
+
+            <div class="type-container">
+                <label for="type">Type</label>
+                <div>
+                    <input type="radio" id="student" name="user-type" value="Student" checked onclick="toggleFields()"> Student
+                    <input type="radio" id="staff" name="user-type" value="Staff" onclick="toggleFields()"> Staff
+                </div>
+            </div>
+
             <label for="name">Name</label>
             <input type="text" id="name" name="name" required>
 
             <label for="email">E-Mail</label>
             <input type="email" id="email" name="email" required>
 
-            <label for="password">password</label>
+            <label for="password">Password</label>
             <input type="password" id="pass" name="pass" onchange="check_pass()" required>
 
-            <label for="cnf-password">Confirm password</label>
+            <label for="cnf-password">Confirm Password</label>
             <input type="password" id="cnf-pass" name="cnf-pass" onchange="check_pass()" required>
-            
-            <label for="admission-number">Admission Number</label>
-            <input type="text" id="admission-number" name="admission-number" required>
-            
+
+            <div id="admission-container">
+                <label for="admission-number">Admission Number</label>
+                <input type="text" id="admission-number" name="admission-number">
+            </div>
+
+            <div id="aadhar-container" style="display: none;">
+                <label for="aadhar">Aadhar Number</label>
+                <input type="text" id="aadhar-number" name="aadhar-number">
+            </div>
+
             <label for="department">Department</label>
             <select id="department" name="department" required>
                 <option value="Computer Engineering">Computer Engineering</option>
@@ -36,27 +73,36 @@
                 <option value="Electronics Engineering">Electronics Engineering</option>
                 <option value="Mechanical Engineering">Mechanical Engineering</option>
             </select>
-            
+
             <button type="button" id="submit">Create Account</button>
         </form>
     </div>
+
     <script>
+        function toggleFields() {
+            var isStudent = document.getElementById("student").checked;
+            document.getElementById("admission-container").style.display = isStudent ? "block" : "none";
+            document.getElementById("aadhar-container").style.display = isStudent ? "none" : "block";
+        }
+
         function check_pass(){
             var pass = document.getElementById("pass").value;
             var cnf_pass = document.getElementById("cnf-pass").value;
             if (pass && cnf_pass){
-                if(pass == cnf_pass){
+                if(pass === cnf_pass){
                     document.getElementById("cnf-pass").style.borderColor = "green";
                     document.getElementById("pass").style.borderColor = "green";
                     document.getElementById("submit").type="submit";
-                }
-                else{
+                } else {
                     document.getElementById("pass").style.borderColor = "red";
+                    document.getElementById("cnf-pass").style.borderColor = "red";
                     alert("Passwords do not match");
                 }
             }
         }
+
+        // Initialize the fields on page load
+        document.addEventListener("DOMContentLoaded", toggleFields);
     </script>
 </body>
 </html>
-

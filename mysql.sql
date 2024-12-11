@@ -10,7 +10,11 @@ CREATE TABLE `student` (
   `Email` varchar(255) NOT NULL UNIQUE,
   `Photo` varchar(50) NOT NULL,
   `Department` varchar(30) NOT NULL,
-  `Password` varchar(20) NOT NULL
+  `Password` varchar(20) NOT NULL,
+  `Type` TINYINT NOT NULL;
+  -- 1 is Student
+  -- 2 is Staff
+
 );
 
 CREATE TABLE `place` (

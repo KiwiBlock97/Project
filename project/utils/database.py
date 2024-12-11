@@ -22,11 +22,17 @@ class MySQLConnection:
         except Error as e:
             print(f"The error '{e}' occurred")
 
-    def create_user(self, admission_number, name, email, photo, department, password):
+    def create_user(self, admission_number, name, email, photo, department, password, user_type):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("insert into student values(%s,%s,%s,%s,%s,%s)", (admission_number, name, email, photo, department, password))
+                if user_type=="Student":
+                    user_type=1
+                elif user_type=="Staff":
+                    user_type=2
+                else:
+                    user_type=3
+                cursor.execute("insert into student values(%s,%s,%s,%s,%s,%s,%s)", (admission_number, name, email, photo, department, password, user_type))
                 cursor.close()
                 self.connection.commit()
             except mysql.connector.errors.IntegrityError as e:

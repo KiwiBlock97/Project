@@ -22,6 +22,7 @@ async def get_create_account(request: web.Request):
 @routes.post("/signup", name="signup_post")
 async def post_create_account2(request: web.Request):
     data=await request.post()
+    print(data)
     admission_number=data["admission-number"]
     name=data["name"]
     email=data["email"]
@@ -29,13 +30,14 @@ async def post_create_account2(request: web.Request):
     department=data["department"]
     password=data["pass"]
     file_name=admission_number
-    status = db.create_user(admission_number, name, email, file_name, department, password)
+    user_type=data['user-type']
+    status = db.create_user(admission_number, name, email, file_name, department, password, user_type)
     if status=="exist":
         return web.Response(body="User Already Exist")
     else:
         with open(f"photo/{admission_number}", "wb") as f:
             f.write(photo.file.read())
-        return web.HTTPSeeOther("/login")
+    return web.HTTPSeeOther("/login")
 
 @routes.get("/login", name="login")
 async def login_get(request: web.Request):
