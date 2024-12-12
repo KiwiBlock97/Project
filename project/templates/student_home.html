@@ -98,19 +98,34 @@ td {padding: 10px; border: 1px solid #ccc;}
                 <td>{{department}}</td>
             </tr>
             <tr>
-                <td>Admission No</td>
+                {% if usertype==1 %}
+                    <td>Admission No</td>
+                {% elif usertype==2 %}
+                    <td>Aadhar No</td>
+                {% endif %}
                 <td>{{admission}}</td>
             </tr>
         </table>
         <h4>Tickets</h4>
         {% for ticket in bus_pass %}
             <table id="{{ticket[3]}}">
+                {% if usertype==1 %}
                 <tr>
-                    <td>Validity</td>
-                    <td>{{get_readable_time(ticket[2])}}</td>
+                    <td>From</td>
+                    <td>{{get_readable_time(ticket[4])}}</td>
                 </tr>
                 <tr>
-                    <td>From/To</td>
+                    <td>To</td>
+                    <td>{{get_readable_time(ticket[5])}}</td>
+                </tr>
+                {% elif usertype==2 %}
+                <tr>
+                    <td>Validity</td>
+                    <td>{{get_readable_time(ticket[5])}}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>From/To Place</td>
                     <td>{{ticket[1]}}</td>
                 </tr>
                 <tr>

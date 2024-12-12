@@ -1,8 +1,11 @@
 import os
+import time
 from typing import Dict
 import uuid
 
 import aiohttp_jinja2
+
+from datetime import datetime
 from aiohttp import web
 from aiohttp_session import get_session
 from project.utils.cashfree import create_order, fetch_payment
@@ -84,13 +87,18 @@ async def student_home(request: web.Request):
     if not user:
         return web.HTTPSeeOther("/login")
     bus_pass = db.get_pass(user[0])
-    if not bus_pass:
+    valid_pass=[]
+    for x in bus_pass:
+        if x[5] > time.time():
+            valid_pass.append(x)
+    if not valid_pass:
         return web.HTTPSeeOther("/student/apply")
     return aiohttp_jinja2.render_template("student_home.html", request, {
         "name": user[1],
         "department": user[4],
         "admission": user[0],
-        "bus_pass": bus_pass,
+        "bus_pass": valid_pass,
+        "usertype": user[6],
         "get_readable_time": get_readable_time
     })
 
@@ -227,18 +235,28 @@ async def order_confirm(request: web.Request):
     admid=user[0]
     name=user[1]
     email=user[2]
-    validity=int(data.get("validity"))
-    db_place=db.get_place(place=place)
-    amount=int(db_place[1])*validity
+    datefrom=data.get("datefrom")
+    dateto=data.get("dateto")
+
+    start_date = datetime.strptime(datefrom, "%Y-%m-%d")
+    end_date = datetime.strptime(dateto, "%Y-%m-%d")
+    print(start_date.timestamp())
+    
+    validity = (end_date - start_date).days + 1
+    db_place = db.get_place(place=place)
+    price = int(db_place[1])
+    
+    amount = price * validity
+
     payment_id=create_order(str(admid), "1234567890", name, email, str(uuid4), amount)
     if payment_id:
-        db.create_order(str(uuid4), email, place, validity, 1 if ukey else 0, ukey if ukey else None, None)
+        db.create_order(str(uuid4), email, place, validity, int(start_date.timestamp()), int(end_date.timestamp()), 1 if ukey else 0, ukey if ukey else None, None)
         return aiohttp_jinja2.render_template("checkout.html", request, {
             "sessionid": payment_id,
             "name": name,
             "department": user[4],
             "place": place,
-            "validity": validity,
+            "validity": end_date,
             "adm_no": admid,
             "price": amount,
             "order_id": str(uuid4),
@@ -255,7 +273,7 @@ async def checkout(request: web.Request):
     print(resp)
     if resp.payment_status=="SUCCESS":
         order=db.get_order(order_id)
-        if order[7] in ["SUCCESS", "PROCESSED"]:
+        if order[9] in ["SUCCESS", "PROCESSED"]:
             return aiohttp_jinja2.render_template("status.html", request, {
                 "status": resp.payment_status,
                 "payment_id": resp.cf_payment_id,
@@ -265,12 +283,14 @@ async def checkout(request: web.Request):
         user=db.get_user(email=order[1], user_type="Student")
         place=db.get_place(place=order[2])
         validity=int(order[3])
+        fromtime=int(order[4])
+        totime=int(order[5])
         valid=validity*86400
-        if order[4]==0:
-            db.create_pass(user[0], place[0], valid, order_id)
+        if order[6]==0:
+            db.create_pass(user[0], place[0], valid, order_id, fromtime, totime)
             db.modify_order(order_id, "PROCESSED")
-        elif order[4]==1:
-            db.extend_pass(valid, order[5])
+        elif order[6]==1:
+            db.extend_pass(valid, order[7])
             db.modify_order(order_id, "PROCESSED")
         return aiohttp_jinja2.render_template("status.html", request, {
             "status": resp.payment_status,
@@ -316,12 +336,16 @@ async def admin_details(request: web.Request):
         db.remove_pass(uuid4=ticket)
     user=db.get_user(admid=admid)
     bus_pass = db.get_pass(user[0])
+    valid_pass=[]
+    for x in bus_pass:
+        if x[5] > time.time():
+            valid_pass.append(x)
 
     return aiohttp_jinja2.render_template("admin_student.html", request, {
         "AdmissionId": user[0],
         "Name": user[1],
         "Email": user[2],
         "Department": user[4],
-        "bus_pass": bus_pass,
+        "bus_pass": valid_pass,
         "get_readable_time": get_readable_time
     })

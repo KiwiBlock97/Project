@@ -5,13 +5,13 @@ CREATE TABLE `admin` (
 );
 
 CREATE TABLE `student` (
-  `AdmissionId` int PRIMARY KEY NOT NULL,
+  `AdmissionId` bigint PRIMARY KEY NOT NULL,
   `Name` varchar(20) NOT NULL,
   `Email` varchar(255) NOT NULL UNIQUE,
   `Photo` varchar(50) NOT NULL,
   `Department` varchar(30) NOT NULL,
   `Password` varchar(20) NOT NULL,
-  `Type` TINYINT NOT NULL;
+  `Type` TINYINT NOT NULL
   -- 1 is Student
   -- 2 is Staff
 
@@ -23,10 +23,12 @@ CREATE TABLE `place` (
 );
 
 CREATE TABLE `pass` (
-  `AdmissionId` int NOT NULL,
+  `AdmissionId` bigint NOT NULL,
   `FromPlace` varchar(20) NOT NULL,
   `Validity` int NOT NULL,
   `UKey` varchar(255) PRIMARY KEY NOT NULL,
+  `fromtime` int NOT NULL,
+  `totime` int NOT NULL,
   FOREIGN KEY (`AdmissionId`) REFERENCES `student` (`AdmissionId`) ON DELETE CASCADE,
   FOREIGN KEY (`FromPlace`) REFERENCES `place` (`Place`) ON DELETE CASCADE
 );
@@ -36,6 +38,8 @@ CREATE TABLE `pass_order` (
   `email` varchar(255) NOT NULL,
   `Place` varchar(20) NOT NULL,
   `Validity` int NOT NULL,
+  `fromtime` int NOT NULL,
+  `totime` int NOT NULL,
   `Type` tinyint NOT NULL,
   `UKey` varchar(255) DEFAULT NULL,
   `Time` int UNSIGNED NOT NULL,
@@ -45,20 +49,20 @@ CREATE TABLE `pass_order` (
 );
 
 
-DELIMITER $$
+-- DELIMITER $$
 
-CREATE EVENT `auto_remove_expired_records`
-ON SCHEDULE EVERY 1 MINUTE
-  ENABLE DO BEGIN
-  DELETE FROM pass
-  WHERE Validity <= UNIX_TIMESTAMP();
+-- CREATE EVENT `auto_remove_expired_records`
+-- ON SCHEDULE EVERY 1 MINUTE
+--   ENABLE DO BEGIN
+--   DELETE FROM pass
+--   WHERE Validity <= UNIX_TIMESTAMP();
 
-  DELETE FROM pass_order
-  WHERE Time + 3600 <= UNIX_TIMESTAMP() AND Status IS NULL;
-END$$
+--   DELETE FROM pass_order
+--   WHERE Time + 3600 <= UNIX_TIMESTAMP() AND Status IS NULL;
+-- END$$
 
-DELIMITER ;
-COMMIT;
+-- DELIMITER ;
+-- COMMIT;
 
 -- SET GLOBAL event_scheduler = OFF; 
 -- ALTER EVENT auto_remove_expired_records DISABLE;  -- Temporarily disable

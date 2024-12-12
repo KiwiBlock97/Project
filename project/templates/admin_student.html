@@ -49,7 +49,7 @@
             {% for ticket in bus_pass %}
                 <tr>
                     <td>{{ticket[1]}}</td>
-                    <td>{{get_readable_time(ticket[2])}}</td>
+                    <td>{{get_readable_time(ticket[5])}}</td>
                     <td>
                         <form method="get" action="/admin/details">
                             <input type="hidden" value="{{AdmissionId}}" name="id">
