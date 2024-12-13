@@ -55,15 +55,8 @@
             <label for="cnf-password">Confirm Password</label>
             <input type="password" id="cnf-pass" name="cnf-pass" onchange="check_pass()" required>
 
-            <div id="admission-container">
-                <label for="admission-number">Admission Number</label>
-                <input type="text" id="admission-number" name="admission-number">
-            </div>
-
-            <div id="aadhar-container" style="display: none;">
-                <label for="aadhar">Aadhar Number</label>
-                <input type="text" id="aadhar-number" name="aadhar-number">
-            </div>
+            <label for="admission-number" id="admission-label">Admission Number</label>
+            <input type="text" id="admission-number" name="admission-number" required>
 
             <label for="department">Department</label>
             <select id="department" name="department" required>
@@ -81,8 +74,7 @@
     <script>
         function toggleFields() {
             var isStudent = document.getElementById("student").checked;
-            document.getElementById("admission-container").style.display = isStudent ? "block" : "none";
-            document.getElementById("aadhar-container").style.display = isStudent ? "none" : "block";
+            document.getElementById("admission-label").innerText = isStudent ? "Admission Number" : "Aadhar Number";
         }
 
         function check_pass(){

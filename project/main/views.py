@@ -117,7 +117,8 @@ async def student_apply(request: web.Request):
         "name": user[1],
         "department": user[4],
         "adm_no": user[0],
-        "place": place
+        "place": place,
+        "usertype": user[6]
     })
 
 @routes.get("/student/renew", name="student_renew")
@@ -240,7 +241,8 @@ async def order_confirm(request: web.Request):
 
     start_date = datetime.strptime(datefrom, "%Y-%m-%d")
     end_date = datetime.strptime(dateto, "%Y-%m-%d")
-    print(start_date.timestamp())
+    start_date = start_date.replace(hour=0, minute=0, second=0)
+    end_date = end_date.replace(hour=23, minute=59, second=59)
     
     validity = (end_date - start_date).days + 1
     db_place = db.get_place(place=place)
@@ -250,13 +252,15 @@ async def order_confirm(request: web.Request):
 
     payment_id=create_order(str(admid), "1234567890", name, email, str(uuid4), amount)
     if payment_id:
+        print(start_date.timestamp())
+        print(end_date.timestamp())
         db.create_order(str(uuid4), email, place, validity, int(start_date.timestamp()), int(end_date.timestamp()), 1 if ukey else 0, ukey if ukey else None, None)
         return aiohttp_jinja2.render_template("checkout.html", request, {
             "sessionid": payment_id,
             "name": name,
             "department": user[4],
             "place": place,
-            "validity": end_date,
+            "validity": end_date.strftime("%d-%m-%Y"),
             "adm_no": admid,
             "price": amount,
             "order_id": str(uuid4),

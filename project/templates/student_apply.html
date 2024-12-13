@@ -81,16 +81,26 @@ button[type="submit"]:hover {
                     <!-- Add more options as needed -->
                 </select>
             </div>
-            
-            <div class="form-group">
-                <label for="datefrom">From Date:</label>
-                <input type="date" id="datefrom" name="datefrom" onchange="update_price()" required>
-            </div>
+            {% if usertype==1 %}
+                <div class="form-group">
+                    <label for="datefrom">From Date:</label>
+                    <input type="date" id="datefrom" name="datefrom" onchange="update_price()" required>
+                </div>
 
-            <div class="form-group">
-                <label for="dateto">Validity:</label>
-                <input type="date" id="dateto" name="dateto" onchange="update_price()" required>
-            </div>
+                <div class="form-group">
+                    <label for="dateto">To Date:</label>
+                    <input type="date" id="dateto" name="dateto" onchange="update_price()" required>
+                </div>
+            {% elif usertype==2 %}
+                <div class="form-group" style="display: none;">
+                    <label for="datefrom">From Date:</label>
+                    <input type="date" id="datefrom" name="datefrom" onchange="update_price()" required>
+                </div>
+                <div class="form-group">
+                    <label for="dateto">Date:</label>
+                    <input type="date" id="dateto" name="dateto" onchange="update_price()" required>
+                </div>
+            {% endif %}
             
             <div class="form-group">
                 <label for="admin-no">Admin No:</label>
@@ -103,6 +113,7 @@ button[type="submit"]:hover {
         </form>
     </div>
     <script>
+const usertype="{{usertype}}";
 function update_price() {
     // Get the 'From Date' and 'To Date' input values
     var fromDate = document.getElementById("datefrom").value;
@@ -110,6 +121,10 @@ function update_price() {
     var pay = document.getElementById("pay");
 
     // Check if both dates are entered
+    if (usertype=="2"){
+        document.getElementById("datefrom").value=toDate
+        fromDate=toDate
+    }
     if (fromDate && toDate) {
         // Convert the date strings to Date objects
         var startDate = new Date(fromDate);
