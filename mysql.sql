@@ -4,6 +4,10 @@ CREATE TABLE `admin` (
   `Password` varchar(20) NOT NULL
 );
 
+CREATE TABLE `departments` (
+  `department` varchar(255) PRIMARY KEY NOT NULL
+);
+
 CREATE TABLE `student` (
   `AdmissionId` bigint PRIMARY KEY NOT NULL,
   `Name` varchar(20) NOT NULL,
@@ -12,6 +16,7 @@ CREATE TABLE `student` (
   `Department` varchar(30) NOT NULL,
   `Password` varchar(20) NOT NULL,
   `Type` TINYINT NOT NULL
+  FOREIGN KEY (`Department`) REFERENCES `departments` (`department`) ON DELETE CASCADE
   -- 1 is Student
   -- 2 is Staff
 
@@ -63,6 +68,7 @@ CREATE TABLE `pass_order` (
   FOREIGN KEY (`email`) REFERENCES `student` (`Email`) ON DELETE CASCADE,
   FOREIGN KEY (`Place`) REFERENCES `place` (`Place`) ON DELETE CASCADE
 );
+
 
 
 -- DELIMITER $$

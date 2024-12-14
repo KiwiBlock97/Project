@@ -14,13 +14,16 @@ from project.utils.timeformat import get_readable_time
 db=MySQLConnection()
 routes = web.RouteTableDef()
 
-@aiohttp_jinja2.template('index.html')
-async def index(request: web.Request) -> Dict[str, str]:
-    return {}
+@routes.get("/", name="index")
+async def index(request: web.Request):
+    return aiohttp_jinja2.render_template("index.html", request, {})
 
 @routes.get("/signup", name="signup")
 async def get_create_account(request: web.Request):
-    return aiohttp_jinja2.render_template("create.html", request, {})
+    departments=db.get_departments()
+    return aiohttp_jinja2.render_template("create.html", request, {
+        "departments": departments
+    })
 
 @routes.post("/signup", name="signup_post")
 async def post_create_account2(request: web.Request):
@@ -346,3 +349,32 @@ async def admin_details(request: web.Request):
         "bus_pass": valid_pass,
         "get_readable_time": get_readable_time
     })
+
+@routes.get("/admin/departments", name="admin_departments")
+async def admin_departments_get(request: web.Request):
+    session = await get_session(request)
+    user_type = session.get("type", None)
+    if user_type!="Admin":
+        return web.HTTPSeeOther("/login")
+    departments=db.get_departments()
+    return aiohttp_jinja2.render_template("admin_department.html", request, {
+        "departments": departments
+        })
+    
+@routes.post("/admin/departments", name="admin_departments_post")
+async def admin_departments_post(request: web.Request):
+    session = await get_session(request)
+    user_type = session.get("type", None)
+    if user_type!="Admin":
+        return web.HTTPSeeOther("/login")
+    data=await request.post()
+    method=data.get("method", None)
+    department=data.get("department", None)
+    if method=="add" and department:
+        db.add_department(department)
+        return web.HTTPSeeOther("/admin/departments")
+    elif method=="delete":
+        db.remove_department(department)
+        return web.HTTPSeeOther("/admin/departments")
+    else:
+        return web.HTTPBadRequest()

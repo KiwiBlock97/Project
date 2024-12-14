@@ -223,6 +223,40 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
+    def get_departments(self):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("select * from departments")
+                result=cursor.fetchall()
+                return result
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def remove_department(self, department:str):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("delete from departments where department=%s", (department,))
+                self.connection.commit()
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def add_department(self, department:str):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("insert into departments values(%s)", (department, ))
+                self.connection.commit()
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
     def close_connection(self):
         if self.connection.is_connected():
             self.connection.close()

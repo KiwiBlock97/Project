@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Stops</title>
+    <link rel="stylesheet" href="/static/styles_admin.css">
+</head>
+<body>
+    <nav>
+        <a href="/admin">View Student</a>
+        <a href="admin/stops">Bus Stops</a>
+        <a href="/logout">Logout</a>
+    </nav>
+    
+    <div class="admin-container">
+        <div id="validate-ticket-section" class="section">
+            <h2>Departments</h2>
+            <table border=1>
+                <tr>
+                    <td><p>Department</p></td>
+                    <td><p>Remove</p></td>
+                </tr>
+                {% for row in departments %}
+                <tr>
+                    <td><p>{{row[0]}}</p></td>
+                    <td><form method="post">
+                        <input type="hidden" value="{{row[0]}}" name="department">
+                        <button type="submit" value="delete" name="method">Remove❌</button>
+                    </form></td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <form method="post">
+                    <td><input type="text" placeholder="Department" name="department"></td>
+                    <td><button type="submit" value="add" name="method">Add</button></td>
+                    </form>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+

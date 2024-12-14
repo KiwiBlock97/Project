@@ -60,11 +60,9 @@
 
             <label for="department">Department</label>
             <select id="department" name="department" required>
-                <option value="Computer Engineering">Computer Engineering</option>
-                <option value="Civil Engineering">Civil Engineering</option>
-                <option value="Electrical Electronics Engineering">Electrical and Electronics Engineering</option>
-                <option value="Electronics Engineering">Electronics Engineering</option>
-                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                {% for row in departments %}
+                    <option value="{{row[0]}}">{{row[0]}}</option>
+                {% endfor %}
             </select>
 
             <button type="button" id="submit">Create Account</button>
