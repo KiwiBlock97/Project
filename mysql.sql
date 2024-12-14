@@ -15,7 +15,7 @@ CREATE TABLE `student` (
   `Photo` varchar(50) NOT NULL,
   `Department` varchar(30) NOT NULL,
   `Password` varchar(20) NOT NULL,
-  `Type` TINYINT NOT NULL
+  `Type` TINYINT NOT NULL,
   FOREIGN KEY (`Department`) REFERENCES `departments` (`department`) ON DELETE CASCADE
   -- 1 is Student
   -- 2 is Staff
