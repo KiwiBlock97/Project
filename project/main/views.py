@@ -179,7 +179,7 @@ async def admin_validate(request: web.Request):
         "key": key,
         "ticket": bus_pass,
         "user": user,
-        "validity": get_readable_time(bus_pass[2] if bus_pass else 0),
+        "validity": bus_pass[4] if bus_pass else 0,
     })
 
 @routes.get("/admin/stops", name="admin_stops")
@@ -338,7 +338,7 @@ async def admin_details(request: web.Request):
     bus_pass = db.get_pass(user[0])
     valid_pass=[]
     for x in bus_pass:
-        if x[5] > time.time():
+        if x[4] > datetime.now().date():
             valid_pass.append(x)
 
     return aiohttp_jinja2.render_template("admin_student.html", request, {
@@ -347,7 +347,6 @@ async def admin_details(request: web.Request):
         "Email": user[2],
         "Department": user[4],
         "bus_pass": valid_pass,
-        "get_readable_time": get_readable_time
     })
 
 @routes.get("/admin/departments", name="admin_departments")
