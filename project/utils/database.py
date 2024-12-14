@@ -1,3 +1,4 @@
+from datetime import datetime, date
 import mysql.connector
 from time import time
 from mysql.connector import Error
@@ -91,25 +92,22 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
-    def create_pass(self, admid: int, place: str, validity: int, uuid4:str, fromtime: int, totime:int):
+    def create_pass(self, admid: int, place: str, uuid4:str, fromtime: date, totime:date):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("insert into pass values(%s,%s,%s,%s, %s, %s)", (admid, place, time()+validity, uuid4, fromtime, totime))
+                cursor.execute("insert into pass values(%s,%s,%s,%s, %s)", (admid, place, uuid4, fromtime, totime))
                 self.connection.commit()
             except Exception as e:
                 print(e)
             finally:
                 cursor.close()
 
-    def extend_pass(self, validity: int, UKey: str):
+    def extend_pass(self, todate: date, UKey: str):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("select * from pass where UKey=%s", (UKey,))
-                result=cursor.fetchone()
-                valid=int(result[2])+validity
-                cursor.execute("update pass set Validity=%s where UKey=%s", (valid, UKey))
+                cursor.execute("update pass set totime=%s where UKey=%s", (todate, UKey))
                 self.connection.commit()
             except Exception as e:
                 print(e)
@@ -169,11 +167,11 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
-    def create_order(self, OrderId:str, email: str, place: str, validity: int, fromtime: int, totime: int, renew: int, ukey:str, status: str):
+    def create_order(self, OrderId:str, email: str, place: str, fromtime: str, totime: str, renew: int, ukey:str, status: str):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("insert into pass_order values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (OrderId, email, place, validity, fromtime, totime, renew, ukey, time(), status))
+                cursor.execute("insert into pass_order values(%s, %s, %s, %s, %s, %s, %s, %s, %s)", (OrderId, email, place, fromtime, totime, renew, ukey, datetime.now().date(), status))
                 self.connection.commit()
             except Exception as e:
                 print(e)

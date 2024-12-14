@@ -5,7 +5,7 @@ import uuid
 
 import aiohttp_jinja2
 
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from aiohttp import web
 from aiohttp_session import get_session
 from project.utils.cashfree import create_order, fetch_payment
@@ -25,7 +25,6 @@ async def get_create_account(request: web.Request):
 @routes.post("/signup", name="signup_post")
 async def post_create_account2(request: web.Request):
     data=await request.post()
-    print(data)
     admission_number=data["admission-number"]
     name=data["name"]
     email=data["email"]
@@ -89,7 +88,7 @@ async def student_home(request: web.Request):
     bus_pass = db.get_pass(user[0])
     valid_pass=[]
     for x in bus_pass:
-        if x[5] > time.time():
+        if x[4] >= datetime.now().date():
             valid_pass.append(x)
     if not valid_pass:
         return web.HTTPSeeOther("/student/apply")
@@ -99,7 +98,6 @@ async def student_home(request: web.Request):
         "admission": user[0],
         "bus_pass": valid_pass,
         "usertype": user[6],
-        "get_readable_time": get_readable_time
     })
 
 @routes.get("/student/apply", name="student_apply")
@@ -142,7 +140,8 @@ async def student_renew(request: web.Request):
         "place": bus_pass[1],
         "adm_no": user[0],
         "price": place[1],
-        "ukey": bus_pass[3]
+        "ukey": bus_pass[2],
+        "fromdate": bus_pass[4]+timedelta(days=1)
     })
 
 @routes.get("/admin", name="admin_home")
@@ -229,20 +228,19 @@ async def order_confirm(request: web.Request):
         return web.HTTPSeeOther("/student")
     elif ukey:=data.get("ukey", None):
         buspass=db.get_pass(key=ukey)
+        datefrom: date=str(buspass[4]+timedelta(days=1))
         place=buspass[1]
     else:
+        datefrom=data.get("datefrom")
         place=data.get("from-to")
     uuid4=uuid.uuid4()
     admid=user[0]
     name=user[1]
     email=user[2]
-    datefrom=data.get("datefrom")
     dateto=data.get("dateto")
 
     start_date = datetime.strptime(datefrom, "%Y-%m-%d")
     end_date = datetime.strptime(dateto, "%Y-%m-%d")
-    start_date = start_date.replace(hour=0, minute=0, second=0)
-    end_date = end_date.replace(hour=23, minute=59, second=59)
     
     validity = (end_date - start_date).days + 1
     db_place = db.get_place(place=place)
@@ -252,9 +250,7 @@ async def order_confirm(request: web.Request):
 
     payment_id=create_order(str(admid), "1234567890", name, email, str(uuid4), amount)
     if payment_id:
-        print(start_date.timestamp())
-        print(end_date.timestamp())
-        db.create_order(str(uuid4), email, place, validity, int(start_date.timestamp()), int(end_date.timestamp()), 1 if ukey else 0, ukey if ukey else None, None)
+        db.create_order(str(uuid4), email, place, datefrom, dateto, 1 if ukey else 0, ukey if ukey else None, None)
         return aiohttp_jinja2.render_template("checkout.html", request, {
             "sessionid": payment_id,
             "name": name,
@@ -264,7 +260,7 @@ async def order_confirm(request: web.Request):
             "adm_no": admid,
             "price": amount,
             "order_id": str(uuid4),
-            "renew": bool(ukey)
+            "renew": "Yes" if bool(ukey) else "No"
         })
     return web.HTTPServerError()
 
@@ -274,10 +270,9 @@ async def checkout(request: web.Request):
     if not order_id:
         return web.HTTPMethodNotAllowed()
     resp=(fetch_payment(order_id))[0]
-    print(resp)
     if resp.payment_status=="SUCCESS":
         order=db.get_order(order_id)
-        if order[9] in ["SUCCESS", "PROCESSED"]:
+        if order[8] in ["SUCCESS", "PROCESSED"]:
             return aiohttp_jinja2.render_template("status.html", request, {
                 "status": resp.payment_status,
                 "payment_id": resp.cf_payment_id,
@@ -286,15 +281,13 @@ async def checkout(request: web.Request):
         db.modify_order(order_id, str(resp.payment_status))
         user=db.get_user(email=order[1], user_type="Student")
         place=db.get_place(place=order[2])
-        validity=int(order[3])
-        fromtime=int(order[4])
-        totime=int(order[5])
-        valid=validity*86400
-        if order[6]==0:
-            db.create_pass(user[0], place[0], valid, order_id, fromtime, totime)
+        fromtime: date=order[3]
+        totime: date=order[4]
+        if order[5]==0:
+            db.create_pass(user[0], place[0], order_id, fromtime, totime)
             db.modify_order(order_id, "PROCESSED")
-        elif order[6]==1:
-            db.extend_pass(valid, order[7])
+        elif order[5]==1:
+            db.extend_pass(totime, order[6])
             db.modify_order(order_id, "PROCESSED")
         return aiohttp_jinja2.render_template("status.html", request, {
             "status": resp.payment_status,

@@ -17,18 +17,35 @@ CREATE TABLE `student` (
 
 );
 
+--
+-- Dumping data for table `admin`
+--
+
+INSERT INTO `admin` (`Email`, `Name`, `Password`) VALUES
+('admin@mail.com', 'Admin', '1234');
+
+-- --------------------------------------------------------
 CREATE TABLE `place` (
   `Place` varchar(30) PRIMARY KEY NOT NULL,
   `Price` int UNSIGNED NOT NULL
 );
 
+--
+-- Dumping data for table `place`
+--
+
+INSERT INTO `place` (`Place`, `Price`) VALUES
+('Cherkala', 20),
+('Kasaragod', 25);
+
+-- --------------------------------------------------------
+
 CREATE TABLE `pass` (
   `AdmissionId` bigint NOT NULL,
   `FromPlace` varchar(20) NOT NULL,
-  `Validity` int NOT NULL,
   `UKey` varchar(255) PRIMARY KEY NOT NULL,
-  `fromtime` int NOT NULL,
-  `totime` int NOT NULL,
+  `fromtime` date NOT NULL,
+  `totime` date NOT NULL,
   FOREIGN KEY (`AdmissionId`) REFERENCES `student` (`AdmissionId`) ON DELETE CASCADE,
   FOREIGN KEY (`FromPlace`) REFERENCES `place` (`Place`) ON DELETE CASCADE
 );
@@ -37,12 +54,11 @@ CREATE TABLE `pass_order` (
   `OrderID` varchar(255) PRIMARY KEY NOT NULL,
   `email` varchar(255) NOT NULL,
   `Place` varchar(20) NOT NULL,
-  `Validity` int NOT NULL,
-  `fromtime` int NOT NULL,
-  `totime` int NOT NULL,
+  `fromtime` date NOT NULL,
+  `totime` date NOT NULL,
   `Type` tinyint NOT NULL,
   `UKey` varchar(255) DEFAULT NULL,
-  `Time` int UNSIGNED NOT NULL,
+  `Time` date NOT NULL,
   `Status` varchar(30) DEFAULT NULL,
   FOREIGN KEY (`email`) REFERENCES `student` (`Email`) ON DELETE CASCADE,
   FOREIGN KEY (`Place`) REFERENCES `place` (`Place`) ON DELETE CASCADE

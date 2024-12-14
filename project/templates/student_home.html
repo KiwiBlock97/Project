@@ -108,20 +108,20 @@ td {padding: 10px; border: 1px solid #ccc;}
         </table>
         <h4>Tickets</h4>
         {% for ticket in bus_pass %}
-            <table id="{{ticket[3]}}">
+            <table id="{{ticket[2]}}">
                 {% if usertype==1 %}
                 <tr>
                     <td>From</td>
-                    <td>{{get_readable_time(ticket[4])}}</td>
+                    <td>{{ticket[3]}}</td>
                 </tr>
                 <tr>
                     <td>To</td>
-                    <td>{{get_readable_time(ticket[5])}}</td>
+                    <td>{{ticket[4]}}</td>
                 </tr>
                 {% elif usertype==2 %}
                 <tr>
                     <td>Date</td>
-                    <td>{{get_readable_time(ticket[5])}}</td>
+                    <td>{{ticket[4]}}</td>
                 </tr>
                 {% endif %}
                 <tr>
@@ -130,14 +130,16 @@ td {padding: 10px; border: 1px solid #ccc;}
                 </tr>
                 <tr>
                     <td>Ticket Id</td>
-                    <td>{{ticket[3]}}</td>
+                    <td>{{ticket[2]}}</td>
                 </tr>
                 <tr>
-                    <td><button class="print" onclick="print_ticket(key='{{ticket[3]}}')">Print ticket</button></td>
+                    <td><button class="print" onclick="print_ticket(key='{{ticket[2]}}')">Print ticket</button></td>
+                    {% if usertype==1 %}
                     <td><form method="get" action="/student/renew">
-                        <input type="hidden" name="key" value="{{ticket[3]}}">
+                        <input type="hidden" name="key" value="{{ticket[2]}}">
                         <button type="submit">Extend Pass</button>
                     </form></td>
+                    {% endif %}
                 </tr>
             </table>
         {% endfor %}

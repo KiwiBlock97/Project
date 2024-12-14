@@ -79,8 +79,13 @@ button[type="submit"]:hover {
             </div>
             
             <div class="form-group">
-                <label for="validity">Validity:</label>
-                <input onchange="update_price()" type="number" id="validity" name="validity">
+                <label for="datefrom">From Date:</label>
+                <input type="date" id="datefrom" name="datefrom" value="{{fromdate}}" readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="dateto">To Date:</label>
+                <input onchange="update_price()" type="date" id="dateto" name="dateto">
             </div>
             
             <div class="form-group">
@@ -99,14 +104,41 @@ button[type="submit"]:hover {
     </div>
     <script>
         function update_price(){
+            var fromDate = document.getElementById("datefrom").value;
+            var toDate = document.getElementById("dateto").value;
+            var pay = document.getElementById("pay");
+
+            if (fromDate && toDate) {
+        // Convert the date strings to Date objects
+        var startDate = new Date(fromDate);
+        var endDate = new Date(toDate);
+
+        // Calculate the difference in time (milliseconds) and convert to days
+        var timeDifference = endDate - startDate;
+        var validity = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)) + 1; // Include the start day
+
+        // Ensure validity is positive
+        if (validity > 0) {
+            // Get the price
             var price = document.getElementById("ticket-price").getAttribute("value");
-            var validity = document.getElementById("validity").value
-            var pay = document.getElementById("pay")
-            if (price && validity){
-                amount=price*validity
-                pay.innerHTML=`Pay ₹${amount}`
-                pay.style.display="block"
-            }
+
+            // Calculate the total amount
+            var amount = price * validity;
+
+            // Display the payment amount
+            pay.innerHTML = `Pay ₹${amount}`;
+            pay.style.display = "block";
+            pay.type="submit";
+        } else {
+            // Show an error if the dates are invalid
+            pay.innerHTML = "Invalid date range. Please select a valid To Date.";
+            pay.style.display = "block";
+            pay.type="button";
+        }
+    } else {
+        // Hide the payment section if dates are not provided
+        pay.style.display = "none";
+    }
         }
     </script>
 </body>
