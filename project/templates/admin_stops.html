@@ -9,7 +9,7 @@
 <body>
     <nav>
         <a href="/admin">View Student</a>
-        <a href="admin/stops">Bus Stops</a>
+        <a href="/admin/stops">Bus Stops</a>
         <a href="/logout">Logout</a>
     </nav>
     
@@ -35,9 +35,9 @@
                 {% endfor %}
                 <tr>
                     <form method="post">
-                    <td><input type="text" placeholder="Stop Name" name="place"></td>
-                    <td><input type="number" placeholder="Price" name="price"></td>
-                    <td><button type="submit" value="add" name="method">Add</button></td>
+                        <td><input type="text" placeholder="Stop Name" name="place" required></td>
+                        <td><input type="number" placeholder="Price" name="price" required></td>
+                        <td><button type="submit" value="add" name="method">Add</button></td>
                     </form>
                 </tr>
             </table>
