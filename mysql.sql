@@ -16,6 +16,7 @@ CREATE TABLE `student` (
   `Department` varchar(30) NOT NULL,
   `Password` varchar(20) NOT NULL,
   `Type` TINYINT NOT NULL,
+  `Verified` TINYINT NOT NULL,
   FOREIGN KEY (`Department`) REFERENCES `departments` (`department`) ON DELETE CASCADE
   -- 1 is Student
   -- 2 is Staff
@@ -70,6 +71,11 @@ CREATE TABLE `pass_order` (
   FOREIGN KEY (`Place`) REFERENCES `place` (`Place`) ON DELETE CASCADE
 );
 
+create table `verification`(
+    `Email` varchar(255) NOT NULL,
+    `Code` varchar(255) NOT NULL PRIMARY KEY,
+    FOREIGN KEY (`Email`) REFERENCES `student` (`Email`) on DELETE CASCADE
+    );
 
 
 -- DELIMITER $$

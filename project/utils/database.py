@@ -1,6 +1,6 @@
 from datetime import datetime, date
+from uuid import uuid4
 import mysql.connector
-from time import time
 from mysql.connector import Error
 
 from project.utils.vars import Var
@@ -33,7 +33,7 @@ class MySQLConnection:
                     user_type=2
                 else:
                     user_type=3
-                cursor.execute("insert into student values(%s,%s,%s,%s,%s,%s,%s)", (admission_number, name, email, photo, department, password, user_type))
+                cursor.execute("insert into student values(%s,%s,%s,%s,%s,%s,%s, %s)", (admission_number, name, email, photo, department, password, user_type, 0))
                 cursor.close()
                 self.connection.commit()
             except mysql.connector.errors.IntegrityError as e:
@@ -45,14 +45,14 @@ class MySQLConnection:
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("select AdmissionId from student where Email=%s and Password=%s", (email, password))
+                cursor.execute("select AdmissionId, Verified, Name from student where Email=%s and Password=%s", (email, password))
                 result=cursor.fetchone()
                 if result:
-                    return result[0], "Student"
+                    return result, "Student"
                 cursor.execute("select Email from admin where Email=%s and Password=%s", (email, password))
                 result=cursor.fetchone()
                 if result:
-                    return result[0], "Admin"
+                    return result, "Admin"
                 return None, None
             except Exception as e:
                 print(e)
@@ -265,6 +265,37 @@ class MySQLConnection:
                 cursor=self.connection.cursor()
                 cursor.execute("insert into departments values(%s)", (department, ))
                 self.connection.commit()
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def gen_code(self, email):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("delete from verification where Email=%s", (email,))
+                code=str(uuid4())
+                cursor.execute("insert into verification values(%s,%s)", (email, code))
+                self.connection.commit()
+                return code
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def verify_code(self, code):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("select Email from verification where Code=%s", (code, ))
+                result=cursor.fetchone()
+                if result:
+                    cursor.execute("delete from verification where Email=%s", (result[0],))
+                    cursor.execute("update student set Verified=1 where Email=%s", (result[0], ))
+                    self.connection.commit()
+                    return True
+                return False
             except Exception as e:
                 print(e)
             finally:

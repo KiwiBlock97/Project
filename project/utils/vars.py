@@ -17,3 +17,4 @@ class Var:
     CF_CLIENTID: str = environ.get("CF_CLIENTID")
     CF_CLIENTSECRET: str = environ.get("CF_CLIENTSECRET")
     CF_VERSION: str = environ.get("CF_VERSION", "2023-08-01")
+    BREVO_API: str = environ.get("BREVO_API", None)

@@ -6,7 +6,8 @@ from aiohttp import web
 from aiohttp_session import get_session
 from project.utils.cashfree import create_order, fetch_payment
 from project.utils.database import MySQLConnection
-from project.utils.utils import user_session
+from project.utils.utils import send_mail, user_session
+from project.utils.vars import Var
 db=MySQLConnection()
 routes = web.RouteTableDef()
 
@@ -46,15 +47,20 @@ async def login_post(request: web.Request):
     if not (email and password):
         return web.HTTPSeeOther("/login")
     Resp, Type = db.auth_user(email, password)
-    if Resp==None:
+    if not Resp:
         return web.Response(body="Invalid Email or Password")
+    if Type=="Student" and Resp[1]==0:
+        code=db.gen_code(email)
+        text=f"<html><head></head><body><p>Verify your email address by opening this link<br>{Var.URL}/verify?code={code}</p></body></html>"
+        await send_mail(Resp[2], email, text, "Email Verification")
+        return web.Response(text="Verify Email by Opening Link sent to Provided Email Address")
     session = await get_session(request)
     session["email"]=email
     session["type"]=Type
     if Type=="Admin":
         return web.HTTPSeeOther("/admin")
     elif Type=="Student":
-        session["admid"]=Resp
+        session["admid"]=Resp[0]
         return web.HTTPSeeOther("/student",)
 
 @routes.get("/photo", name="photo")
@@ -363,3 +369,12 @@ async def admin_tickets_today(request: web.Request):
     today=datetime.now().date()
     passes=db.get_pass(regular=True, fromdate=today, todate=today)
     return aiohttp_jinja2.render_template("admin_tickets_today.html", request, {"passes": enumerate(passes, 1)})
+
+@routes.get("/verify")
+async def verify_email(request: web.Request):
+    code=request.rel_url.query.get("code")
+    resp=db.verify_code(code)
+    if resp:
+        return web.Response(text="Email Verified successfully. Please Login Again")
+    else:
+        return web.Response(text="invalid Link or Account already verified")
