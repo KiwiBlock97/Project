@@ -76,7 +76,7 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
-    def get_pass(self, admid:int=None, key: str=None):
+    def get_pass(self, admid:int=None, key: str=None, regular=None, fromdate=None, todate=None):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
@@ -86,6 +86,9 @@ class MySQLConnection:
                 elif key:
                     cursor.execute("select * from pass where UKey=%s", (key,))
                     result=cursor.fetchone()
+                elif regular:
+                    cursor.execute("select * from pass where (fromtime <= %s AND totime >= %s) ", (fromdate, todate))
+                    result=cursor.fetchall()
                 return result
             except Exception as e:
                 print(e)
@@ -167,18 +170,18 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
-    def create_order(self, OrderId:str, email: str, place: str, fromtime: str, totime: str, renew: int, ukey:str, status: str):
+    def create_order(self, OrderId:str, email: str, place: str, fromtime: str, totime: str, renew: int, ukey:str, status: str, price: int):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("insert into pass_order values(%s, %s, %s, %s, %s, %s, %s, %s, %s)", (OrderId, email, place, fromtime, totime, renew, ukey, datetime.now().date(), status))
+                cursor.execute("insert into pass_order values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (OrderId, email, place, fromtime, totime, renew, ukey, datetime.now().date(), status, price))
                 self.connection.commit()
             except Exception as e:
                 print(e)
             finally:
                 cursor.close()
 
-    def get_order(self, OrderId:str= None, fromdate=None, todate=None):
+    def get_order(self, OrderId:str= None, fromdate=None, todate=None, department=None):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
@@ -187,9 +190,14 @@ class MySQLConnection:
                     result=cursor.fetchone()
                     return result
                 else:
-                    cursor.execute("SELECT s.Name, s.Department, po.fromtime, po.totime, po.Price FROM pass_order po JOIN  student s ON po.email = s.Email WHERE po.Time BETWEEN '%s' AND '%s';", (fromdate, todate))
+                    query="SELECT s.Name, s.Department, po.fromtime, po.totime, po.Price, po.Place FROM pass_order po JOIN student s ON po.email = s.Email WHERE po.Status='PROCESSED' AND (po.Time BETWEEN %s AND %s)"
+                    params = [fromdate, todate]
+                    if department:
+                        query+="AND s.Department = %s"
+                        params.append(department)
+                    cursor.execute(query, params)
                     result=cursor.fetchall()
-                    return result
+                    return result if result else []
             except Exception as e:
                 print(e)
             finally:

@@ -211,7 +211,7 @@ async def order_confirm(request: web.Request):
 
     payment_id=create_order(str(admid), "1234567890", name, email, str(uuid4), amount)
     if payment_id:
-        db.create_order(str(uuid4), email, place, datefrom, dateto, 1 if ukey else 0, ukey if ukey else None, None)
+        db.create_order(str(uuid4), email, place, datefrom, dateto, 1 if ukey else 0, ukey if ukey else None, None, amount)
         return aiohttp_jinja2.render_template("checkout.html", request, {
             "sessionid": payment_id,
             "name": name,
@@ -316,23 +316,50 @@ async def admin_departments_post(request: web.Request):
         return web.HTTPBadRequest()
     return web.HTTPSeeOther("/admin/departments")
 
-@routes.get("/admin/tickets")
+@routes.get("/admin/tickets/purchased")
 async def admin_tickets(request: web.Request):
     email, user_type = await user_session(request)
     if user_type!="Admin":
         return web.HTTPSeeOther("/login")
     fromdate=request.rel_url.query.get("fromdate")
     todate=request.rel_url.query.get("todate")
-    print(fromdate)
-    print(todate)
+    department=request.rel_url.query.get("department")
+    departments=db.get_departments()
     if not(fromdate and todate):
         return aiohttp_jinja2.render_template("admin_tickets.html", request, {
+            "departments": departments
         })
-    orders=db.get_order(fromdate=fromdate, todate=todate)
+    orders=db.get_order(fromdate=fromdate, todate=todate, department=department)
     sum=0
     for x in orders:
         sum+=x[4]
     return aiohttp_jinja2.render_template("admin_tickets.html", request, {
         "orders": orders,
-        "sum": sum
+        "sum": sum,
+        "departments": departments,
+        "count": len(orders),
+        "fromdate": fromdate,
+        "todate": todate
         })
+
+@routes.get("/admin/tickets/regular")
+async def admin_tickets_regular(request: web.Request):
+    email, user_type = await user_session(request)
+    if user_type!="Admin":
+        return web.HTTPSeeOther("/login")
+    fromdate=request.rel_url.query.get("fromdate")
+    todate=request.rel_url.query.get("todate")
+    params={"fromdate": fromdate, "todate": todate}
+    if fromdate and todate:
+        passes=db.get_pass(regular=True, fromdate=fromdate, todate=todate)
+        params["passes"]=enumerate(passes, 1)
+    return aiohttp_jinja2.render_template("admin_regular_student.html", request, params)
+    
+@routes.get("/admin/ticket/today")
+async def admin_tickets_today(request: web.Request):
+    email, user_type = await user_session(request)
+    if user_type!="Admin":
+        return web.HTTPSeeOther("/login")
+    today=datetime.now().date()
+    passes=db.get_pass(regular=True, fromdate=today, todate=today)
+    return aiohttp_jinja2.render_template("admin_tickets_today.html", request, {"passes": enumerate(passes, 1)})
