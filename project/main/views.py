@@ -315,3 +315,24 @@ async def admin_departments_post(request: web.Request):
     else:
         return web.HTTPBadRequest()
     return web.HTTPSeeOther("/admin/departments")
+
+@routes.get("/admin/tickets")
+async def admin_tickets(request: web.Request):
+    email, user_type = await user_session(request)
+    if user_type!="Admin":
+        return web.HTTPSeeOther("/login")
+    fromdate=request.rel_url.query.get("fromdate")
+    todate=request.rel_url.query.get("todate")
+    print(fromdate)
+    print(todate)
+    if not(fromdate and todate):
+        return aiohttp_jinja2.render_template("admin_tickets.html", request, {
+        })
+    orders=db.get_order(fromdate=fromdate, todate=todate)
+    sum=0
+    for x in orders:
+        sum+=x[4]
+    return aiohttp_jinja2.render_template("admin_tickets.html", request, {
+        "orders": orders,
+        "sum": sum
+        })

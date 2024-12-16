@@ -178,13 +178,18 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
-    def get_order(self, OrderId:str):
+    def get_order(self, OrderId:str= None, fromdate=None, todate=None):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("select * from pass_order where OrderID=%s", (OrderId,))
-                result=cursor.fetchone()
-                return result
+                if OrderId:
+                    cursor.execute("select * from pass_order where OrderID=%s", (OrderId,))
+                    result=cursor.fetchone()
+                    return result
+                else:
+                    cursor.execute("SELECT s.Name, s.Department, po.fromtime, po.totime, po.Price FROM pass_order po JOIN  student s ON po.email = s.Email WHERE po.Time BETWEEN '%s' AND '%s';", (fromdate, todate))
+                    result=cursor.fetchall()
+                    return result
             except Exception as e:
                 print(e)
             finally:

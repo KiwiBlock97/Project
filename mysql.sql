@@ -65,6 +65,7 @@ CREATE TABLE `pass_order` (
   `UKey` varchar(255) DEFAULT NULL,
   `Time` date NOT NULL,
   `Status` varchar(30) DEFAULT NULL,
+  `Price` int NOT NULL,
   FOREIGN KEY (`email`) REFERENCES `student` (`Email`) ON DELETE CASCADE,
   FOREIGN KEY (`Place`) REFERENCES `place` (`Place`) ON DELETE CASCADE
 );

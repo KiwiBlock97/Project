@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Student</title>
+    <link rel="stylesheet" href="/static/styles_admin.css">
+</head>
+<body>
+    <nav>
+        <a href="/admin">View Students</a>
+        <a href="/admin/validate">Validate Ticket</a>
+        <a href="/admin/stops">Bus Stops</a>
+        <a href="/admin/departments">Departments</a>
+        <a href="/logout">Logout</a>
+    </nav>
+    
+    <div class="admin-container">
+        <form>
+            <div>
+                <label for="fromdate">From Date</label>
+                <input type="date" name="fromdate">
+            </div>
+            <div>
+                <label for="todate">To Date</label>
+                <input type="date" name="todate">
+            </div>
+            <div>
+                <input type="submit" value="search">
+            </div>
+        </form>
+    </div>
+</body>
+</html>
+
