@@ -5,151 +5,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Details</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .table-container {
-            width: 80%;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        td {
-            padding: 10px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
-
-        .photo-cell {
-            text-align: center;
-            font-weight: bold;
-            font-size: 16px;
-            background-color: #f9f9f9;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        td:first-child {
-            font-weight: bold;
-            background-color: #e9e9e9;
-        }
-    </style>
-    <script>
-        function print_ticket(key){
-            const passTable = document.getElementById('pass');
-            const ticketTable = document.getElementById(key);
-
-            const printWindow = window.open('', '', 'height=600,width=800');
-            printWindow.document.write(`<html><head><title>Print Ticket</title>
-<style>
-table {width: 100%; border-collapse: collapse;}
-td {padding: 10px; border: 1px solid #ccc;}
-.print {visibility: hidden;}
-</style>
-</head><body><table>`);
-
-            printWindow.document.write(passTable.innerHTML);
-            printWindow.document.write(ticketTable.innerHTML);
-
-            printWindow.document.write('</table</body></html>');
-            printWindow.document.close();
-            printWindow.focus();
-            
-            // Print the content
-            printWindow.print();
-
-            // Close the print window after printing
-            printWindow.close();
-        }
-    </script>
+    <link rel="stylesheet" href="/static/styles/global.css">
 </head>
 
 <body>
-    <div class="table-container">
-        <table class="pass" id="pass">
+    <nav>
+        <ul>
+            <li><a href="/student/apply">New Pass</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="student-details">
+        <table class="student-info" id="student-pass">
             <tr>
-                <td colspan="2" class="photo-cell"><img height="200px" src="/photo"></td>
+                <td colspan="2" class="photo-container">
+                    <img class="student-photo" src="/photo" alt="Student Photo" height="200">
+                </td>
             </tr>
             <tr>
-                <td>Name</td>
-                <td>{{name}}</td>
+                <td class="label">Name</td>
+                <td class="value">{{ name }}</td>
             </tr>
             <tr>
-                <td>Department</td>
-                <td>{{department}}</td>
+                <td class="label">Department</td>
+                <td class="value">{{ department }}</td>
             </tr>
             <tr>
-                {% if usertype==1 %}
-                    <td>Admission No</td>
-                {% elif usertype==2 %}
-                    <td>Aadhar No</td>
+                {% if usertype == 1 %}
+                    <td class="label">Admission No</td>
+                {% elif usertype == 2 %}
+                    <td class="label">Aadhar No</td>
                 {% endif %}
-                <td>{{admission}}</td>
+                <td class="value">{{ admission }}</td>
             </tr>
         </table>
-        <h4>Tickets</h4>
+
+        <h4 class="section-heading">Tickets</h4>
         {% for ticket in bus_pass %}
-            <table id="{{ticket[2]}}">
-                {% if usertype==1 %}
-                <tr>
-                    <td>From</td>
-                    <td>{{ticket[3]}}</td>
-                </tr>
-                <tr>
-                    <td>To</td>
-                    <td>{{ticket[4]}}</td>
-                </tr>
-                {% elif usertype==2 %}
-                <tr>
-                    <td>Date</td>
-                    <td>{{ticket[4]}}</td>
-                </tr>
+            <table class="ticket-info" id="ticket-{{ ticket[2] }}">
+                {% if usertype == 1 %}
+                    <tr>
+                        <td class="label">From</td>
+                        <td class="value">{{ ticket[3] }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">To</td>
+                        <td class="value">{{ ticket[4] }}</td>
+                    </tr>
+                {% elif usertype == 2 %}
+                    <tr>
+                        <td class="label">Date</td>
+                        <td class="value">{{ ticket[4] }}</td>
+                    </tr>
                 {% endif %}
                 <tr>
-                    <td>From/To Place</td>
-                    <td>{{ticket[1]}}</td>
+                    <td class="label">From/To Place</td>
+                    <td class="value">{{ ticket[1] }}</td>
                 </tr>
                 <tr>
-                    <td>Ticket Id</td>
-                    <td>{{ticket[2]}}</td>
+                    <td class="label">Ticket ID</td>
+                    <td class="value">{{ ticket[2] }}</td>
                 </tr>
                 <tr>
-                    <td><button class="print" onclick="print_ticket(key='{{ticket[2]}}')">Print ticket</button></td>
-                    {% if usertype==1 %}
-                    <td><form method="get" action="/student/renew">
-                        <input type="hidden" name="key" value="{{ticket[2]}}">
-                        <button type="submit">Extend Pass</button>
-                    </form></td>
+                    <td>
+                        <a class="print-button" href="/student/print?key={{ ticket[2] }}">Print Ticket</button>
+                    </td>
+                    {% if usertype == 1 %}
+                        <td>
+                            <form class="renew-form" method="get" action="/student/renew">
+                                <input type="hidden" name="key" value="{{ ticket[2] }}">
+                                <button class="extend-button" type="submit">Extend Pass</button>
+                            </form>
+                        </td>
                     {% endif %}
                 </tr>
             </table>
         {% endfor %}
-        <h4></h4>
-        <table>
-            <tr>
-                <td><a href="/logout">Logout</a></td>
-                <td><a href="/student/apply">New Pass</a></td>
-            </tr>
-        </table>
     </div>
 </body>
 

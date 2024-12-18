@@ -1,44 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bus Stops</title>
-    <link rel="stylesheet" href="/static/styles_admin.css">
+    <title>Departments - Admin Page</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
 </head>
-<body>
-    <nav>
-        <a href="/admin">View Student</a>
-        <a href="admin/stops">Bus Stops</a>
-        <a href="/logout">Logout</a>
-    </nav>
-    
-    <div class="admin-container">
-        <div id="validate-ticket-section" class="section">
-            <h2>Departments</h2>
-            <table border=1>
-                <tr>
-                    <td><p>Department</p></td>
-                    <td><p>Remove</p></td>
-                </tr>
-                {% for row in departments %}
-                <tr>
-                    <td><p>{{row[0]}}</p></td>
-                    <td><form method="post">
-                        <input type="hidden" value="{{row[0]}}" name="department">
-                        <button type="submit" value="delete" name="method">Remove❌</button>
-                    </form></td>
-                </tr>
-                {% endfor %}
-                <tr>
-                    <form method="post">
-                    <td><input type="text" placeholder="Department" name="department" required></td>
-                    <td><button type="submit" value="add" name="method">Add</button></td>
-                    </form>
-                </tr>
-            </table>
-        </div>
-    </div>
-</body>
-</html>
 
+<body>
+    <!-- Navigation -->
+    <nav>
+        <ul>
+            <li><a href="/admin">Home</a></li>
+            <li><a href="/admin/students">Manage Students</a></li>
+            <li><a href="/admin/validate">Validate Tickets</a></li>
+            <li><a href="/admin/stops">Manage Bus Stops</a></li>
+            <li><a href="/admin/tickets/purchased">Tickets Purchased</a></li>
+            <li><a href="/admin/tickets/regular">Regular Tickets</a></li>
+            <li><a href="/admin/ticket/today">Today's Tickets</a></li>
+            <li><a href="/logout" class="nav-link">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+        <section id="bus-stops-section" class="admin-section">
+            <h2 class="section-title">Departments</h2>
+
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Department</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in departments %}
+                    <tr>
+                        <td class="table-cell">{{ row[0] }}</td>
+                        <td class="table-cell">
+                            <form method="post">
+                                <input type="hidden" name="department" value="{{ row[0] }}">
+                                <button type="submit" name="method" value="delete" class="btn btn-remove">❌ Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <form method="post">
+                            <td>
+                                <input type="text" name="department" placeholder="Enter Department" class="form-input" required>
+                            </td>
+                            <td>
+                                <button type="submit" name="method" value="add" class="btn btn-add">➕ Add</button>
+                            </td>
+                        </form>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+
+</html>

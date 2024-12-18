@@ -1,78 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Home</title>
     <link rel="stylesheet" href="/static/styles/global.css">
-    <style>
-        .admin-header {
-    text-align: center;
-    margin: 1em 0;
-    font-size: 1.8rem;
-}
-
-.admin-button-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin: 2rem;
-}
-
-.admin-button {
-    display: block;
-    text-align: center;
-    padding: 1rem;
-    background-color: #007BFF;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-
-.admin-button:hover {
-    background-color: #0056b3;
-}
-
-.admin-footer {
-    text-align: center;
-    margin-top: 2rem;
-    color: #777;
-    font-size: 0.9rem;
-}
-
-    </style>
 </head>
-
 <body>
-    <!-- Header -->
-    <header class="admin-header">
-        <h1>Admin Dashboard</h1>
-    </header>
+    <header>Admin Dashboard</header>
 
-    <!-- Main Content -->
-    <main class="admin-content">
-        <section class="admin-section">
-            <h2>Quick Access</h2>
-            <div class="admin-button-grid">
-                <a href="/admin/students" class="admin-button">View Students</a>
-                <a href="/admin/validate" class="admin-button">Validate Ticket</a>
-                <a href="/admin/stops" class="admin-button">Manage Bus Stops</a>
-                <a href="/admin/departments" class="admin-button">Manage Departments</a>
-                <a href="/admin/tickets/purchased" class="admin-button">Purchased Tickets</a>
-                <a href="/admin/tickets/regular" class="admin-button">Regular Tickets</a>
-                <a href="/admin/ticket/today" class="admin-button">Today's Tickets</a>
-            </div>
+    <nav>
+        <ul>
+            <li><a href="/admin/students">Manage Students</a></li>
+            <li><a href="/admin/validate">Validate Tickets</a></li>
+            <li><a href="/admin/stops">Manage Bus Stops</a></li>
+            <li><a href="/admin/departments">Manage Departments</a></li>
+            <li><a href="/admin/tickets/purchased">Tickets Purchased</a></li>
+            <li><a href="/admin/tickets/regular">Regular Tickets</a></li>
+            <li><a href="/admin/ticket/today">Today's Tickets</a></li>
+            <li><a href="/logout" class="nav-link">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section class="admin-grid">
+            <a href="/admin/students" class="admin-card">
+                <h3>Manage Students</h3>
+                <p>View and manage student accounts.</p>
+            </a>
+            <a href="/admin/validate" class="admin-card">
+                <h3>Validate Tickets</h3>
+                <p>Check ticket validity by ID.</p>
+            </a>
+            <a href="/admin/stops" class="admin-card">
+                <h3>Manage Bus Stops</h3>
+                <p>Add or remove bus stops for tickets.</p>
+            </a>
+            <a href="/admin/departments" class="admin-card">
+                <h3>Manage Departments</h3>
+                <p>Add or remove departments for accounts.</p>
+            </a>
+            <a href="/admin/tickets/purchased" class="admin-card">
+                <h3>Tickets Purchased</h3>
+                <p>View purchased tickets within a date range.</p>
+            </a>
+            <a href="/admin/tickets/regular" class="admin-card">
+                <h3>Regular Tickets</h3>
+                <p>List tickets valid for a range of dates.</p>
+            </a>
+            <a href="/admin/ticket/today" class="admin-card">
+                <h3>Today's Tickets</h3>
+                <p>View all tickets valid today.</p>
+            </a>
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="admin-footer">
-        <p>&copy; 2024 Admin Dashboard. All rights reserved.</p>
-    </footer>
+    <!-- <footer>
+        &copy; 2024 Admin Dashboard. All rights reserved.
+    </footer> -->
 </body>
-
 </html>

@@ -3,95 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account</title>
-    <link rel="stylesheet" href="/static/styles_c.css">
-    <style>
-        .type-container {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .type-container label {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .type-container div {
-            display: flex;
-            justify-content: start;
-            gap: 20px;
-            align-items: center;
-        }
-    </style>
+    <title>Signup</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
 </head>
 <body>
-    <div class="create-account-container">
-        <h1>Create Account</h1>
-        <form method="post" action="/signup" enctype="multipart/form-data">
-            <label for="photo">Photo</label>
-            <input type="file" id="photo" name="photo" accept="image/*" required>
+    <div class="signup-container">
+        <h1 class="signup-title">Create Account</h1>
+        <form class="signup-form" method="post" action="/signup" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="photo" class="form-label">Photo</label>
+                <input type="file" id="photo" name="photo" class="form-input" accept="image/*" required>
+            </div>
 
-            <div class="type-container">
-                <label for="type">Type</label>
-                <div>
-                    <input type="radio" id="student" name="user-type" value="Student" checked onclick="toggleFields()"> Student
-                    <input type="radio" id="staff" name="user-type" value="Staff" onclick="toggleFields()"> Staff
+            <div class="form-group">
+                <label class="form-label">Type</label>
+                <div class="form-radio-group">
+                    <input type="radio" id="student" name="user-type" value="Student" checked onclick="toggleFields()"> 
+                    <label for="student">Student</label>
+                    <input type="radio" id="staff" name="user-type" value="Staff" onclick="toggleFields()"> 
+                    <label for="staff">Staff</label>
                 </div>
             </div>
 
-            <label for="name">Name</label>
-            <input type="text" id="name" name="name" required>
+            <div class="form-group">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" id="name" name="name" class="form-input" required>
+            </div>
 
-            <label for="email">E-Mail</label>
-            <input type="email" id="email" name="email" required>
+            <div class="form-group">
+                <label for="email" class="form-label">E-Mail</label>
+                <input type="email" id="email" name="email" class="form-input" required>
+            </div>
 
-            <label for="password">Password</label>
-            <input type="password" id="pass" name="pass" onchange="check_pass()" required>
+            <div class="form-group">
+                <label for="pass" class="form-label">Password</label>
+                <input type="password" id="pass" name="pass" class="form-input" onchange="check_pass()" required>
+            </div>
 
-            <label for="cnf-password">Confirm Password</label>
-            <input type="password" id="cnf-pass" name="cnf-pass" onchange="check_pass()" required>
+            <div class="form-group">
+                <label for="cnf-pass" class="form-label">Confirm Password</label>
+                <input type="password" id="cnf-pass" name="cnf-pass" class="form-input" onchange="check_pass()" required>
+            </div>
 
-            <label for="admission-number" id="admission-label">Admission Number</label>
-            <input type="text" id="admission-number" name="admission-number" required>
+            <div class="form-group">
+                <label for="admission-number" id="admission-label" class="form-label">Admission Number</label>
+                <input type="text" id="admission-number" name="admission-number" class="form-input" required>
+            </div>
 
-            <label for="department">Department</label>
-            <select id="department" name="department" required>
-                {% for row in departments %}
-                    <option value="{{row[0]}}">{{row[0]}}</option>
-                {% endfor %}
-            </select>
+            <div class="form-group">
+                <label for="department" class="form-label">Department</label>
+                <select id="department" name="department" class="form-select" required>
+                    {% for row in departments %}
+                        <option value="{{ row[0] }}">{{ row[0] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-            <button type="button" id="submit">Create Account</button>
+            <button type="button" id="submit" class="form-button">Create Account</button>
         </form>
     </div>
 
     <script>
         function toggleFields() {
             var isStudent = document.getElementById("student").checked;
-            document.getElementById("admission-label").innerText = isStudent ? "Admission Number" : "Aadhar Number";
+            var admissionLabel = document.getElementById("admission-label");
+            admissionLabel.innerText = isStudent ? "Admission Number" : "Aadhar Number";
         }
 
-        function check_pass(){
+        function check_pass() {
             var pass = document.getElementById("pass").value;
-            var cnf_pass = document.getElementById("cnf-pass").value;
-            if (pass && cnf_pass){
-                if(pass === cnf_pass){
-                    document.getElementById("cnf-pass").style.borderColor = "green";
-                    document.getElementById("pass").style.borderColor = "green";
-                    document.getElementById("submit").type="submit";
+            var cnfPass = document.getElementById("cnf-pass").value;
+            var passField = document.getElementById("pass");
+            var cnfPassField = document.getElementById("cnf-pass");
+            var submitButton = document.getElementById("submit");
+
+            if (pass && cnfPass) {
+                if (pass === cnfPass) {
+                    passField.style.borderColor = "green";
+                    cnfPassField.style.borderColor = "green";
+                    submitButton.type = "submit";
                 } else {
-                    document.getElementById("pass").style.borderColor = "red";
-                    document.getElementById("cnf-pass").style.borderColor = "red";
+                    passField.style.borderColor = "red";
+                    cnfPassField.style.borderColor = "red";
                     alert("Passwords do not match");
                 }
             }
         }
 
-        // Initialize the fields on page load
+        // Initialize fields on page load
         document.addEventListener("DOMContentLoaded", toggleFields);
     </script>
 </body>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Ticket Details</title>
+    <style>
+        /* General reset and body styles */
+        body,
+        table,
+        td,
+        th {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            line-height: 1.4;
+        }
+
+        /* Set the page size for printing */
+        @page {
+            size: 10cm 5cm;
+            margin: 0;
+
+        }
+
+        /* Container for the ticket */
+        .student-details {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            padding: 5mm;
+            /* Adds margin between the contents and edges */
+        }
+
+        /* Left side (personal details) */
+        .personal-details {
+            width: 50%;
+            padding-right: 5px;
+            box-sizing: border-box;
+            border-right: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        /* Right side (ticket details) */
+        .ticket-details {
+            width: 50%;
+            padding-left: 5px;
+            box-sizing: border-box;
+        }
+
+        /* Styling for student information table */
+        .student-info {
+            width: 100%;
+            margin-bottom: 10px;
+            border-collapse: collapse;
+        }
+
+        .student-info td {
+            padding: 3px;
+            font-size: 9px;
+        }
+
+        .student-info .label {
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .student-info .value {
+            text-align: left;
+        }
+
+        .photo-container {
+            text-align: center;
+            padding-bottom: 10px;
+        }
+
+        .student-photo {
+            max-height: 40px;
+            max-width: 40px;
+            border-radius: 50%;
+        }
+
+        /* Ticket information table */
+        .ticket-info {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ticket-info td {
+            padding: 3px;
+            font-size: 9px;
+        }
+
+        .ticket-info .label {
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .ticket-info .value {
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="student-details">
+        <!-- Left Side: Personal Information and Photo -->
+        <div class="personal-details">
+            <div class="photo-container">
+                <img class="student-photo" src="/photo" alt="Student Photo">
+            </div>
+            <table class="student-info">
+                <tr>
+                    <td class="label">Name</td>
+                    <td class="value">{{ name }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Department</td>
+                    <td class="value">{{ department }}</td>
+                </tr>
+                <tr>
+                    {% if usertype == 1 %}
+                    <td class="label">Admission No</td>
+                    {% elif usertype == 2 %}
+                    <td class="label">Aadhar No</td>
+                    {% endif %}
+                    <td class="value">{{ admission }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Right Side: Ticket Details -->
+        <div class="ticket-details">
+            <table class="ticket-info">
+                {% if usertype == 1 %}
+                <tr>
+                    <td class="label">From</td>
+                    <td class="value">{{ ticket[3] }}</td>
+                </tr>
+                <tr>
+                    <td class="label">To</td>
+                    <td class="value">{{ ticket[4] }}</td>
+                </tr>
+                {% elif usertype == 2 %}
+                <tr>
+                    <td class="label">Date</td>
+                    <td class="value">{{ ticket[4] }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td class="label">From/To Place</td>
+                    <td class="value">{{ ticket[1] }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Ticket ID</td>
+                    <td class="value">{{ ticket[2] }}</td>
+                </tr>
+                <!-- <tr>
+                    <td colspan="2">
+                        <button class="print-button" onclick="window.print()">Print Ticket</button>
+                    </td>
+                </tr> -->
+            </table>
+        </div>
+    </div>
+    <script>
+        window.onload = function () {
+            window.print();
+        };
+    </script>
+</body>
+
+</html>

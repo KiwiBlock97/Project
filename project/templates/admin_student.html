@@ -4,67 +4,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Details</title>
-    <link rel="stylesheet" href="/static/style_admin_student.css">
+    <title>Student Details - Admin Page</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
 </head>
 
 <body>
     <nav>
-        <a href="/admin">View Student</a>
-        <a href="/admin/validate">Validate Ticket</a>
-        <a href="/admin/stops">Bus Stops</a>
-        <a href="/logout">Logout</a>
+        <ul>
+            <li><a href="/admin">Home</a></li>
+            <li><a href="/admin/validate">Validate Tickets</a></li>
+            <li><a href="/admin/stops">Manage Bus Stops</a></li>
+            <li><a href="/admin/departments">Manage Departments</a></li>
+            <li><a href="/admin/tickets/purchased">Tickets Purchased</a></li>
+            <li><a href="/admin/tickets/regular">Regular Tickets</a></li>
+            <li><a href="/admin/ticket/today">Today's Tickets</a></li>
+            <li><a href="/logout" class="nav-link">Logout</a></li>
+        </ul>
     </nav>
-    <div class="admin-container">
-    <div class="table-container">
-        <table class="pass">
-            <tr>
-                <td colspan="2" class="photo-cell"><img height="200px" src="/photo?id={{AdmissionId}}"></td>
-            </tr>
-            <tr>
-                <td>AdmissionId</td>
-                <td>{{AdmissionId}}</td>
-            </tr>
-            <tr>
-                <td>Name</td>
-                <td>{{Name}}</td>
-            </tr>
-            <tr>
-                <td>Email</td>
-                <td>{{Email}}</td>
-            </tr>
-            <tr>
-                <td>Department</td>
-                <td>{{Department}}</td>
-            </tr>
-        </table>
-        <hr>
-        {% if bus_pass %}
-        <table class="pass">
-            <tr>
-                <th>Place</th>
-                <th>Validity</th>
-                <th></th>
-            </tr>
-            {% for ticket in bus_pass %}
+
+    <!-- Main Content -->
+    <main class="admin-content">
+        <!-- Student Information -->
+        <section class="student-details">
+            <h2 class="section-title">Student Details</h2>
+            <table class="details-table">
                 <tr>
-                    <td>{{ticket[1]}}</td>
-                    <td>{{ticket[4]}}</td>
-                    <td>
-                        <form method="get" action="/admin/details">
-                            <input type="hidden" value="{{AdmissionId}}" name="id">
-                            <input type="hidden" value="{{ticket[2]}}" name="pass">
-                            <button type="submit">Reject</button>
-                        </form>
-                    </td>
+                    <td class="label">Admission ID:</td>
+                    <td>{{ AdmissionId }}</td>
                 </tr>
-            {% endfor %}
-        </table>
-        {% else %}
+                <tr>
+                    <td class="label">Name:</td>
+                    <td>{{ Name }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Email:</td>
+                    <td>{{ Email }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Department:</td>
+                    <td>{{ Department }}</td>
+                </tr>
+            </table>
+        </section>
+
+        <hr>
+
+        <!-- Bus Pass Details -->
+        <section class="bus-pass-section">
+            <h3 class="section-title">Bus Pass Details</h3>
+            {% if bus_pass %}
+            <div class="table-container">
+                <table class="bus-pass-table">
+                    <thead>
+                        <tr>
+                            <th>Place</th>
+                            <th>Validity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in bus_pass %}
+                        <tr>
+                            <td>{{ ticket[1] }}</td>
+                            <td>{{ ticket[4] }}</td>
+                            <td>
+                                <form method="get" action="/admin/details">
+                                    <input type="hidden" name="id" value="{{ AdmissionId }}">
+                                    <input type="hidden" name="pass" value="{{ ticket[2] }}">
+                                    <button type="submit" class="btn btn-reject">Reject</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
             <p>No Tickets Found</p>
-        {% endif %}
-    </div>
-    
+            {% endif %}
+        </section>
+    </main>
 </body>
 
 </html>

@@ -74,7 +74,7 @@ async def get_photo(request: web.Request):
     admid=request["session"].get("admid")
     if request["user_type"]=="Admin":
         admid=request.rel_url.query.get("id")
-    elif admid:
+    if admid:
         return web.FileResponse(f"photo/{admid}")
     return web.HTTPNotFound
 
@@ -220,11 +220,18 @@ async def admin_home(request: web.Request):
     return aiohttp_jinja2.render_template("admin_home.html", request, {})
 
 @routes.get("/admin/students", name="admin_students")
+@routes.post("/admin/students")
 async def admin_home(request: web.Request):
-    students=db.get_students()
-    return aiohttp_jinja2.render_template("admin_student_list.html", request, {
-        "students": students
-    })
+    if request.method == "GET":
+        students=db.get_students()
+        return aiohttp_jinja2.render_template("admin_student_list.html", request, {
+            "students": students
+        })
+    data=await request.post()
+    if (admid:=data.get("admid")):
+        db.remove_student(int(admid))
+        return web.HTTPSeeOther("/admin/students")
+    return web.HTTPMethodNotAllowed("POST", ["GET"])
 
 @routes.get("/admin/validate", name="admin_validate")
 async def admin_validate(request: web.Request):
@@ -259,14 +266,6 @@ async def admin_stops_post(request: web.Request):
     else:
         return web.HTTPBadRequest()
     return web.HTTPSeeOther("/admin/stops")
-    
-@routes.post("/admin/remove")
-async def admin_remove(request: web.Request):
-    data=await request.post()
-    if (admid:=data.get("admid")):
-        db.remove_student(int(admid))
-        return web.HTTPSeeOther("/admin")
-    return web.HTTPMethodNotAllowed()
 
 @routes.get("/admin/details")
 async def admin_details(request: web.Request):

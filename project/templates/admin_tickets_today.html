@@ -1,40 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Student</title>
-    <link rel="stylesheet" href="/static/styles_admin.css">
+    <title>Today's Tickets</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
 </head>
-<body>
-    <nav>
-        <a href="/admin">View Students</a>
-        <a href="/admin/validate">Validate Ticket</a>
-        <a href="/admin/stops">Bus Stops</a>
-        <a href="/admin/departments">Departments</a>
-        <a href="/logout">Logout</a>
-    </nav>
-    
-    <div class="admin-container">
-        <table>
-            <tr>
-                <th>Sl No</th>
-                <th>Ticket ID</th>
-                <th>Place</th>
-                <th>From</th>
-                <th>To</th>
-            </tr>
-            {% for no, row in passes %}
-            <tr>
-                <td>{{no}}</td>
-                <td><a href="/admin/validate?ticket-id={{row[2]}}">{{row[2]}}</a></td>
-                <td>{{row[1]}}</td>
-                <td>{{row[3]}}</td>
-                <td>{{row[4]}}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-</body>
-</html>
 
+<body>
+    <!-- Navigation -->
+    <nav>
+        <ul>
+            <li><a href="/admin">Home</a></li>
+            <li><a href="/admin/students">Manage Students</a></li>
+            <li><a href="/admin/validate">Validate Tickets</a></li>
+            <li><a href="/admin/stops">Manage Bus Stops</a></li>
+            <li><a href="/admin/departments">Manage Departments</a></li>
+            <li><a href="/admin/tickets/purchased">Tickets Purchased</a></li>
+            <li><a href="/admin/tickets/regular">Regular Tickets</a></li>
+            <li><a href="/logout" class="nav-link">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+        <section class="admin-section">
+            <h2 class="section-title">Today's Tickets</h2>
+
+            <!-- Tickets Table -->
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Sl No</th>
+                        <th>Ticket ID</th>
+                        <th>Place</th>
+                        <th>From</th>
+                        <th>To</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for no, row in passes %}
+                    <tr>
+                        <td>{{no}}</td>
+                        <td>
+                            <a href="/admin/validate?ticket-id={{row[2]}}" class="link-ticket">{{row[2]}}</a>
+                        </td>
+                        <td>{{row[1]}}</td>
+                        <td>{{row[3]}}</td>
+                        <td>{{row[4]}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+
+</html>

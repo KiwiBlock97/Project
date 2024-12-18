@@ -3,142 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Form</title>
-    <style>
-        body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding: 0;
-}
-
-.form-container {
-    width: 50%;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-label {
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-input[type="text"], select {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-button[type="submit"] {
-    padding: 10px;
-    background-color: #007BFF;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-button[type="submit"]:hover {
-    background-color: #0056b3;
-}
-
-    </style>
+    <title>Renew Ticket</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
 </head>
 <body>
-    <div class="form-container">
-        <form method="post" action="/order/confirm">
-            <input type="hidden" name="ukey" value="{{ukey}}">
+    <nav>
+        <ul>
+            <li><a href="/student">Home</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="renew-ticket">
+        <form class="ticket-form" method="post" action="/student/order/confirm">
+            <input type="hidden" name="ukey" value="{{ ukey }}">
+
             <div class="form-group">
                 <label for="name">Name:</label>
-                <p id="name" name="name">{{name}}</p>
+                <p id="name" name="name" class="value">{{ name }}</p>
             </div>
-            
+
             <div class="form-group">
                 <label for="department">Department:</label>
-                <p id="department" name="department">{{department}}</p>
+                <p id="department" name="department" class="value">{{ department }}</p>
             </div>
-            
+
             <div class="form-group">
                 <label for="from-to">From/To:</label>
-                <p id="from-to" name="from-to" >{{place}}</p>
+                <p id="from-to" name="from-to" class="value">{{ place }}</p>
             </div>
-            
+
             <div class="form-group">
                 <label for="datefrom">From Date:</label>
-                <input type="date" id="datefrom" name="datefrom" value="{{fromdate}}" readonly>
+                <input type="date" id="datefrom" name="datefrom" value="{{ fromdate }}" readonly>
             </div>
 
             <div class="form-group">
                 <label for="dateto">To Date:</label>
-                <input onchange="update_price()" type="date" id="dateto" name="dateto">
+                <input type="date" id="dateto" name="dateto" onchange="update_price()">
             </div>
-            
+
             <div class="form-group">
                 <label for="admin-no">Admin No:</label>
-                <p id="admin-no" name="admin-no">{{adm_no}}</p>
+                <p id="admin-no" name="admin-no" class="value">{{ adm_no }}</p>
             </div>
+
             <div class="form-group">
                 <label for="ticket-price">Ticket Price:</label>
-                <p id="ticket-price" value="{{price}}" name="ticket-price">{{price}}</p>
+                <p id="ticket-price" name="ticket-price" class="value" data-price="{{ price }}">{{ price }}</p>
             </div>
             
             <div class="form-group">
-                <button type="submit" id="pay" style="display: none;">Pay ₹</button>
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" class="value" required>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" id="pay" class="pay-button" style="display: none;">Pay ₹</button>
             </div>
         </form>
     </div>
+
     <script>
-        function update_price(){
+        function update_price() {
             var fromDate = document.getElementById("datefrom").value;
             var toDate = document.getElementById("dateto").value;
-            var pay = document.getElementById("pay");
+            var payButton = document.getElementById("pay");
+            var ticketPriceElement = document.getElementById("ticket-price");
+            var ticketPrice = parseFloat(ticketPriceElement.getAttribute("data-price"));
 
             if (fromDate && toDate) {
-        // Convert the date strings to Date objects
-        var startDate = new Date(fromDate);
-        var endDate = new Date(toDate);
+                var startDate = new Date(fromDate);
+                var endDate = new Date(toDate);
+                var timeDifference = endDate - startDate;
+                var validity = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)) + 1;
 
-        // Calculate the difference in time (milliseconds) and convert to days
-        var timeDifference = endDate - startDate;
-        var validity = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)) + 1; // Include the start day
-
-        // Ensure validity is positive
-        if (validity > 0) {
-            // Get the price
-            var price = document.getElementById("ticket-price").getAttribute("value");
-
-            // Calculate the total amount
-            var amount = price * validity;
-
-            // Display the payment amount
-            pay.innerHTML = `Pay ₹${amount}`;
-            pay.style.display = "block";
-            pay.type="submit";
-        } else {
-            // Show an error if the dates are invalid
-            pay.innerHTML = "Invalid date range. Please select a valid To Date.";
-            pay.style.display = "block";
-            pay.type="button";
-        }
-    } else {
-        // Hide the payment section if dates are not provided
-        pay.style.display = "none";
-    }
+                if (validity > 0) {
+                    var totalAmount = ticketPrice * validity;
+                    payButton.innerHTML = `Pay ₹${totalAmount}`;
+                    payButton.style.display = "block";
+                } else {
+                    payButton.innerHTML = "Invalid date range. Please select a valid To Date.";
+                    payButton.style.display = "block";
+                }
+            } else {
+                payButton.style.display = "none";
+            }
         }
     </script>
 </body>

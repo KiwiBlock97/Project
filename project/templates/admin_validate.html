@@ -1,67 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validate Ticket</title>
-    <link rel="stylesheet" href="/static/styles_admin.css">
+    <title>Validate Ticket - Admin Page</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
 </head>
+
 <body>
+    <!-- Navigation -->
     <nav>
-        <a href="/admin">View Student</a>
-        <a href="/admin/stops">Bus Stops</a>
-        <a href="/logout">Logout</a>
+        <ul>
+            <li><a href="/admin">Home</a></li>
+            <li><a href="/admin/students">Manage Students</a></li>
+            <li><a href="/admin/stops">Manage Bus Stops</a></li>
+            <li><a href="/admin/departments">Manage Departments</a></li>
+            <li><a href="/admin/tickets/purchased">Tickets Purchased</a></li>
+            <li><a href="/admin/tickets/regular">Regular Tickets</a></li>
+            <li><a href="/admin/ticket/today">Today's Tickets</a></li>
+            <li><a href="/logout" class="nav-link">Logout</a></li>
+        </ul>
     </nav>
-    
-    <div class="admin-container">
-        <div id="validate-ticket-section" class="section">
-            <h2>Validate Ticket</h2>
-            <form>
-                <label for="ticket-id">Ticket ID</label>
-                <input type="text" id="ticket-id" name="ticket-id" required>
-                
-                <button type="submit">Validate</button>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+        <!-- Ticket Validation Section -->
+        <section id="validate-ticket-section" class="validate-ticket">
+            <h2 class="section-title">Validate Ticket</h2>
+
+            <!-- Validation Form -->
+            <form class="validate-form">
+                <label for="ticket-id" class="form-label">Ticket ID:</label>
+                <input type="text" id="ticket-id" name="ticket-id" class="form-input" required>
+
+                <button type="submit" class="btn btn-validate">Validate</button>
             </form>
-            <div id="status">
+
+            <!-- Validation Status -->
+            <div id="status" class="ticket-status">
                 {% if key %}
                     {% if ticket %}
-                        <table class="pass">
-                            <tr>
-                                <td>Photo</td>
-                                <td class="photo-cell"><img height="200px" src="/photo?id={{ticket[0]}}"></td>
-                            </tr>
-                            <tr>
-                                <td>Name</td>
-                                <td>{{user[1]}}</td>
-                            </tr>
-                            <tr>
-                                <td>Department</td>
-                                <td>{{user[4]}}</td>
-                            </tr>
-                            <tr>
-                                <td>Admission No</td>
-                                <td>{{ticket[0]}}</td>
-                            </tr>
-                            <tr>
-                                <td>Validity</td>
-                                <td>{{validity}}</td>
-                            </tr>
-                            <tr>
-                                <td>From/To</td>
-                                <td>{{ticket[1]}}</td>
-                            </tr>
-                            <tr>
-                                <td>Ticket Id</td>
-                                <td>{{ticket[2]}}</td>
-                            </tr>
-                        </table>
+                        <div class="ticket-details">
+                            <h3 class="section-subtitle">Ticket Information</h3>
+                            <table class="details-table">
+                                <tr>
+                                    <td class="label">Photo:</td>
+                                    <td><img height="200px" src="/photo?id={{ticket[0]}}" alt="User Photo" class="user-photo"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Name:</td>
+                                    <td>{{ user[1] }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Department:</td>
+                                    <td>{{ user[4] }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Admission No:</td>
+                                    <td>{{ ticket[0] }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Validity:</td>
+                                    <td>{{ validity }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">From/To:</td>
+                                    <td>{{ ticket[1] }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Ticket ID:</td>
+                                    <td>{{ ticket[2] }}</td>
+                                </tr>
+                            </table>
+                        </div>
                     {% else %}
-                        <p>❌ Ticket is Invalid</p>
+                        <p class="error-message">❌ Ticket is Invalid</p>
                     {% endif %}
                 {% endif %}
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 </body>
-</html>
 
+</html>
