@@ -10,15 +10,13 @@ Cashfree.XClientSecret = Var.CF_CLIENTSECRET
 Cashfree.XEnvironment = Cashfree.SANDBOX
 x_api_version = Var.CF_VERSION
 def create_order(admid: str, phone: str, name: str, email: str, uuid4: str, amount: int):
-    customerDetails = CustomerDetails(customer_id=admid, customer_phone=phone)
-    customerDetails.customer_name = name
-    customerDetails.customer_email = email
+    customerDetails = CustomerDetails(customer_id=admid, customer_email=email, customer_phone=phone, customer_name=name)
     createOrderRequest = CreateOrderRequest(order_id=uuid4, order_amount=amount, order_currency="INR", customer_details=customerDetails)
 
-    orderMeta = OrderMeta()
-    orderMeta.return_url = Var.URL+"/order/checkout?order_id={order_id}"
-    orderMeta.payment_methods = "cc,dc,upi"
-    createOrderRequest.order_meta = orderMeta
+    createOrderRequest.order_meta = OrderMeta(
+        return_url=Var.URL+"/student/order/checkout?order_id={order_id}",
+        payment_methods="cc,dc,upi",
+    )
 
     try:
         api_response = Cashfree().PGCreateOrder(x_api_version, createOrderRequest, None, None)

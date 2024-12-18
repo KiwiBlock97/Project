@@ -6,7 +6,7 @@ from aiohttp import web
 from aiohttp_session import get_session
 from project.utils.cashfree import create_order, fetch_payment
 from project.utils.database import MySQLConnection
-from project.utils.utils import send_mail, user_session
+from project.utils.utils import send_mail
 from project.utils.vars import Var
 db=MySQLConnection()
 routes = web.RouteTableDef()
@@ -53,7 +53,7 @@ async def login_post(request: web.Request):
         code=db.gen_code(email)
         text=f"<html><head></head><body><p>Verify your email address by opening this link<br>{Var.URL}/verify?code={code}</p></body></html>"
         await send_mail(Resp[2], email, text, "Email Verification")
-        return web.Response(text="Verify Email by Opening Link sent to Provided Email Address")
+        return web.Response(text="Refresh this page or Login again after verifying your Email by Opening Link sent to Provided Email Address")
     session = await get_session(request)
     session["email"]=email
     session["type"]=Type
@@ -62,26 +62,25 @@ async def login_post(request: web.Request):
     elif Type=="Student":
         session["admid"]=Resp[0]
         return web.HTTPSeeOther("/student",)
+    
+@routes.get("/logout", name="logout")
+async def logout(request: web.Request):
+    session = await get_session(request)
+    session.invalidate()
+    return web.HTTPSeeOther("/login")
 
 @routes.get("/photo", name="photo")
 async def get_photo(request: web.Request):
-    session = await get_session(request)
-    user_type = session.get("type", None)
-    admid=session.get("admid")
-    if user_type=="Admin":
+    admid=request["session"].get("admid")
+    if request["user_type"]=="Admin":
         admid=request.rel_url.query.get("id")
-    if admid:
+    elif admid:
         return web.FileResponse(f"photo/{admid}")
     return web.HTTPNotFound
 
 @routes.get("/student", name="student_home")
 async def student_home(request: web.Request):
-    email, user_type = await user_session(request)
-    if user_type!="Student":
-        return web.HTTPSeeOther("/login")
-    user = db.get_user(email=email, user_type="Student")
-    if not user:
-        return web.HTTPSeeOther("/login")
+    user=request["user"]
     bus_pass = db.get_pass(user[0])
     valid_pass=[ x for x in bus_pass if x[4] >= datetime.now().date()]
     if not valid_pass:
@@ -94,12 +93,22 @@ async def student_home(request: web.Request):
         "usertype": user[6],
     })
 
+@routes.get("/student/print", name="student_print")
+async def student_home(request: web.Request):
+    bus_pass = db.get_pass(key=request.rel_url.query.get("key"))
+    print(bus_pass)
+    user = db.get_user(admid=bus_pass[0])
+    return aiohttp_jinja2.render_template("student_ticket_print.html", request, {
+        "name": user[1],
+        "department": user[4],
+        "admission": user[0],
+        "ticket": bus_pass,
+        "usertype": user[6],
+    })
+
 @routes.get("/student/apply", name="student_apply")
 async def student_apply(request: web.Request):
-    email, user_type = await user_session(request)
-    user = db.get_user(email=email, user_type="Student")
-    if not user:
-        return web.HTTPSeeOther("/signup")
+    user = request["user"]
     place=db.get_place()
     return aiohttp_jinja2.render_template("student_apply.html", request, {
         "name": user[1],
@@ -111,15 +120,13 @@ async def student_apply(request: web.Request):
 
 @routes.get("/student/renew", name="student_renew")
 async def student_renew(request: web.Request):
-    email, user_type = await user_session(request)
     key=request.rel_url.query.get("key")
     if not key:
         return web.HTTPBadRequest()
-    elif not (user:=db.get_user(email=email, user_type="Student")):
-        return web.HTTPSeeOther("/signup")
     elif not (bus_pass:=db.get_pass(key=key)):
         return web.HTTPSeeOther("/student/apply")
     place=db.get_place(bus_pass[1])
+    user=request["user"]
     return aiohttp_jinja2.render_template("student_renew.html", request, {
         "name": user[1],
         "department": user[4],
@@ -130,77 +137,11 @@ async def student_renew(request: web.Request):
         "fromdate": bus_pass[4]+timedelta(days=1)
     })
 
-@routes.get("/admin", name="admin_home")
-async def admin_home(request: web.Request):
-    email, user_type = await user_session(request)
-    if user_type!="Admin":
-        return web.HTTPSeeOther("/login")
-    return aiohttp_jinja2.render_template("admin_home.html", request, {})
-
-@routes.get("/admin/students", name="admin_students")
-async def admin_home(request: web.Request):
-    email, user_type = await user_session(request)
-    if user_type!="Admin":
-        return web.HTTPSeeOther("/login")
-    students=db.get_students()
-    return aiohttp_jinja2.render_template("admin_student_list.html", request, {
-        "students": students
-    })
-
-@routes.get("/admin/validate", name="admin_validate")
-async def admin_validate(request: web.Request):
-    email, user_type = await user_session(request)
-    if user_type!="Admin":
-        return web.HTTPSeeOther("/login")
-    if key:=request.rel_url.query.get("ticket-id", None):
-        bus_pass=db.get_pass(key=key)
-        user = db.get_user(admid=bus_pass[0]) if bus_pass else None
-        context={
-            "key": key,
-            "ticket": bus_pass,
-            "user": user,
-            "validity": bus_pass[4] if bus_pass else 0,
-        }
-    else:
-        context = {"key": None}
-    return aiohttp_jinja2.render_template("admin_validate.html", request, context)
-    
-@routes.get("/admin/stops", name="admin_stops")
-@routes.post("/admin/stops", name="admin_stops_post")
-async def admin_stops_post(request: web.Request):
-    email, user_type = await user_session(request)
-    if user_type!="Admin":
-        return web.HTTPSeeOther("/login")
-    if request.method == "GET":
-        stops=db.get_place()
-        return aiohttp_jinja2.render_template("admin_stops.html", request, {
-            "places": stops
-            })
-    # If Post Request
-    data=await request.post()
-    method=data.get("method", None)
-    if method=="add":
-        db.add_place(data.get("place"), int(data.get("price")))
-    elif method=="delete":
-        db.remove_place(data.get("place"))
-    else:
-        return web.HTTPBadRequest()
-    return web.HTTPSeeOther("/admin/stops")
-
-@routes.get("/logout", name="logout")
-async def logout(request: web.Request):
-    session = await get_session(request)
-    session.invalidate()
-    return web.HTTPSeeOther("/login")
-
-@routes.post("/order/confirm", name="order_confirm")
+@routes.post("/student/order/confirm", name="order_confirm")
 async def order_confirm(request: web.Request):
-    email, user_type = await user_session(request)
-    if not (data:=await request.post()):
-        return web.HTTPSeeOther("/student")
-    elif not (user:=db.get_user(email=email, user_type="Student")):
-        return web.HTTPSeeOther("/signup")
-    elif ukey:=data.get("ukey", None):
+    data=await request.post()
+    user=request["user"]
+    if ukey:=data.get("ukey", None):
         buspass=db.get_pass(key=ukey)
         datefrom: date=str(buspass[4]+timedelta(days=1))
         place=buspass[1]
@@ -212,6 +153,7 @@ async def order_confirm(request: web.Request):
     name=user[1]
     email=user[2]
     dateto=data.get("dateto")
+    phoneno=data.get("phone")
 
     start_date = datetime.strptime(datefrom, "%Y-%m-%d")
     end_date = datetime.strptime(dateto, "%Y-%m-%d")
@@ -222,7 +164,7 @@ async def order_confirm(request: web.Request):
     
     amount = price * validity
 
-    payment_id=create_order(str(admid), "1234567890", name, email, str(uuid4), amount)
+    payment_id=create_order(str(admid), str(phoneno), name, email, str(uuid4), amount)
     if payment_id:
         db.create_order(str(uuid4), email, place, datefrom, dateto, 1 if ukey else 0, ukey if ukey else None, None, amount)
         return aiohttp_jinja2.render_template("checkout.html", request, {
@@ -238,7 +180,7 @@ async def order_confirm(request: web.Request):
         })
     return web.HTTPServerError()
 
-@routes.get("/order/checkout", name="checkout")
+@routes.get("/student/order/checkout", name="checkout")
 async def checkout(request: web.Request):
     order_id=request.rel_url.query.get("order_id")
     if not order_id:
@@ -272,12 +214,54 @@ async def checkout(request: web.Request):
         "payment_id": resp.cf_payment_id,
         "order_id": resp.order_id
     })
+
+@routes.get("/admin", name="admin_home")
+async def admin_home(request: web.Request):
+    return aiohttp_jinja2.render_template("admin_home.html", request, {})
+
+@routes.get("/admin/students", name="admin_students")
+async def admin_home(request: web.Request):
+    students=db.get_students()
+    return aiohttp_jinja2.render_template("admin_student_list.html", request, {
+        "students": students
+    })
+
+@routes.get("/admin/validate", name="admin_validate")
+async def admin_validate(request: web.Request):
+    if key:=request.rel_url.query.get("ticket-id", None):
+        bus_pass=db.get_pass(key=key)
+        user = db.get_user(admid=bus_pass[0]) if bus_pass else None
+        context={
+            "key": key,
+            "ticket": bus_pass,
+            "user": user,
+            "validity": bus_pass[4] if bus_pass else 0,
+        }
+    else:
+        context = {"key": None}
+    return aiohttp_jinja2.render_template("admin_validate.html", request, context)
+    
+@routes.get("/admin/stops", name="admin_stops")
+@routes.post("/admin/stops", name="admin_stops_post")
+async def admin_stops_post(request: web.Request):
+    if request.method == "GET":
+        stops=db.get_place()
+        return aiohttp_jinja2.render_template("admin_stops.html", request, {
+            "places": stops
+            })
+    # If Post Request
+    data=await request.post()
+    method=data.get("method", None)
+    if method=="add":
+        db.add_place(data.get("place"), int(data.get("price")))
+    elif method=="delete":
+        db.remove_place(data.get("place"))
+    else:
+        return web.HTTPBadRequest()
+    return web.HTTPSeeOther("/admin/stops")
     
 @routes.post("/admin/remove")
 async def admin_remove(request: web.Request):
-    email, user_type = await user_session(request)
-    if user_type!="Admin":
-        return web.HTTPSeeOther("/login")
     data=await request.post()
     if (admid:=data.get("admid")):
         db.remove_student(int(admid))
@@ -286,9 +270,6 @@ async def admin_remove(request: web.Request):
 
 @routes.get("/admin/details")
 async def admin_details(request: web.Request):
-    email, user_type = await user_session(request)
-    if user_type!="Admin":
-        return web.HTTPSeeOther("/login")
     if ticket:=request.rel_url.query.get("pass"):
         db.remove_pass(uuid4=ticket)
     if not (admid:=request.rel_url.query.get("id")):
@@ -296,7 +277,6 @@ async def admin_details(request: web.Request):
     user=db.get_user(admid=admid)
     bus_pass = db.get_pass(user[0])
     valid_pass=[ x for x in bus_pass if x[4] >= datetime.now().date()]
-    print(valid_pass)
 
     return aiohttp_jinja2.render_template("admin_student.html", request, {
         "AdmissionId": user[0],
@@ -309,9 +289,6 @@ async def admin_details(request: web.Request):
 @routes.get("/admin/departments", name="admin_departments")
 @routes.post("/admin/departments", name="admin_departments_post")
 async def admin_departments_post(request: web.Request):
-    email, user_type = await user_session(request)
-    if user_type!="Admin":
-        return web.HTTPSeeOther("/login")
     if request.method == "GET":
         departments=db.get_departments()
         return aiohttp_jinja2.render_template("admin_department.html", request, {
@@ -331,9 +308,6 @@ async def admin_departments_post(request: web.Request):
 
 @routes.get("/admin/tickets/purchased")
 async def admin_tickets(request: web.Request):
-    email, user_type = await user_session(request)
-    if user_type!="Admin":
-        return web.HTTPSeeOther("/login")
     fromdate=request.rel_url.query.get("fromdate")
     todate=request.rel_url.query.get("todate")
     department=request.rel_url.query.get("department")
@@ -357,9 +331,6 @@ async def admin_tickets(request: web.Request):
 
 @routes.get("/admin/tickets/regular")
 async def admin_tickets_regular(request: web.Request):
-    email, user_type = await user_session(request)
-    if user_type!="Admin":
-        return web.HTTPSeeOther("/login")
     fromdate=request.rel_url.query.get("fromdate")
     todate=request.rel_url.query.get("todate")
     params={"fromdate": fromdate, "todate": todate}
@@ -370,9 +341,6 @@ async def admin_tickets_regular(request: web.Request):
     
 @routes.get("/admin/ticket/today")
 async def admin_tickets_today(request: web.Request):
-    email, user_type = await user_session(request)
-    if user_type!="Admin":
-        return web.HTTPSeeOther("/login")
     today=datetime.now().date()
     passes=db.get_pass(regular=True, fromdate=today, todate=today)
     return aiohttp_jinja2.render_template("admin_tickets_today.html", request, {"passes": enumerate(passes, 1)})

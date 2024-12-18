@@ -1,12 +1,5 @@
-from aiohttp import web, ClientSession, ClientTimeout
-from aiohttp_session import get_session
+from aiohttp import ClientSession, ClientTimeout
 from project.utils.vars import Var
-
-async def user_session(request: web.Request):
-    session = await get_session(request)
-    email = session.get("email", None)
-    user_type = session.get("type", None)
-    return email, user_type
 
 
 async def send_mail(name, email, text, subject):
