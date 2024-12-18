@@ -135,8 +135,15 @@ async def admin_home(request: web.Request):
     email, user_type = await user_session(request)
     if user_type!="Admin":
         return web.HTTPSeeOther("/login")
+    return aiohttp_jinja2.render_template("admin_home.html", request, {})
+
+@routes.get("/admin/students", name="admin_students")
+async def admin_home(request: web.Request):
+    email, user_type = await user_session(request)
+    if user_type!="Admin":
+        return web.HTTPSeeOther("/login")
     students=db.get_students()
-    return aiohttp_jinja2.render_template("admin_home.html", request, {
+    return aiohttp_jinja2.render_template("admin_student_list.html", request, {
         "students": students
     })
 
