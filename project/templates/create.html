@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signup</title>
-    <link rel="stylesheet" href="/static/styles/global.css">
+    <link rel="stylesheet" href="/static/styles/create.css">
 </head>
 <body>
     <div class="signup-container">
@@ -18,12 +18,18 @@
             <div class="form-group">
                 <label class="form-label">Type</label>
                 <div class="form-radio-group">
-                    <input type="radio" id="student" name="user-type" value="Student" checked onclick="toggleFields()"> 
-                    <label for="student">Student</label>
-                    <input type="radio" id="staff" name="user-type" value="Staff" onclick="toggleFields()"> 
-                    <label for="staff">Staff</label>
+                    <div>
+                        <input type="radio" id="student" name="user-type" value="Student" checked onclick="toggleFields()"> 
+                        <label for="student">Student</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="staff" name="user-type" value="Staff" onclick="toggleFields()"> 
+                        <label for="staff">Staff</label>
+                    </div>
                 </div>
             </div>
+            
+            
 
             <div class="form-group">
                 <label for="name" class="form-label">Name</label>
@@ -59,7 +65,7 @@
                 </select>
             </div>
 
-            <button type="button" id="submit" class="form-button">Create Account</button>
+            <button type="submit" id="submit" class="form-button">Create Account</button>
         </form>
     </div>
 
