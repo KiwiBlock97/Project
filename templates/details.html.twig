@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details - Admin Page</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <li><a href="/admin">Home</a></li>
+            <li><a href="/admin/validate.php">Validate Tickets</a></li>
+            <li><a href="/admin/stops.php">Manage Bus Stops</a></li>
+            <li><a href="/admin/departments.php">Manage Departments</a></li>
+            <li><a href="/admin/tickets/purchased.php">Tickets Purchased</a></li>
+            <li><a href="/admin/tickets/regular.php">Regular Tickets</a></li>
+            <li><a href="/admin/tickets/today.php">Today's Tickets</a></li>
+            <li><a href="/logout.php" class="nav-link">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+        <!-- Student Information -->
+        <section class="student-details">
+            <h2 class="section-title">Student Details</h2>
+            <table class="details-table">
+                <tr>
+                    <td class="label">Admission ID:</td>
+                    <td>{{ AdmissionId }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Name:</td>
+                    <td>{{ Name }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Email:</td>
+                    <td>{{ Email }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Department:</td>
+                    <td>{{ Department }}</td>
+                </tr>
+            </table>
+        </section>
+
+        <hr>
+
+        <!-- Bus Pass Details -->
+        <section class="bus-pass-section">
+            <h3 class="section-title">Bus Pass Details</h3>
+            {% if bus_pass %}
+            <div class="table-container">
+                <table class="bus-pass-table">
+                    <thead>
+                        <tr>
+                            <th>Place</th>
+                            <th>Validity From</th>
+                            <th>Validity To</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in bus_pass %}
+                        <tr>
+                            <td>{{ ticket["FromPlace"] }}</td>
+                            <td>{{ ticket["fromtime"] }}</td>
+                            <td>{{ ticket["totime"] }}</td>
+                            <td>
+                                <form method="get" action="/admin/details.php">
+                                    <input type="hidden" name="id" value="{{ AdmissionId }}">
+                                    <input type="hidden" name="pass" value="{{ ticket["UKey"] }}">
+                                    <button type="submit" class="btn btn-reject">Reject</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>No Tickets Found</p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+
+</html>

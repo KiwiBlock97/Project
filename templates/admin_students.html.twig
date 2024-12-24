@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student List - Admin Page</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <ul>
+            <li><a href="/admin">Home</a></li>
+            <li><a href="/admin/validate.php">Validate Tickets</a></li>
+            <li><a href="/admin/stops.php">Manage Bus Stops</a></li>
+            <li><a href="/admin/departments.php">Manage Departments</a></li>
+            <li><a href="/admin/tickets/purchased.php">Tickets Purchased</a></li>
+            <li><a href="/admin/tickets/regular.php">Regular Tickets</a></li>
+            <li><a href="/admin/tickets/today.php">Today's Tickets</a></li>
+            <li><a href="/logout.php" class="nav-link">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+        <section id="view-student-section" class="student-section">
+            <h2 class="section-title">View Student</h2>
+            <div class="table-container">
+                <table class="student-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Details</th>
+                            <th>Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in students %}
+                        <tr>
+                            <td>{{ row["Name"] }}</td>
+                            <td>{{ row["Department"] }}</td>
+                            <td>
+                                <form method="get" action="/admin/details.php">
+                                    <input type="hidden" name="id" value="{{ row["AdmissionId"] }}">
+                                    <button type="submit" class="btn btn-details">More</button>
+                                </form>
+                            </td>
+                            <td>
+                                <form method="post">
+                                    <input type="hidden" name="admid" value="{{ row["AdmissionId"] }}">
+                                    <button type="submit" class="btn btn-remove">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

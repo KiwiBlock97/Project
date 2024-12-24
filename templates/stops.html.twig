@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Stops - Admin Page</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav>
+        <ul>
+            <li><a href="/admin">Home</a></li>
+            <li><a href="/admin/students.php">Manage Students</a></li>
+            <li><a href="/admin/validate.php">Validate Tickets</a></li>
+            <li><a href="/admin/departments.php">Manage Departments</a></li>
+            <li><a href="/admin/tickets/purchased.php">Tickets Purchased</a></li>
+            <li><a href="/admin/tickets/regular.php">Regular Tickets</a></li>
+            <li><a href="/admin/tickets/today.php">Today's Tickets</a></li>
+            <li><a href="/logout.php" class="nav-link">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+        <section id="bus-stops-section" class="admin-section">
+            <h2 class="section-title">Bus Stops</h2>
+
+            <!-- Bus Stops Table -->
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <td><p>Place</p></td>
+                        <td><p>Fair</p></td>
+                        <td><p>Remove Stop</p></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in places %}
+                    <tr>
+                        <td class="table-cell">{{ row["Place"] }}</td>
+                        <td class="table-cell">{{ row["Price"] }}</td>
+                        <td class="table-cell">
+                            <form method="post" action="/admin/stops.php">
+                                <input type="hidden" value="{{row["Place"]}}" name="place">
+                                <input type="hidden" value="{{row["Price"]}}" name="price">
+                                <button type="submit" name="method" value="delete" class="btn btn-remove">❌ Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <form method="post">
+                            <td>
+                                <input type="text" placeholder="Stop Name" name="place" class="form-input" required>
+                            </td>
+                            <td>
+                                <input type="number" placeholder="Price" name="price" class="form-input" required>
+                            </td>
+                            <td>
+                                <button type="submit" value="add" name="method" class="btn btn-add">➕ Add</button>
+                            </td>
+                        </form>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+
+</html>

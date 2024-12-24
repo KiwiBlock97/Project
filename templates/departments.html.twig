@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Departments - Admin Page</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav>
+        <ul>
+            <li><a href="/admin">Home</a></li>
+            <li><a href="/admin/students.php">Manage Students</a></li>
+            <li><a href="/admin/validate.php">Validate Tickets</a></li>
+            <li><a href="/admin/stops.php">Manage Bus Stops</a></li>
+            <li><a href="/admin/tickets/purchased.php">Tickets Purchased</a></li>
+            <li><a href="/admin/tickets/regular.php">Regular Tickets</a></li>
+            <li><a href="/admin/tickets/today.php">Today's Tickets</a></li>
+            <li><a href="/logout.php" class="nav-link">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+        <section id="bus-stops-section" class="admin-section">
+            <h2 class="section-title">Departments</h2>
+
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Department</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in departments %}
+                    <tr>
+                        <td class="table-cell">{{ row["department"] }}</td>
+                        <td class="table-cell">
+                            <form method="post">
+                                <input type="hidden" name="department" value="{{ row["department"] }}">
+                                <button type="submit" name="method" value="delete" class="btn btn-remove">❌ Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <form method="post">
+                            <td>
+                                <input type="text" name="department" placeholder="Enter Department" class="form-input" required>
+                            </td>
+                            <td>
+                                <button type="submit" name="method" value="add" class="btn btn-add">➕ Add</button>
+                            </td>
+                        </form>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+
+</html>

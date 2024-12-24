@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validate Ticket - Admin Page</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav>
+        <ul>
+            <li><a href="/admin">Home</a></li>
+            <li><a href="/admin/students.php">Manage Students</a></li>
+            <li><a href="/admin/stops.php">Manage Bus Stops</a></li>
+            <li><a href="/admin/departments.php">Manage Departments</a></li>
+            <li><a href="/admin/tickets/purchased.php">Tickets Purchased</a></li>
+            <li><a href="/admin/tickets/regular.php">Regular Tickets</a></li>
+            <li><a href="/admin/tickets/today.php">Today's Tickets</a></li>
+            <li><a href="/logout.php" class="nav-link">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+        <!-- Ticket Validation Section -->
+        <section id="validate-ticket-section" class="validate-ticket">
+            <h2 class="section-title">Validate Ticket</h2>
+
+            <!-- Validation Form -->
+            <form class="validate-form">
+                <label for="ticket-id" class="form-label">Ticket ID:</label>
+                <input type="text" id="ticket-id" name="ticket-id" class="form-input" required>
+
+                <button type="submit" class="btn btn-validate">Validate</button>
+            </form>
+
+            <!-- Validation Status -->
+            <div id="status" class="ticket-status">
+                {% if key %}
+                    {% if ticket %}
+                        <div class="ticket-details">
+                            <h3 class="section-subtitle">Ticket Information</h3>
+                            <table class="details-table">
+                                <tr>
+                                    <td class="label">Photo:</td>
+                                    <td><img height="200px" src="/photo.php?id={{ticket["AdmissionId"]}}" alt="User Photo" class="user-photo"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Name:</td>
+                                    <td>{{ user["Name"] }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Department:</td>
+                                    <td>{{ user["Department"] }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Admission No:</td>
+                                    <td>{{ ticket["AdmissionId"] }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Validity:</td>
+                                    <td>{{ validity }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">From/To:</td>
+                                    <td>{{ ticket["FromPlace"] }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Ticket ID:</td>
+                                    <td>{{ ticket["UKey"] }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="error-message">❌ Ticket is Invalid</p>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

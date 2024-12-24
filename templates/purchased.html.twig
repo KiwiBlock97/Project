@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tickets Purchased</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav>
+        <ul>
+            <li><a href="/admin">Home</a></li>
+            <li><a href="/admin/students.php">Manage Students</a></li>
+            <li><a href="/admin/validate.php">Validate Tickets</a></li>
+            <li><a href="/admin/stops.php">Manage Bus Stops</a></li>
+            <li><a href="/admin/departments.php">Manage Departments</a></li>
+            <li><a href="/admin/tickets/regular.php">Regular Tickets</a></li>
+            <li><a href="/admin/tickets/today.php">Today's Tickets</a></li>
+            <li><a href="/logout.php" class="nav-link">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+        <section class="admin-section">
+            <h2 class="section-title">View Students</h2>
+
+            <!-- Search Form -->
+            <form method="get">
+                <div class="form-group">
+                    <label for="fromdate">From Date</label>
+                    <input type="date" name="fromdate" id="fromdate" value="{{fromdate}}" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="todate">To Date</label>
+                    <input type="date" name="todate" id="todate" value="{{todate}}" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <select id="department" name="department" class="form-input">
+                        <option disabled selected value>Select Department</option>
+                        {% for row in departments %}
+                        <option value="{{row["department"]}}">{{row["department"]}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-search">Search</button>
+            </form>
+
+            <!-- Orders Table -->
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th colspan="6">{{count}} Orders</th>
+                    </tr>
+                    <tr>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Place</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in orders %}
+                    <tr>
+                        <td>{{row["Name"]}}</td>
+                        <td>{{row["Department"]}}</td>
+                        <td>{{row["fromtime"]}}</td>
+                        <td>{{row["totime"]}}</td>
+                        <td>{{row["Place"]}}</td>
+                        <td>{{row["Price"]}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5" class="table-total">Total</td>
+                        <td>{{sum}}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </section>
+    </main>
+</body>
+
+</html>

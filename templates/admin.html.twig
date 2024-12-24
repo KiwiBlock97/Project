@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Home</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
+</head>
+<body>
+    <header>Admin Dashboard</header>
+
+    <nav>
+        <ul>
+            <li><a href="/admin/students.php">Manage Students</a></li>
+            <li><a href="/admin/validate.php">Validate Tickets</a></li>
+            <li><a href="/admin/stops.php">Manage Bus Stops</a></li>
+            <li><a href="/admin/departments.php">Manage Departments</a></li>
+            <li><a href="/admin/tickets/purchased.php">Tickets Purchased</a></li>
+            <li><a href="/admin/tickets/regular.php">Regular Tickets</a></li>
+            <li><a href="/admin/tickets/today.php">Today's Tickets</a></li>
+            <li><a href="/logout.php" class="nav-link">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section class="admin-grid">
+            <a href="/admin/students.php" class="admin-card">
+                <h3>Manage Students</h3>
+                <p>View and manage student accounts.</p>
+            </a>
+            <a href="/admin/validate.php" class="admin-card">
+                <h3>Validate Tickets</h3>
+                <p>Check ticket validity by ID.</p>
+            </a>
+            <a href="/admin/stops.php" class="admin-card">
+                <h3>Manage Bus Stops</h3>
+                <p>Add or remove bus stops for tickets.</p>
+            </a>
+            <a href="/admin/departments.php" class="admin-card">
+                <h3>Manage Departments</h3>
+                <p>Add or remove departments for accounts.</p>
+            </a>
+            <a href="/admin/tickets/purchased.php" class="admin-card">
+                <h3>Tickets Purchased</h3>
+                <p>View purchased tickets within a date range.</p>
+            </a>
+            <a href="/admin/tickets/regular.php" class="admin-card">
+                <h3>Regular Tickets</h3>
+                <p>List tickets valid for a range of dates.</p>
+            </a>
+            <a href="/admin/tickets/today.php" class="admin-card">
+                <h3>Today's Tickets</h3>
+                <p>View all tickets valid today.</p>
+            </a>
+        </section>
+    </main>
+
+    <!-- <footer>
+        &copy; 2024 Admin Dashboard. All rights reserved.
+    </footer> -->
+</body>
+</html>

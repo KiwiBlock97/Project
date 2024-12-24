@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renew Ticket</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/student">Home</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="renew-ticket">
+        <form class="ticket-form" method="post" action="/student/order/confirm.php">
+            <input type="hidden" name="ukey" value="{{ ukey }}">
+
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <p id="name" name="name" class="value">{{ name }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="department">Department:</label>
+                <p id="department" name="department" class="value">{{ department }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="from-to">From/To:</label>
+                <p id="from-to" name="from-to" class="value">{{ place }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="datefrom">From Date:</label>
+                <input type="date" id="datefrom" name="datefrom" value="{{ fromdate }}" readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="dateto">To Date:</label>
+                <input type="date" id="dateto" name="dateto" onchange="update_price()">
+            </div>
+
+            <div class="form-group">
+                <label for="admin-no">Admin No:</label>
+                <p id="admin-no" name="admin-no" class="value">{{ adm_no }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="ticket-price">Ticket Price:</label>
+                <p id="ticket-price" name="ticket-price" class="value" data-price="{{ price }}">{{ price }}</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" class="value" required>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" id="pay" class="pay-button" style="display: none;">Pay ₹</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function update_price() {
+            var fromDate = document.getElementById("datefrom").value;
+            var toDate = document.getElementById("dateto").value;
+            var payButton = document.getElementById("pay");
+            var ticketPriceElement = document.getElementById("ticket-price");
+            var ticketPrice = parseFloat(ticketPriceElement.getAttribute("data-price"));
+
+            if (fromDate && toDate) {
+                var startDate = new Date(fromDate);
+                var endDate = new Date(toDate);
+                var timeDifference = endDate - startDate;
+                var validity = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)) + 1;
+
+                if (validity > 0) {
+                    var totalAmount = ticketPrice * validity;
+                    payButton.innerHTML = `Pay ₹${totalAmount}`;
+                    payButton.style.display = "block";
+                } else {
+                    payButton.innerHTML = "Invalid date range. Please select a valid To Date.";
+                    payButton.style.display = "block";
+                }
+            } else {
+                payButton.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

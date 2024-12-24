@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment {{ status }}</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
+    <style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f7f9fc;
+    }
+    .payment-status-container {
+        background-color: white;
+        padding: 3rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+    }
+    h1 {
+        margin-bottom: 2rem;
+        color: #333;
+        font-size: 2rem;
+    }
+    .payment-status-message {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .status-icon {
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+    }
+    .success { color: #28a745; }
+    .pending { color: #ffc107; }
+    .user_dropped { color: #6c757d; }
+    .failed { color: #dc3545; }
+    .info {
+        margin-bottom: 2rem;
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 10px;
+    }
+    .info p {
+        margin: 0.5rem 0;
+        color: #495057;
+    }
+    .button {
+        display: inline-block;
+        background-color: #007bff;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        text-decoration: none;
+        border-radius: 50px;
+        transition: all 0.3s;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .button:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+    }
+</style>
+</head>
+<body>
+    <div class="payment-status-container">
+        <h1 class="payment-status-title">Payment Status</h1>
+        <div class="payment-status-message {{ status.lower() }}">
+            {% if status == 'SUCCESS' %}
+                <svg class="status-icon" viewBox="0 0 24 24">
+                    <path fill="#28a745" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                </svg>
+            {% elseif status == 'PENDING' %}
+                <svg class="status-icon" viewBox="0 0 24 24">
+                    <path fill="#ffc107" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                </svg>
+            {% elseif status == 'USER_DROPPED' %}
+                <svg class="status-icon" viewBox="0 0 24 24">
+                    <path fill="#6c757d" d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" />
+                </svg>
+            {% elseif status == 'FAILED' %}
+                <svg class="status-icon" viewBox="0 0 24 24">
+                    <path fill="#dc3545" d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" />
+                </svg>
+            {% endif %}
+            {{ status }}
+        </div>
+        <div class="payment-info">
+            <p>Payment ID: <strong>{{ payment_id }}</strong></p>
+            <p>Order ID: <strong>{{ order_id }}</strong></p>
+        </div>
+        <a href="/student" class="return-home-button">Go to Home Page</a>
+    </div>
+</body>
+</html>
