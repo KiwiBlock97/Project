@@ -1,11 +1,5 @@
 {
     "require": {
-        "twig/twig": "^3.0",
-        "cashfree/cashfree-pg": "^4.3"
-    },
-    "config": {
-        "allow-plugins": {
-            "php-http/discovery": true
-        }
+        "twig/twig": "^3.0"
     }
 }
