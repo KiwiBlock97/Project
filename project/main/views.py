@@ -164,7 +164,7 @@ async def order_confirm(request: web.Request):
     
     amount = price * validity
 
-    payment_id=create_order(str(admid), str(phoneno), name, email, str(uuid4), amount)
+    payment_id=await create_order(str(admid), str(phoneno), name, email, str(uuid4), amount)
     if payment_id:
         db.create_order(str(uuid4), email, place, datefrom, dateto, 1 if ukey else 0, ukey if ukey else None, None, amount)
         return aiohttp_jinja2.render_template("checkout.html", request, {
@@ -185,16 +185,16 @@ async def checkout(request: web.Request):
     order_id=request.rel_url.query.get("order_id")
     if not order_id:
         return web.HTTPMethodNotAllowed()
-    resp=(fetch_payment(order_id))[0]
-    if resp.payment_status=="SUCCESS":
+    resp=(await fetch_payment(order_id))[0]
+    if resp.get("payment_status")=="SUCCESS":
         order=db.get_order(order_id)
         if order[8] in ["SUCCESS", "PROCESSED"]:
             return aiohttp_jinja2.render_template("status.html", request, {
-                "status": resp.payment_status,
-                "payment_id": resp.cf_payment_id,
-                "order_id": resp.order_id
+                "status": resp.get("payment_status"),
+                "payment_id": resp.get("cf_payment_id"),
+                "order_id": resp.get("order_id")
             })
-        db.modify_order(order_id, str(resp.payment_status))
+        db.modify_order(order_id, str(resp.get("payment_status")))
         user=db.get_user(email=order[1], user_type="Student")
         place=db.get_place(place=order[2])
         fromtime: date=order[3]
@@ -204,15 +204,15 @@ async def checkout(request: web.Request):
         elif order[5]==1:
             db.extend_pass(totime, order[6])
         db.modify_order(order_id, "PROCESSED")
-    elif resp.payment_status:
-        db.modify_order(order_id, str(resp.payment_status))
+    elif resp.get("payment_status"):
+        db.modify_order(order_id, str(resp.get("payment_status")))
         # [PENDING, USER_DROPPED, FAILED]
     else:
         return web.HTTPBadRequest()
     return aiohttp_jinja2.render_template("status.html", request, {
-        "status": resp.payment_status,
-        "payment_id": resp.cf_payment_id,
-        "order_id": resp.order_id
+        "status": resp.get("payment_status"),
+        "payment_id": resp.get("cf_payment_id"),
+        "order_id": resp.get("order_id")
     })
 
 @routes.get("/admin", name="admin_home")
