@@ -2,7 +2,7 @@ import pathlib
 
 from aiohttp import web
 
-from project.main.views import index, routes
+from project.main.views import routes
 
 PROJECT_PATH = pathlib.Path(__file__).parent
 
