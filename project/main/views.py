@@ -337,7 +337,7 @@ async def admin_tickets_regular(request: web.Request):
         params["passes"]=enumerate(passes, 1)
     return aiohttp_jinja2.render_template("admin_tickets_regular.html", request, params)
     
-@routes.get("/admin/ticket/today")
+@routes.get("/admin/tickets/today")
 async def admin_tickets_today(request: web.Request):
     today=datetime.now().date()
     passes=db.get_pass(regular=True, fromdate=today, todate=today)
