@@ -34,6 +34,11 @@
                     {% endfor %}
                 </select>
             </div>
+            
+            <div class="form-group">
+                <label for="ticket-price">Ticket Price per Day:</label>
+                <input type="number" id="ticket-price" name="ticket-price" class="value" readonly>
+            </div>            
 
             {% if usertype == 1 %}
                 <div class="form-group">
@@ -67,7 +72,7 @@
             </div>
             
             <div class="form-group">
-                <button type="submit" id="pay" class="pay-button" style="display: none;">Pay ₹</button>
+                <button type="submit" id="pay" class="pay-button" style="display: none;">Pay</button>
             </div>
         </form>
     </div>
@@ -79,6 +84,19 @@ function update_price() {
     var fromDate = document.getElementById("datefrom").value;
     var toDate = document.getElementById("dateto").value;
     var pay = document.getElementById("pay");
+    var ticket_price = document.getElementById("ticket-price");
+
+    var selectElement = document.getElementById("from-to");
+    var selectedOption = selectElement.options[selectElement.selectedIndex];
+    var price = parseFloat(selectedOption.getAttribute("price"));
+    ticket_price.value = price
+    document.getElementById("datefrom").min=new Date().toISOString().slice(0,10)
+    if (fromDate){
+        document.getElementById("dateto").min=fromDate
+    }
+    if (toDate){
+        document.getElementById("datefrom").max=toDate
+    }
 
     if (usertype === "2") {
         document.getElementById("datefrom").value = toDate;
@@ -92,12 +110,8 @@ function update_price() {
         var validity = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)) + 1;
 
         if (validity > 0) {
-            var selectElement = document.getElementById("from-to");
-            var selectedOption = selectElement.options[selectElement.selectedIndex];
-            var price = parseFloat(selectedOption.getAttribute("price"));
-
-            var amount = price * validity;
-            pay.innerHTML = `Pay ₹${amount}`;
+            // var amount = price * validity;
+            pay.innerHTML = `Pay`;
             pay.style.display = "block";
         } else {
             pay.innerHTML = "Invalid date range. Please select a valid To Date.";
@@ -107,6 +121,7 @@ function update_price() {
         pay.style.display = "none";
     }
 }
+    window.onload=update_price();
     </script>
 </body>
 </html>

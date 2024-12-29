@@ -158,7 +158,11 @@ async def order_confirm(request: web.Request):
     start_date = datetime.strptime(datefrom, "%Y-%m-%d")
     end_date = datetime.strptime(dateto, "%Y-%m-%d")
     
-    validity = (end_date - start_date).days + 1
+    no_days = (end_date - start_date).days
+    no_sun = (no_days)//7
+    if (no_days % 7 + start_date.isoweekday()) >= 7:
+        no_sun+=1
+    validity = no_days+1-no_sun
     db_place = db.get_place(place=place)
     price = int(db_place[1])
     
