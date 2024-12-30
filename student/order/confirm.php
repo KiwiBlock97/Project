@@ -36,7 +36,18 @@ $phoneno = $_POST['phone'];
 // Calculate validity
 $startDate = new DateTime($datefrom);
 $endDate = new DateTime($dateto);
-$validity = $endDate->diff($startDate)->days + 1;
+$curent_date=$startDate;
+$no_days = $endDate->diff($startDate)->days + 1;
+$no_sun = 0;
+
+while ($curent_date <= $endDate) {
+    if ($curent_date->format('w') == 0) {
+        $no_sun = $no_sun+1;
+    }
+    
+    $curent_date->modify('+1 day');
+}
+$validity = $no_days-$no_sun;
 
 // Fetch place details and calculate amount
 $dbPlace = getPlace($place); // Replace with your database call
