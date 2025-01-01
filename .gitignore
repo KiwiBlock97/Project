@@ -7,3 +7,5 @@ __pycache__/
 *$py.class
 
 photo/*
+vendor/
+config.php
