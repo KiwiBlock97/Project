@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/utils/vars.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
 
 
 function createOrder($admid, $phoneno, $name, $email, $uuid4, $amount)

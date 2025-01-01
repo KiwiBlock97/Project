@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/utils/vars.php'; 
+require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php'; 
 
 function sendMail($name, $email, $text, $subject) {
     $url = "https://api.brevo.com/v3/smtp/email";

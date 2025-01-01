@@ -1,10 +1,11 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
 
 function getDatabaseConnection() {
-    $host = 'localhost';
-    $dbname = 'bus';
-    $username = 'root';
-    $password = 'mysql';
+    $host = Config::DB_HOST;
+    $dbname = Config::DB_NAME;
+    $username = Config::DB_USERNAME;
+    $password = Config::DB_PASSWORD;
 
     try {
         $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password, [

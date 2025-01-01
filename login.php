@@ -1,6 +1,6 @@
 <?php
 
-require_once 'utils/vars.php'; 
+require_once 'config.php'; 
 require_once 'utils/database.php';
 require_once 'utils/utils.php';
 $twig = require 'utils/twig.php';

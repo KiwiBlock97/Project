@@ -10,4 +10,4 @@ photo/*
 cache/*
 vendor/*
 index.html.old
-utils/vars.php
+config.php
