@@ -96,7 +96,6 @@ async def student_home(request: web.Request):
 @routes.get("/student/print")
 async def student_home(request: web.Request):
     bus_pass = db.get_pass(key=request.rel_url.query.get("key"))
-    print(bus_pass)
     user = db.get_user(admid=bus_pass[0])
     return aiohttp_jinja2.render_template("student_print.html", request, {
         "name": user[1],

@@ -19,7 +19,6 @@ class MySQLConnection:
                 database=Var.DB_NAME,
                 port=Var.DB_PORT
             )
-            print("Connection to MySQL DB successful")
         except Error as e:
             print(f"The error '{e}' occurred")
 
@@ -304,4 +303,3 @@ class MySQLConnection:
     def close_connection(self):
         if self.connection.is_connected():
             self.connection.close()
-            print("MySQL connection is closed")
