@@ -56,7 +56,6 @@ $amount = $price * $validity;
 
 // Create payment order
 $paymentId = createOrder($admid, $phoneno, $name, $email, $uuid4, $amount);
-error_log("--------".$paymentId."---------");
 
 if ($paymentId) {
     // Store order details in the database
