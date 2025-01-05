@@ -72,7 +72,8 @@ if ($paymentId) {
         'adm_no' => $admid,
         'price' => $amount,
         'order_id' => $uuid4,
-        'renew' => isset($ukey) ? 'Yes' : 'No'
+        'renew' => isset($ukey) ? 'Yes' : 'No',
+        'usertype' => $user['Type']
     ]);
 } else {
     http_response_code(500); // Internal Server Error
