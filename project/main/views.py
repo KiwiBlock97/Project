@@ -180,7 +180,8 @@ async def order_confirm(request: web.Request):
             "adm_no": admid,
             "price": amount,
             "order_id": str(uuid4),
-            "renew": "Yes" if bool(ukey) else "No"
+            "renew": "Yes" if bool(ukey) else "No",
+            "usertype": user[6]
         })
     return web.HTTPServerError()
 

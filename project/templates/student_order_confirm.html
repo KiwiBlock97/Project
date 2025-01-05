@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cashfree Checkout</title>
+    <title>Checkout</title>
     <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
     <link rel="stylesheet" href="/static/styles/global.css">
 </head>
@@ -28,7 +28,13 @@
                 <span class="detail-value">{{ validity }}</span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Admin No:</span>
+                <span class="detail-label">
+                    {% if usertype == 1 %}
+                    Admin No:
+                    {% elif usertype == 2 %}
+                    Aadhar No:
+                    {% endif %}
+                </span>
                 <span class="detail-value">{{ adm_no }}</span>
             </div>
             <div class="detail-row">
