@@ -60,10 +60,25 @@
                                     <td class="label">Admission No:</td>
                                     <td>{{ ticket[0] }}</td>
                                 </tr>
+                                {% if usertype == "Student" %}
                                 <tr>
-                                    <td class="label">Validity:</td>
-                                    <td>{{ validity }}</td>
+                                    <td class="label">From Date:</td>
+                                    <td>{{ ticket[3] }}</td>
                                 </tr>
+                                <tr>
+                                    <td class="label">To Date:</td>
+                                    <td>{{ ticket[4] }}</td>
+                                </tr>
+                                {% elif usertype == "Staff" %}
+                                <tr>
+                                    <td class="label">Total Days:</td>
+                                    <td>{{ ticket[3] }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Days Left:</td>
+                                    <td>{{ ticket[3] - ticket[4] }}</td>
+                                </tr>
+                                {% endif %}
                                 <tr>
                                     <td class="label">From/To:</td>
                                     <td>{{ ticket[1] }}</td>

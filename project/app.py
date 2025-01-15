@@ -42,6 +42,12 @@ async def middleware(request: web.Request, handler):
         request["user"] = db.get_user(email=request["email"], user_type="Student")
         if not request["user"]:
             return web.HTTPSeeOther("/login")
+    elif path.startswith("/staff"):
+        if request["user_type"]!="Staff":
+            return web.HTTPSeeOther("/login")
+        request["user"] = db.get_user(email=request["email"], user_type="Staff")
+        if not request["user"]:
+            return web.HTTPSeeOther("/login")
     elif path.startswith("/admin"):
         if request["user_type"]!="Admin":
             return web.HTTPSeeOther("/login")

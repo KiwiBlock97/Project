@@ -27,12 +27,9 @@ class MySQLConnection:
             try:
                 cursor=self.connection.cursor()
                 if user_type=="Student":
-                    user_type=1
+                    cursor.execute("insert into student values(%s,%s,%s,%s,%s,%s,%s,%s)", (admission_number, name, email, photo, department, password, 0))
                 elif user_type=="Staff":
-                    user_type=2
-                else:
-                    user_type=3
-                cursor.execute("insert into student values(%s,%s,%s,%s,%s,%s,%s, %s)", (admission_number, name, email, photo, department, password, user_type, 0))
+                    cursor.execute("insert into staff values(%s,%s,%s,%s,%s,%s,%s)", (admission_number, name, email, photo, department, password, 0))
                 cursor.close()
                 self.connection.commit()
             except mysql.connector.errors.IntegrityError as e:
@@ -48,26 +45,37 @@ class MySQLConnection:
                 result=cursor.fetchone()
                 if result:
                     return result, "Student"
+
                 cursor.execute("select Email from admin where Email=%s and Password=%s", (email, password))
                 result=cursor.fetchone()
                 if result:
                     return result, "Admin"
+
+                cursor.execute("select Aadhar, Verified, Name from staff where Email=%s and Password=%s", (email, password))
+                result=cursor.fetchone()
+                if result:
+                    return result, "Staff"
                 return None, None
             except Exception as e:
                 print(e)
             finally:
                 cursor.close()
     
-    def get_user(self, email: str = None, admid: int = None, user_type: str = None):
+    def get_user(self, email: str = None, admid: int = None, user_type: str = "Student"):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if admid:
-                    cursor.execute("select * from student where AdmissionId=%s", (admid,))
+                    if user_type=="Student":
+                        cursor.execute("select * from student where AdmissionId=%s", (admid,))
+                    elif user_type=="Staff":
+                        cursor.execute("select * from staff where Aadhar=%s", (admid,))
                 elif user_type=="Admin":
                     cursor.execute("select * from admin where Email=%s", (email,))
                 elif user_type=="Student":
                     cursor.execute("select * from student where Email=%s", (email,))
+                elif user_type=="Staff":
+                    cursor.execute("select * from staff where Email=%s", (email,))
                 result=cursor.fetchone()
                 return result
             except Exception as e:
@@ -75,15 +83,21 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
-    def get_pass(self, admid:int=None, key: str=None, regular=None, fromdate=None, todate=None):
+    def get_pass(self, admid:int=None, key: str=None, regular=None, fromdate=None, todate=None, type=1):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if admid:
-                    cursor.execute("select * from pass where AdmissionId=%s", (admid,))
+                    if type==1:
+                        cursor.execute("select * from pass where AdmissionId=%s", (admid,))
+                    elif type==2:
+                        cursor.execute("select * from staff_pass where Aadhar=%s", (admid,))
                     result=cursor.fetchall()
                 elif key:
-                    cursor.execute("select * from pass where UKey=%s", (key,))
+                    if type==1:
+                        cursor.execute("select * from pass where UKey=%s", (key,))
+                    elif type==2:
+                        cursor.execute("select * from staff_pass where UKey=%s", (key,))
                     result=cursor.fetchone()
                 elif regular:
                     cursor.execute("select * from pass where (fromtime <= %s AND totime >= %s) ", (fromdate, todate))
@@ -94,11 +108,14 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
-    def create_pass(self, admid: int, place: str, uuid4:str, fromtime: date, totime:date):
+    def create_pass(self, admid: int, place: str, uuid4:str, fromtime: date=None, totime:date=None, days: int=0):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("insert into pass values(%s,%s,%s,%s, %s)", (admid, place, uuid4, fromtime, totime))
+                if fromtime:
+                    cursor.execute("insert into pass values(%s,%s,%s,%s, %s)", (admid, place, uuid4, fromtime, totime))
+                elif days:
+                    cursor.execute("insert into staff_pass values(%s,%s,%s,%s, %s)", (admid, place, uuid4, days, 0))
                 self.connection.commit()
             except Exception as e:
                 print(e)
@@ -169,23 +186,29 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
-    def create_order(self, OrderId:str, email: str, place: str, fromtime: str, totime: str, renew: int, ukey:str, status: str, price: int):
+    def create_order(self, OrderId:str, email: str, place: str, fromtime: str=None, totime: str=None, renew: int=None, ukey:str=None, status: str=None, price: int=0, days: int=None):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("insert into pass_order values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (OrderId, email, place, fromtime, totime, renew, ukey, datetime.now().date(), status, price))
+                if fromtime:
+                    cursor.execute("insert into pass_order values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (OrderId, email, place, fromtime, totime, renew, ukey, datetime.now().date(), status, price))
+                elif days:
+                    cursor.execute("insert into staff_order values(%s, %s, %s, %s, %s, %s, %s)", (OrderId, email, place, days, datetime.now().date(), status, price))
                 self.connection.commit()
             except Exception as e:
                 print(e)
             finally:
                 cursor.close()
 
-    def get_order(self, OrderId:str= None, fromdate=None, todate=None, department=None):
+    def get_order(self, OrderId:str= None, fromdate=None, todate=None, department=None, utype: int=1):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if OrderId:
-                    cursor.execute("select * from pass_order where OrderID=%s", (OrderId,))
+                    if utype==1:
+                        cursor.execute("select * from pass_order where OrderID=%s", (OrderId,))
+                    elif utype==2:
+                        cursor.execute("select * from staff_order where OrderID=%s", (OrderId,))
                     result=cursor.fetchone()
                     return result
                 else:
@@ -202,11 +225,14 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
-    def modify_order(self, OrderId:str, Status):
+    def modify_order(self, OrderId:str, Status, utype: int=1):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("update pass_order set Status=%s where OrderID=%s", (Status, OrderId,))
+                if utype==1:
+                    cursor.execute("update pass_order set Status=%s where OrderID=%s", (Status, OrderId,))
+                elif utype==2:
+                    cursor.execute("update staff_order set Status=%s where OrderID=%s", (Status, OrderId,))
                 self.connection.commit()
             except Exception as e:
                 print(e)

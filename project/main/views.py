@@ -37,6 +37,8 @@ async def get_create_account(request: web.Request):
 
 @routes.get("/login")
 async def login_get(request: web.Request):
+    if request["user_type"]:
+        return web.HTTPSeeOther("/"+request["user_type"].lower())
     return aiohttp_jinja2.render_template("login.html", request, {})
 
 @routes.post("/login")
@@ -49,7 +51,7 @@ async def login_post(request: web.Request):
     Resp, Type = db.auth_user(email, password)
     if not Resp:
         return web.Response(body="Invalid Email or Password")
-    if Type=="Student" and Resp[1]==0:
+    if Type in ["Student", "Staff"] and Resp[1]==0:
         code=db.gen_code(email)
         text=f"<html><head></head><body><p>Verify your email address by opening this link<br>{Var.URL}/verify?code={code}</p></body></html>"
         await send_mail(Resp[2], email, text, "Email Verification")
@@ -60,8 +62,9 @@ async def login_post(request: web.Request):
     if Type=="Admin":
         return web.HTTPSeeOther("/admin")
     elif Type=="Student":
-        session["admid"]=Resp[0]
         return web.HTTPSeeOther("/student")
+    elif Type=="Staff":
+        return web.HTTPSeeOther("/staff")
     
 @routes.get("/logout")
 async def logout(request: web.Request):
@@ -71,9 +74,13 @@ async def logout(request: web.Request):
 
 @routes.get("/photo")
 async def get_photo(request: web.Request):
-    admid=request["session"].get("admid")
     if request["user_type"]=="Admin":
         admid=request.rel_url.query.get("id")
+    else:
+        email=request["email"]
+        user_type=request["user_type"]
+        user=db.get_user(email, user_type=user_type)
+        admid=user[0]
     if admid:
         return web.FileResponse(f"photo/{admid}")
     return web.HTTPNotFound
@@ -90,7 +97,6 @@ async def student_home(request: web.Request):
         "department": user[4],
         "admission": user[0],
         "bus_pass": valid_pass,
-        "usertype": user[6],
     })
 
 @routes.get("/student/print")
@@ -102,7 +108,6 @@ async def student_home(request: web.Request):
         "department": user[4],
         "admission": user[0],
         "ticket": bus_pass,
-        "usertype": user[6],
     })
 
 @routes.get("/student/apply")
@@ -114,7 +119,6 @@ async def student_apply(request: web.Request):
         "department": user[4],
         "adm_no": user[0],
         "place": place,
-        "usertype": user[6]
     })
 
 @routes.get("/student/renew")
@@ -167,7 +171,7 @@ async def order_confirm(request: web.Request):
     
     amount = price * validity
 
-    payment_id=await create_order(str(admid), str(phoneno), name, email, str(uuid4), amount)
+    payment_id=await create_order(str(admid), str(phoneno), name, email, str(uuid4), amount, "/student/order/checkout")
     if payment_id:
         db.create_order(str(uuid4), email, place, datefrom, dateto, 1 if ukey else 0, ukey if ukey else None, None, amount)
         return aiohttp_jinja2.render_template("student_order_confirm.html", request, {
@@ -180,7 +184,6 @@ async def order_confirm(request: web.Request):
             "price": amount,
             "order_id": str(uuid4),
             "renew": "Yes" if bool(ukey) else "No",
-            "usertype": user[6]
         })
     return web.HTTPServerError()
 
@@ -240,13 +243,18 @@ async def admin_home(request: web.Request):
 @routes.get("/admin/validate")
 async def admin_validate(request: web.Request):
     if key:=request.rel_url.query.get("ticket-id", None):
-        bus_pass=db.get_pass(key=key)
-        user = db.get_user(admid=bus_pass[0]) if bus_pass else None
+        usertype=0
+        if bus_pass:=db.get_pass(key=key):
+            usertype="Student"
+        elif bus_pass:=db.get_pass(key=key, type=2):
+            usertype="Staff"
+        user = db.get_user(admid=bus_pass[0], user_type=usertype) if bus_pass else None
+        print(user, usertype)
         context={
             "key": key,
             "ticket": bus_pass,
             "user": user,
-            "validity": bus_pass[4] if bus_pass else 0,
+            "usertype": usertype
         }
     else:
         context = {"key": None}
@@ -355,3 +363,105 @@ async def verify_email(request: web.Request):
         return web.Response(text="Email Verified successfully. Please Login Again")
     else:
         return web.Response(text="invalid Link or Account already verified")
+    
+# -------------------------------------------
+
+@routes.get("/staff")
+async def student_home(request: web.Request):
+    user=request["user"]
+    bus_pass = db.get_pass(user[0], type=2)
+    valid_pass=[ x for x in bus_pass if x[3] >= x[4]]
+    if not valid_pass:
+        return web.HTTPSeeOther("/staff/apply")
+    return aiohttp_jinja2.render_template("staff_home.html", request, {
+        "name": user[1],
+        "department": user[4],
+        "aadhar": user[0],
+        "bus_pass": valid_pass,
+    })
+
+@routes.get("/staff/print")
+async def student_home(request: web.Request):
+    bus_pass = db.get_pass(key=request.rel_url.query.get("key"), type=2)
+    user=request["user"]
+    return aiohttp_jinja2.render_template("staff_print.html", request, {
+        "name": user[1],
+        "department": user[4],
+        "aadhar": user[0],
+        "ticket": bus_pass
+    })
+
+@routes.get("/staff/apply")
+async def student_apply(request: web.Request):
+    user = request["user"]
+    place=db.get_place()
+    return aiohttp_jinja2.render_template("staff_apply.html", request, {
+        "name": user[1],
+        "department": user[4],
+        "aadhar_no": user[0],
+        "place": place
+    })
+
+@routes.post("/staff/order/confirm")
+async def order_confirm(request: web.Request):
+    data=await request.post()
+    print(data)
+    user=request["user"]
+
+    days=int(data.get("days"))
+    place=data.get("from-to")
+    uuid4=uuid.uuid4()
+    aadhar=user[0]
+    name=user[1]
+    email=user[2]
+    phoneno=data.get("phone")
+
+    db_place = db.get_place(place=place)
+    price = int(db_place[1])
+    
+    amount = price * days
+
+    payment_id=await create_order(str(aadhar), str(phoneno), name, email, str(uuid4), amount, "/staff/order/checkout")
+    if payment_id:
+        db.create_order(str(uuid4), email, place, price=amount, days=days)
+        return aiohttp_jinja2.render_template("staff_order_confirm.html", request, {
+            "sessionid": payment_id,
+            "name": name,
+            "department": user[4],
+            "place": place,
+            "days": days,
+            "aadhar": aadhar,
+            "price": amount,
+        })
+    return web.HTTPServerError()
+
+@routes.get("/staff/order/checkout")
+async def checkout(request: web.Request):
+    order_id=request.rel_url.query.get("order_id")
+    if not order_id:
+        return web.HTTPMethodNotAllowed()
+    resp=(await fetch_payment(order_id))[0]
+    if resp.get("payment_status")=="SUCCESS":
+        order=db.get_order(order_id, utype=2)
+        if order[5] in ["SUCCESS", "PROCESSED"]:
+            return aiohttp_jinja2.render_template("student_order_checkout.html", request, {
+                "status": resp.get("payment_status"),
+                "payment_id": resp.get("cf_payment_id"),
+                "order_id": resp.get("order_id")
+            })
+        db.modify_order(order_id, str(resp.get("payment_status")), utype=2)
+        user=db.get_user(email=order[1], user_type="Staff")
+        place=db.get_place(place=order[2])
+        days: int=order[3]
+        db.create_pass(user[0], place[0], order_id, days=days)
+        db.modify_order(order_id, "PROCESSED", utype=2)
+    elif resp.get("payment_status"):
+        db.modify_order(order_id, str(resp.get("payment_status")), utype=2)
+        # [PENDING, USER_DROPPED, FAILED]
+    else:
+        return web.HTTPBadRequest()
+    return aiohttp_jinja2.render_template("student_order_checkout.html", request, {
+        "status": resp.get("payment_status"),
+        "payment_id": resp.get("cf_payment_id"),
+        "order_id": resp.get("order_id")
+    })

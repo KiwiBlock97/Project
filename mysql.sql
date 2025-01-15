@@ -15,7 +15,6 @@ CREATE TABLE `student` (
   `Photo` varchar(50) NOT NULL,
   `Department` varchar(30) NOT NULL,
   `Password` varchar(20) NOT NULL,
-  `Type` TINYINT NOT NULL,
   `Verified` TINYINT NOT NULL,
   FOREIGN KEY (`Department`) REFERENCES `departments` (`department`) ON DELETE CASCADE
   -- 1 is Student
@@ -73,9 +72,43 @@ CREATE TABLE `pass_order` (
 
 create table `verification`(
     `Email` varchar(255) NOT NULL,
-    `Code` varchar(255) NOT NULL PRIMARY KEY,
-    FOREIGN KEY (`Email`) REFERENCES `student` (`Email`) on DELETE CASCADE
+    `Code` varchar(255) NOT NULL PRIMARY KEY
     );
+
+-- -------------------------------------
+
+CREATE TABLE `staff` (
+  `Aadhar` bigint PRIMARY KEY NOT NULL,
+  `Name` varchar(20) NOT NULL,
+  `Email` varchar(255) NOT NULL UNIQUE,
+  `Photo` varchar(50) NOT NULL,
+  `Department` varchar(30) NOT NULL,
+  `Password` varchar(20) NOT NULL,
+  `Verified` TINYINT NOT NULL,
+  FOREIGN KEY (`Department`) REFERENCES `departments` (`department`) ON DELETE CASCADE
+);
+
+CREATE TABLE `staff_pass` (
+  `Aadhar` bigint NOT NULL,
+  `FromPlace` varchar(20) NOT NULL,
+  `UKey` varchar(255) PRIMARY KEY NOT NULL,
+  `Days` int NOT NULL,
+  `Count` int NOT NULL DEFAULT 0,
+  FOREIGN KEY (`Aadhar`) REFERENCES `staff` (`Aadhar`) ON DELETE CASCADE,
+  FOREIGN KEY (`FromPlace`) REFERENCES `place` (`Place`) ON DELETE CASCADE
+);
+
+CREATE TABLE `staff_order` (
+  `OrderID` varchar(255) PRIMARY KEY NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `Place` varchar(20) NOT NULL,
+  `Days` int NOT NULL,
+  `Time` date NOT NULL,
+  `Status` varchar(30) DEFAULT NULL,
+  `Price` int NOT NULL,
+  FOREIGN KEY (`email`) REFERENCES `staff` (`Email`) ON DELETE CASCADE,
+  FOREIGN KEY (`Place`) REFERENCES `place` (`Place`) ON DELETE CASCADE
+);
 
 
 -- DELIMITER $$

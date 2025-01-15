@@ -11,7 +11,7 @@
 <body>
     <nav>
         <ul>
-            <li><a href="/student/apply">New Pass</a></li>
+            <li><a href="/staff/apply">New Pass</a></li>
             <li><a href="/logout">Logout</a></li>
         </ul>
     </nav>
@@ -32,8 +32,8 @@
                 <td class="value">{{ department }}</td>
             </tr>
             <tr>
-                <td class="label">Admission No</td>
-                <td class="value">{{ admission }}</td>
+                <td class="label">Aadhar No</td>
+                <td class="value">{{ aadhar }}</td>
             </tr>
         </table>
 
@@ -41,12 +41,12 @@
         {% for ticket in bus_pass %}
             <table class="ticket-info" id="ticket-{{ ticket[2] }}">
                 <tr>
-                    <td class="label">From</td>
+                    <td class="label">Total Days</td>
                     <td class="value">{{ ticket[3] }}</td>
                 </tr>
                 <tr>
-                    <td class="label">To</td>
-                    <td class="value">{{ ticket[4] }}</td>
+                    <td class="label">Days Left</td>
+                    <td class="value">{{ ticket[3] - ticket[4] }}</td>
                 </tr>
                 <tr>
                     <td class="label">From/To Place</td>
@@ -58,14 +58,8 @@
                 </tr>
                 <tr>
                     <td>
-                        <a class="print-button" href="/student/print?key={{ ticket[2] }}">Print Ticket</button>
+                        <a class="print-button" href="/staff/print?key={{ ticket[2] }}">Print Ticket</button>
                     </td>
-                        <td>
-                            <form class="renew-form" method="get" action="/student/renew">
-                                <input type="hidden" name="key" value="{{ ticket[2] }}">
-                                <button class="extend-button" type="submit">Extend Pass</button>
-                            </form>
-                        </td>
                 </tr>
             </table>
         {% endfor %}

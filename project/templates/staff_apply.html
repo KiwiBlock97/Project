@@ -9,13 +9,13 @@
 <body>
     <nav>
         <ul>
-            <li><a href="/student">Home</a></li>
+            <li><a href="/staff">Home</a></li>
             <li><a href="/logout">Logout</a></li>
         </ul>
     </nav>
 
     <div class="apply-ticket">
-        <form class="ticket-form" method="post" action="/student/order/confirm">
+        <form class="ticket-form" method="post" action="/staff/order/confirm">
             <div class="form-group">
                 <label for="name">Name:</label>
                 <p id="name" name="name" class="value">{{ name }}</p>
@@ -39,20 +39,14 @@
                 <label for="ticket-price">Ticket Price per Day:</label>
                 <input type="number" id="ticket-price" name="ticket-price" class="value" readonly>
             </div>            
-
-            <div class="form-group">
-                <label for="datefrom">From Date:</label>
-                <input type="date" id="datefrom" name="datefrom" onchange="update_price()" required>
-            </div>
-
-            <div class="form-group">
-                <label for="dateto">To Date:</label>
-                <input type="date" id="dateto" name="dateto" onchange="update_price()" required>
-            </div>
+                <div class="form-group">
+                    <label for="datefrom">Days</label>
+                    <input type="number" id="days" name="days" onchange="update_price()" required>
+                </div>
             
             <div class="form-group">
-                <label for="admin-no">Admin No:</label>
-                <p id="admin-no" name="admin-no" class="value">{{ adm_no }}</p>
+                <label for="admin-no">Aadhar No:</label>
+                <p id="admin-no" name="admin-no" class="value">{{ aadhar_no }}</p>
             </div>
 
             <div class="form-group">
@@ -68,8 +62,7 @@
 
     <script>
 function update_price() {
-    var fromDate = document.getElementById("datefrom").value;
-    var toDate = document.getElementById("dateto").value;
+    var days = document.getElementById("days").value;
     var pay = document.getElementById("pay");
     var ticket_price = document.getElementById("ticket-price");
 
@@ -77,28 +70,11 @@ function update_price() {
     var selectedOption = selectElement.options[selectElement.selectedIndex];
     var price = parseFloat(selectedOption.getAttribute("price"));
     ticket_price.value = price
-    document.getElementById("datefrom").min=new Date().toISOString().slice(0,10)
-    if (fromDate){
-        document.getElementById("dateto").min=fromDate
-    }
-    if (toDate){
-        document.getElementById("datefrom").max=toDate
-    }
 
-    if (fromDate && toDate) {
-        var startDate = new Date(fromDate);
-        var endDate = new Date(toDate);
-        var timeDifference = endDate - startDate;
-        var validity = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)) + 1;
-
-        if (validity > 0) {
-            // var amount = price * validity;
-            pay.innerHTML = `Pay`;
-            pay.style.display = "block";
-        } else {
-            pay.innerHTML = "Invalid date range. Please select a valid To Date.";
-            pay.style.display = "block";
-        }
+    if (days > 0) {
+        var amount = price * days;
+        pay.innerHTML = `Pay ₹${amount}`;
+        pay.style.display = "block";
     } else {
         pay.style.display = "none";
     }

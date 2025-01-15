@@ -15,7 +15,7 @@ async def init_session():
     session = aiohttp.ClientSession(
         "https://sandbox.cashfree.com", headers=headers)
 
-async def create_order(admid: str, phone: str, name: str, email: str, uuid4: str, amount: int):
+async def create_order(admid: str, phone: str, name: str, email: str, uuid4: str, amount: int, return_path: str):
     global session
     if not session:
         await init_session()
@@ -30,7 +30,7 @@ async def create_order(admid: str, phone: str, name: str, email: str, uuid4: str
             "customer_email": email
         },
         "order_meta": {
-            "return_url": Var.URL+"/student/order/checkout?order_id={order_id}",
+            "return_url": Var.URL+return_path+"?order_id={order_id}",
             "payment_methods": "cc,dc,upi"
         }
     }
