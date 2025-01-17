@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply for Ticket</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <li><a href="/student">Home</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="apply-ticket">
+        <form class="ticket-form" method="post" action="/student/order/confirm.php">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <p id="name" name="name" class="value">{{ name }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="department">Department:</label>
+                <p id="department" name="department" class="value">{{ department }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="from-to">From/To:</label>
+                <select id="from-to" name="from-to" onchange="update_price()" required>
+                    {% for row in place %}
+                    <option price={{ row['Price'] }} value={{ row['Place'] }}>{{ row['Place'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="ticket-price">Ticket Price per Day:</label>
+                <input type="number" id="ticket-price" name="ticket-price" class="value" readonly>
+            </div>
+
+            {% if usertype == 1 %}
+            <div class="form-group">
+                <label for="datefrom">From Date:</label>
+                <input type="date" id="datefrom" name="datefrom" onchange="update_price()" required>
+            </div>
+
+            <div class="form-group">
+                <label for="dateto">To Date:</label>
+                <input type="date" id="dateto" name="dateto" onchange="update_price()" required>
+            </div>
+            {% elseif usertype == 2 %}
+            <div class="form-group">
+                <label for="datefrom">Date:</label>
+                <input type="date" id="datefrom" name="datefrom" onchange="update_price()" required>
+            </div>
+            <div class="form-group" style="display:none;">
+                <label for="dateto">To Date:</label>
+                <input type="date" id="dateto" name="dateto" onchange="update_price()" required>
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="admin-no">
+                {% if usertype == 1 %}
+                Admin No:
+                {% elseif usertype == 2 %}
+                Aadhar No:
+                {% endif %}
+                </label>
+                <p id="admin-no" name="admin-no" class="value">{{ adm_no }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" class="value" required>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" id="pay" class="pay-button" style="display: none;">Pay</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const usertype = "{{ usertype }}";
+
+        function update_price() {
+            var fromDate = document.getElementById("datefrom").value;
+            var toDate = document.getElementById("dateto").value;
+            var pay = document.getElementById("pay");
+            var ticket_price = document.getElementById("ticket-price");
+
+            var selectElement = document.getElementById("from-to");
+            var selectedOption = selectElement.options[selectElement.selectedIndex];
+            var price = parseFloat(selectedOption.getAttribute("price"));
+            ticket_price.value = price
+            document.getElementById("datefrom").min = new Date().toISOString().slice(0, 10)
+            if(usertype === "1") {
+                if (fromDate) {
+                    document.getElementById("dateto").min = fromDate
+                }
+                if (toDate) {
+                    document.getElementById("datefrom").max = toDate
+                }
+            }
+
+            if (usertype === "2") {
+                document.getElementById("dateto").value = fromDate;
+                toDate = fromDate;
+            }
+
+            if (fromDate && toDate) {
+                var startDate = new Date(fromDate);
+                var endDate = new Date(toDate);
+                var timeDifference = endDate - startDate;
+                var validity = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)) + 1;
+
+                if (validity > 0) {
+                    pay.style.display = "block";
+                }
+            } else {
+                pay.style.display = "none";
+            }
+        }
+        window.onload = update_price();
+    </script>
+</body>
+
+</html>

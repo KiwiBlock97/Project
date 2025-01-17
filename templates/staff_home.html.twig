@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <li><a href="/student/apply.php">New Pass</a></li>
+            <li><a href="/logout.php">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="student-details">
+        <table class="student-info" id="student-pass">
+            <tr>
+                <td colspan="2" class="photo-container">
+                    <img class="student-photo" src="/photo.php" alt="Student Photo" height="200">
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Name</td>
+                <td class="value">{{ name }}</td>
+            </tr>
+            <tr>
+                <td class="label">Department</td>
+                <td class="value">{{ department }}</td>
+            </tr>
+            <tr>
+                {% if usertype == 1 %}
+                    <td class="label">Admission No</td>
+                {% elseif usertype == 2 %}
+                    <td class="label">Aadhar No</td>
+                {% endif %}
+                <td class="value">{{ admission }}</td>
+            </tr>
+        </table>
+
+        <h4 class="section-heading">Tickets</h4>
+        {% for ticket in bus_pass %}
+            <table class="ticket-info" id="ticket-{{ ticket['UKey'] }}">
+                {% if usertype == 1 %}
+                    <tr>
+                        <td class="label">From</td>
+                        <td class="value">{{ ticket['fromtime'] }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">To</td>
+                        <td class="value">{{ ticket['totime'] }}</td>
+                    </tr>
+                {% elseif usertype == 2 %}
+                    <tr>
+                        <td class="label">Date</td>
+                        <td class="value">{{ ticket['totime'] }}</td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td class="label">From/To Place</td>
+                    <td class="value">{{ ticket['FromPlace'] }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Ticket ID</td>
+                    <td class="value">{{ ticket['UKey'] }}</td>
+                </tr>
+                <tr>
+                    <td>
+                        <a class="print-button" href="/student/print.php?key={{ ticket['UKey'] }}">Print Ticket</button>
+                    </td>
+                    {% if usertype == 1 %}
+                        <td>
+                            <form class="renew-form" method="get" action="/student/renew.php">
+                                <input type="hidden" name="key" value="{{ ticket['UKey'] }}">
+                                <button class="extend-button" type="submit">Extend Pass</button>
+                            </form>
+                        </td>
+                    {% endif %}
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+</body>
+
+</html>
