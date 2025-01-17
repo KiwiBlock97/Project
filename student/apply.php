@@ -10,7 +10,7 @@ if ($_SESSION["type"]!="Student"){
 
 $user=getUser(null, $_SESSION['admid']);
 $place=getPlace();
-echo $twig->render("apply.html.twig", [
+echo $twig->render("student_apply.html.twig", [
     "name" => $user['Name'],
     "department" => $user['Department'],
     "adm_no" => $user['AdmissionId'],

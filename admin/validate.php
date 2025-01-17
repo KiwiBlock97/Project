@@ -22,5 +22,5 @@ if ($key){
 else{
     $context = ["key" => null];
 }
-echo $twig->render("validate.html.twig", $context);
+echo $twig->render("admin_validate.html.twig", $context);
 ?>

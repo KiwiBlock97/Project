@@ -24,7 +24,7 @@ $user=getUser(null, $_SESSION['admid']);
 $totime = new DateTime($bus_pass['totime']);
 $totime->modify('+1 day');
 
-echo $twig->render("renew.html.twig", [
+echo $twig->render("student_renew.html.twig", [
     "name" => $user["Name"],
     "department" => $user['Department'],
     "place" => $bus_pass['FromPlace'],

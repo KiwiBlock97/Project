@@ -1,6 +1,9 @@
 <?php
-session_start();
-echo json_encode($_SESSION);
-// session_destroy();
-echo json_encode($_SESSION);
+
+$twig = require 'utils/twig.php';
+
+// Render a template
+echo $twig->render('index.html.twig', [
+    "abc" => "Hello ABC"
+]);
 ?>

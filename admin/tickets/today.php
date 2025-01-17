@@ -11,7 +11,7 @@ if ($_SESSION["type"]!="Admin"){
 $today = (new DateTime())->format('Y-m-d');
 $passes = getPass(null, null, true, $today, $today);
 
-echo $twig->render("today.html.twig", [
+echo $twig->render("admin_tickets_today.html.twig", [
     'passes' => $passes
 ]);
 ?>

@@ -6,5 +6,5 @@ if ($_SESSION["type"]!="Admin"){
     header("Location: /login.php");
     exit();
 }
-echo $twig->render("admin.html.twig",[]);
+echo $twig->render("admin_home.html.twig",[]);
 ?>

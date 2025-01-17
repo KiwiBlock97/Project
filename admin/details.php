@@ -23,7 +23,7 @@ if ($admid){
         return new DateTime($pass['totime']) >= $current_date;
     });
 
-    echo $twig->render("details.html.twig", [
+    echo $twig->render("admin_details.html.twig", [
         "AdmissionId" => $user['AdmissionId'],
         "Name" => $user['Name'],
         "Email" => $user['Email'],

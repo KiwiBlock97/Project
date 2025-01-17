@@ -11,7 +11,7 @@ if ($_SESSION["type"]!="Admin"){
 $departments=getDepartments();
 
 if(!(isset($_GET["fromdate"]) && isset($_GET["todate"]))){
-    echo $twig->render("purchased.html.twig",[
+    echo $twig->render("admin_tickets_purchased.html.twig",[
         "departments" => $departments
     ]);
     exit();
@@ -25,7 +25,7 @@ $sum=0;
 foreach ($orders as $row){
     $sum=$sum+$row['Price'];
 }
-echo $twig->render("purchased.html.twig", [
+echo $twig->render("admin_tickets_purchased.html.twig", [
     "orders" => $orders,
     "sum" => $sum,
     "departments" => $departments,

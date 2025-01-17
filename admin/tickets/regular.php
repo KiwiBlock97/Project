@@ -15,5 +15,5 @@ if ($fromdate && $todate){
     $passes=getPass(null, null, true, $fromdate, $todate);
     $params["passes"]=$passes;
 }
-echo $twig->render("regular.html.twig", $params);
+echo $twig->render("admin_tickets_regular.html.twig", $params);
 ?>

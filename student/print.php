@@ -10,7 +10,7 @@ if ($_SESSION["type"]!="Student"){
 
 $bus_pass = getPass(null, $_GET["key"]);
 $user = getUser(null, $bus_pass['AdmissionId']);
-echo $twig->render('print.html.twig',[
+echo $twig->render('student_print.html.twig',[
     "name" => $user['Name'],
     "department" => $user['Department'],
     "admission" => $user['AdmissionId'],

@@ -10,7 +10,7 @@ if ($_SESSION["type"]!="Admin"){
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET'){
     $departments=getDepartments();
-    echo $twig->render("departments.html.twig",[
+    echo $twig->render("admin_departments.html.twig",[
         "departments" => $departments
     ]);
 }

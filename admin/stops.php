@@ -10,7 +10,7 @@ if ($_SESSION["type"]!="Admin"){
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET'){
     $stops=getPlace();
-    echo $twig->render("stops.html.twig", [
+    echo $twig->render("admin_stops.html.twig", [
         "places" => $stops
     ]);
 }

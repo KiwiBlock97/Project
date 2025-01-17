@@ -62,7 +62,7 @@ if ($paymentId) {
     createOrderDB($uuid4, $email, $place, $datefrom, $dateto, isset($ukey) ? 1 : 0, $ukey ?? null, null, $amount);
 
     // Render checkout template
-    echo $twig->render('confirm.html.twig', [
+    echo $twig->render('student_order_confirm.html.twig', [
         'sessionid' => $paymentId,
         'name' => $name,
         'department' => $user['Department'],

@@ -22,7 +22,7 @@ if (empty($valid_pass)) {
     exit();
 }
 
-echo $twig->render("student.html.twig",[
+echo $twig->render("student_home.html.twig",[
     "name" => $user['Name'],
     "department" => $user['Department'],
     "admission" => $user['AdmissionId'],
