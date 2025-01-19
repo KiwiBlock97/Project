@@ -246,10 +246,9 @@ async def admin_validate(request: web.Request):
         usertype=0
         if bus_pass:=db.get_pass(key=key):
             usertype="Student"
-        elif bus_pass:=db.get_pass(key=key, type=2):
+        elif bus_pass:=db.get_pass(key=key, utype=2):
             usertype="Staff"
         user = db.get_user(admid=bus_pass[0], user_type=usertype) if bus_pass else None
-        print(user, usertype)
         context={
             "key": key,
             "ticket": bus_pass,
@@ -348,12 +347,29 @@ async def admin_tickets_regular(request: web.Request):
         passes=db.get_pass(regular=True, fromdate=fromdate, todate=todate)
         params["passes"]=enumerate(passes, 1)
     return aiohttp_jinja2.render_template("admin_tickets_regular.html", request, params)
-    
+
+@routes.post("/admin/tickets/today")
 @routes.get("/admin/tickets/today")
 async def admin_tickets_today(request: web.Request):
-    today=datetime.now().date()
-    passes=db.get_pass(regular=True, fromdate=today, todate=today)
-    return aiohttp_jinja2.render_template("admin_tickets_today.html", request, {"passes": enumerate(passes, 1)})
+    if request.method == "GET":
+        today=datetime.now().date()
+        passes=db.get_pass(regular=True, fromdate=today, todate=today)
+        staff=db.get_pass(regular=True, utype=2)
+        return aiohttp_jinja2.render_template("admin_tickets_today.html", request, {
+            "passes": list(enumerate(passes, 1)) if passes else None,
+            "staff": enumerate(staff, 1) if staff else None,
+            "today": str(today)
+        })
+    data=await request.post()
+    if "student" in data.keys():
+        students=data.getall("student")
+        for x in students:
+            db.update_pass(x, datetime.now().date())
+    if "staff" in data.keys():
+        staff=data.getall("staff")
+        for x in staff:
+            db.update_pass(x, datetime.now().date(), utype=2)
+    return web.HTTPSeeOther("/admin/tickets/today")
 
 @routes.get("/verify")
 async def verify_email(request: web.Request):
@@ -369,8 +385,8 @@ async def verify_email(request: web.Request):
 @routes.get("/staff")
 async def student_home(request: web.Request):
     user=request["user"]
-    bus_pass = db.get_pass(user[0], type=2)
-    valid_pass=[ x for x in bus_pass if x[3] >= x[4]]
+    bus_pass = db.get_pass(user[0], utype=2)
+    valid_pass=[ x for x in bus_pass if x[3] >= len(x[4])]
     if not valid_pass:
         return web.HTTPSeeOther("/staff/apply")
     return aiohttp_jinja2.render_template("staff_home.html", request, {
@@ -382,7 +398,7 @@ async def student_home(request: web.Request):
 
 @routes.get("/staff/print")
 async def student_home(request: web.Request):
-    bus_pass = db.get_pass(key=request.rel_url.query.get("key"), type=2)
+    bus_pass = db.get_pass(key=request.rel_url.query.get("key"), utype=2)
     user=request["user"]
     return aiohttp_jinja2.render_template("staff_print.html", request, {
         "name": user[1],
@@ -405,7 +421,6 @@ async def student_apply(request: web.Request):
 @routes.post("/staff/order/confirm")
 async def order_confirm(request: web.Request):
     data=await request.post()
-    print(data)
     user=request["user"]
 
     days=int(data.get("days"))

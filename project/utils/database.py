@@ -1,9 +1,19 @@
 from datetime import datetime, date
+import json
 from uuid import uuid4
 import mysql.connector
 from mysql.connector import Error
 
 from project.utils.vars import Var
+
+def to_json(result):
+    if len(result)==5:
+        key_id=4
+    else:
+        key_id=5
+    result=list(result)
+    result[key_id]=json.loads(result[key_id])
+    return result
 
 class MySQLConnection:
     def __init__(self):
@@ -83,25 +93,33 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
-    def get_pass(self, admid:int=None, key: str=None, regular=None, fromdate=None, todate=None, type=1):
+    def get_pass(self, admid:int=None, key: str=None, regular=None, fromdate=None, todate=None, utype=1):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if admid:
-                    if type==1:
+                    if utype==1:
                         cursor.execute("select * from pass where AdmissionId=%s", (admid,))
-                    elif type==2:
+                    elif utype==2:
                         cursor.execute("select * from staff_pass where Aadhar=%s", (admid,))
                     result=cursor.fetchall()
                 elif key:
-                    if type==1:
+                    if utype==1:
                         cursor.execute("select * from pass where UKey=%s", (key,))
-                    elif type==2:
+                    elif utype==2:
                         cursor.execute("select * from staff_pass where UKey=%s", (key,))
                     result=cursor.fetchone()
                 elif regular:
-                    cursor.execute("select * from pass where (fromtime <= %s AND totime >= %s) ", (fromdate, todate))
+                    if utype==1:
+                        cursor.execute("select * from pass where (fromtime <= %s AND totime >= %s) ", (fromdate, todate))
+                    elif utype==2:
+                        cursor.execute("select * from staff_pass where JSON_LENGTH(Traveled) < Days")
                     result=cursor.fetchall()
+
+                if key:
+                    result=to_json(result)
+                else:
+                    result=map(to_json, result)
                 return result
             except Exception as e:
                 print(e)
@@ -113,9 +131,9 @@ class MySQLConnection:
             try:
                 cursor=self.connection.cursor()
                 if fromtime:
-                    cursor.execute("insert into pass values(%s,%s,%s,%s, %s)", (admid, place, uuid4, fromtime, totime))
+                    cursor.execute("insert into pass values(%s,%s,%s,%s,%s,%s)", (admid, place, uuid4, fromtime, totime, "[]"))
                 elif days:
-                    cursor.execute("insert into staff_pass values(%s,%s,%s,%s, %s)", (admid, place, uuid4, days, 0))
+                    cursor.execute("insert into staff_pass values(%s,%s,%s,%s,%s)", (admid, place, uuid4, days, "[]"))
                 self.connection.commit()
             except Exception as e:
                 print(e)
@@ -321,6 +339,29 @@ class MySQLConnection:
                     self.connection.commit()
                     return True
                 return False
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def update_pass(self, uuid4:str, date, utype:int=1):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                if utype==1:
+                    cursor.execute("select traveled from pass where UKey=%s", (uuid4, ))
+                elif utype==2:
+                    cursor.execute("select Traveled from staff_pass where UKey=%s", (uuid4, ))
+                tickets=list(cursor.fetchone())
+                if tickets:
+                    tickets=json.loads(tickets[0])
+                if not str(date) in tickets:
+                    tickets.append(str(date))
+                    if utype==1:
+                        cursor.execute("update `pass` SET traveled=%s where UKey=%s", (json.dumps(tickets) ,uuid4))
+                    elif utype==2:
+                        cursor.execute("update `staff_pass` SET Traveled=%s where UKey=%s", (json.dumps(tickets) ,uuid4))
+                self.connection.commit()
             except Exception as e:
                 print(e)
             finally:
