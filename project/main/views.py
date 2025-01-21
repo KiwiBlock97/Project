@@ -389,7 +389,7 @@ async def verify_email(request: web.Request):
 async def student_home(request: web.Request):
     user=request["user"]
     bus_pass = db.get_pass(user[0], utype=2)
-    valid_pass=[ x for x in bus_pass if x[3] >= len(x[4])]
+    valid_pass=[ x for x in bus_pass if x[3] > len(x[4])]
     if not valid_pass:
         return web.HTTPSeeOther("/staff/apply")
     return aiohttp_jinja2.render_template("staff_home.html", request, {
