@@ -57,9 +57,10 @@
             <table class="admin-table">
                 <thead>
                     <tr>
-                        <th colspan="6">{{count}} Orders</th>
+                        <th colspan="7">{{count}} Orders</th>
                     </tr>
                     <tr>
+                        <th>User Type</th>
                         <th>Name</th>
                         <th>Department</th>
                         <th>From</th>
@@ -69,8 +70,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for row in orders %}
+                    {% for row in student %}
                     <tr>
+                        <td>Student</td>
                         <td>{{row[0]}}</td>
                         <td>{{row[1]}}</td>
                         <td>{{row[2]}}</td>
@@ -79,11 +81,33 @@
                         <td>{{row[4]}}</td>
                     </tr>
                     {% endfor %}
+                    {% if staff %}
+                    <tr>
+                        <th>User Type</th>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Days</th>
+                        <th></th>
+                        <th>Place</th>
+                        <th>Amount</th>
+                    </tr>
+                    {% for row in staff %}
+                    <tr>
+                        <td>Staff</td>
+                        <td>{{row[0]}}</td>
+                        <td>{{row[1]}}</td>
+                        <td>{{row[2]}}</td>
+                        <td></td>
+                        <td>{{row[4]}}</td>
+                        <td>{{row[3]}}</td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="5" class="table-total">Total</td>
-                        <td>{{sum}}</td>
+                        <th colspan="6" class="table-total">Total</th>
+                        <th>{{sum}}</th>
                     </tr>
                 </tfoot>
             </table>

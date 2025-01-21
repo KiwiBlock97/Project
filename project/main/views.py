@@ -324,15 +324,18 @@ async def admin_tickets(request: web.Request):
     departments=db.get_departments()
     context={"departments": departments}
     if fromdate and todate:
-        orders=db.get_order(fromdate=fromdate, todate=todate, department=department)
+        student, staff=db.get_order(fromdate=fromdate, todate=todate, department=department)
         sum=0
-        for x in orders:
+        for x in student:
             sum+=x[4]
+        for x in staff:
+            sum+=x[3]
         context.update({
-            "orders": orders,
+            "student": student,
+            "staff": staff,
             "sum": sum,
             "departments": departments,
-            "count": len(orders),
+            "count": len(student)+len(staff),
             "fromdate": fromdate,
             "todate": todate
             })

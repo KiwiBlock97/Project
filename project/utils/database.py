@@ -231,13 +231,17 @@ class MySQLConnection:
                     return result
                 else:
                     query="SELECT s.Name, s.Department, po.fromtime, po.totime, po.Price, po.Place FROM pass_order po JOIN student s ON po.email = s.Email WHERE po.Status='PROCESSED' AND (po.Time BETWEEN %s AND %s)"
+                    query2="SELECT s.Name, s.Department, po.Days, po.Price, po.Place FROM staff_order po JOIN staff s ON po.email = s.Email WHERE po.Status='PROCESSED' AND (po.Time BETWEEN %s AND %s)"
                     params = [fromdate, todate]
                     if department:
                         query+="AND s.Department = %s"
+                        query2+="AND s.Department = %s"
                         params.append(department)
                     cursor.execute(query, params)
                     result=cursor.fetchall()
-                    return result if result else []
+                    cursor.execute(query2, params)
+                    result2=cursor.fetchall()
+                    return (result if result else [], result2 if result2 else [])
             except Exception as e:
                 print(e)
             finally:
