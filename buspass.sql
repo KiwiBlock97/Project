@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 19, 2025 at 04:13 PM
+-- Generation Time: Jan 23, 2025 at 06:15 PM
 -- Server version: 8.0.40-0ubuntu0.24.10.1
 -- PHP Version: 8.3.11
 
@@ -57,6 +57,18 @@ CREATE TABLE `departments` (
 INSERT INTO `departments` (`department`) VALUES
 ('Computer Engineering'),
 ('Mechanical Engineering');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `forget`
+--
+
+CREATE TABLE `forget` (
+  `Email` varchar(255) NOT NULL,
+  `OTP` varchar(255) NOT NULL,
+  `Type` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 

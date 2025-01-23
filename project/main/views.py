@@ -483,3 +483,39 @@ async def checkout(request: web.Request):
         "payment_id": resp.get("cf_payment_id"),
         "order_id": resp.get("order_id")
     })
+
+@routes.get("/forgot")
+async def forgot_password(request: web.Request):
+    data=request.rel_url.query
+    user_type=data.get("user-type")
+    email=data.get("email", "")
+    otp=data.get("otp", "")
+    password=data.get("password", None)
+    error=None
+    success=False
+    if email:
+        if otp:
+            resp=db.update_password(email, otp, password)
+            if resp:
+                if password:
+                    success=True
+            else:
+                error="Inavlid OTP"
+                otp=""
+        else:
+            gen_otp=db.gen_otp(email, user_type)
+            if gen_otp:
+                await send_mail(None, email, "Your otp for changing password is "+gen_otp, "OTP for Password Reset")
+            else:
+                error="Invalid Email or User type"
+                email=""
+            
+            
+    return aiohttp_jinja2.render_template("forgot_password.html", request, {
+        "user_type": user_type,
+        "email": email,
+        "otp": otp,
+        "success": success,
+        "error": error,
+        "btn_name": "Update Password" if otp else "Verify OTP" if email else "Generate OTP"
+    })

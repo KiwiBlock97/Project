@@ -1,5 +1,7 @@
 from datetime import datetime, date
 import json
+from random import choice
+import string
 from uuid import uuid4
 import mysql.connector
 from mysql.connector import Error
@@ -366,6 +368,41 @@ class MySQLConnection:
                     elif utype==2:
                         cursor.execute("update `staff_pass` SET Traveled=%s where UKey=%s", (json.dumps(tickets) ,uuid4))
                 self.connection.commit()
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def gen_otp(self, email: str, utype: str):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute(f"select Email from {utype} where Email=%s", (email, ))
+                if not cursor.fetchone():
+                    return None
+                cursor.execute("delete from forget where Email=%s", (email,))
+                otp = ''.join(choice(string.digits) for _ in range(6))
+                cursor.execute("insert into forget values(%s,%s,%s)", (email, otp, utype))
+                self.connection.commit()
+                return otp
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def update_password(self, email, otp, password=None):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("select * from forget where Email=%s and OTP=%s", (email, otp))
+                result=cursor.fetchone()
+                if result:
+                    if password:
+                        cursor.execute("delete from forget where Email=%s", (email,))
+                        cursor.execute(f"update {result[2]} set Password=%s where Email=%s", (password, email))
+                    
+                    self.connection.commit()
+                    return result
             except Exception as e:
                 print(e)
             finally:
