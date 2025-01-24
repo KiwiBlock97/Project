@@ -39,7 +39,7 @@ class MySQLConnection:
             try:
                 cursor=self.connection.cursor()
                 if user_type=="Student":
-                    cursor.execute("insert into student values(%s,%s,%s,%s,%s,%s,%s,%s)", (admission_number, name, email, photo, department, password, 0))
+                    cursor.execute("insert into student values(%s,%s,%s,%s,%s,%s,%s)", (admission_number, name, email, photo, department, password, 0))
                 elif user_type=="Staff":
                     cursor.execute("insert into staff values(%s,%s,%s,%s,%s,%s,%s)", (admission_number, name, email, photo, department, password, 0))
                 cursor.close()
@@ -117,11 +117,11 @@ class MySQLConnection:
                     elif utype==2:
                         cursor.execute("select * from staff_pass where JSON_LENGTH(Traveled) < Days")
                     result=cursor.fetchall()
-
-                if key:
-                    result=to_json(result)
-                else:
-                    result=map(to_json, result)
+                if result:
+                    if key:
+                        result=to_json(result)
+                    else:
+                        result=map(to_json, result)
                 return result
             except Exception as e:
                 print(e)
