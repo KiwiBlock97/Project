@@ -9,19 +9,6 @@
 <body>
     <header>Admin Dashboard</header>
 
-    <nav>
-        <ul>
-            <li><a href="/admin/students">Manage Students</a></li>
-            <li><a href="/admin/validate">Validate Tickets</a></li>
-            <li><a href="/admin/stops">Manage Bus Stops</a></li>
-            <li><a href="/admin/departments">Manage Departments</a></li>
-            <li><a href="/admin/tickets/purchased">Tickets Purchased</a></li>
-            <li><a href="/admin/tickets/regular">Regular Tickets</a></li>
-            <li><a href="/admin/tickets/today">Today's Tickets</a></li>
-            <li><a href="/logout" class="nav-link">Logout</a></li>
-        </ul>
-    </nav>
-
     <main>
         <section class="admin-grid">
             <a href="/admin/students" class="admin-card">
@@ -51,6 +38,10 @@
             <a href="/admin/tickets/today" class="admin-card">
                 <h3>Today's Tickets</h3>
                 <p>View all tickets valid today.</p>
+            </a>
+            <a href="/logout" class="admin-card">
+                <h3>Logout</h3>
+                <p>Logout from this device</p>
             </a>
         </section>
     </main>
