@@ -52,7 +52,11 @@
                     <thead>
                         <tr>
                             <th>Place</th>
+                            {% if utype==1 %}
                             <th>Validity</th>
+                            {% else %}
+                            <th>Days left</th>
+                            {% endif %}
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -60,9 +64,14 @@
                         {% for ticket in bus_pass %}
                         <tr>
                             <td>{{ ticket[1] }}</td>
+                            {% if utype==1 %}
                             <td>{{ ticket[4] }}</td>
+                            {% else %}
+                            <td>{{ ticket[3]-ticket[4]|length }}</td>
+                            {% endif %}
                             <td>
                                 <form method="get" action="/admin/details">
+                                    <input type="hidden" name="type" value="{{ utype }}">
                                     <input type="hidden" name="id" value="{{ AdmissionId }}">
                                     <input type="hidden" name="pass" value="{{ ticket[2] }}">
                                     <button type="submit" class="btn btn-reject">Reject</button>

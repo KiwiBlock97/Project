@@ -194,11 +194,14 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
-    def get_students(self):
+    def get_students(self, utype=0):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("select * from student")
+                if utype==1:
+                    cursor.execute("select * from staff")
+                else:
+                    cursor.execute("select * from student")
                 result=cursor.fetchall()
                 return result
             except Exception as e:
@@ -263,22 +266,28 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
-    def remove_student(self, admission_number):
+    def remove_student(self, admission_number, utype=1):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("delete from student where AdmissionId=%s", (admission_number, ))
+                if utype==1:
+                    cursor.execute("delete from student where AdmissionId=%s", (admission_number, ))
+                else:
+                    cursor.execute("delete from staff where Aadhar=%s", (admission_number, ))
                 self.connection.commit()
             except Exception as e:
                 print(e)
             finally:
                 cursor.close()
 
-    def remove_pass(self, uuid4:str):
+    def remove_pass(self, uuid4:str, utype:int=1):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("delete from pass where UKey=%s", (uuid4, ))
+                if utype==1:
+                    cursor.execute("delete from pass where UKey=%s", (uuid4, ))
+                else:
+                    cursor.execute("delete from staff_pass where UKey=%s", (uuid4, ))
                 self.connection.commit()
             except Exception as e:
                 print(e)

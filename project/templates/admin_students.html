@@ -17,7 +17,7 @@
     <!-- Main Content -->
     <main class="admin-content">
         <section id="view-student-section" class="student-section">
-            <h2 class="section-title">View Student</h2>
+            <h2 class="section-title">Student</h2>
             <div class="table-container">
                 <table class="student-table">
                     <thead>
@@ -42,6 +42,40 @@
                             <td>
                                 <form method="post">
                                     <input type="hidden" name="admid" value="{{ row[0] }}">
+                                    <button type="submit" class="btn btn-remove">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-container">
+                <h2 class="section-title">Staffs</h2>
+                <table class="student-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Details</th>
+                            <th>Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in staff %}
+                        <tr>
+                            <td>{{ row[1] }}</td>
+                            <td>{{ row[4] }}</td>
+                            <td>
+                                <form method="get" action="/admin/details">
+                                    <input type="hidden" name="id" value="{{ row[0] }}">
+                                    <button type="submit" class="btn btn-details">More</button>
+                                </form>
+                            </td>
+                            <td>
+                                <form method="post">
+                                    <input type="hidden" name="aadhar" value="{{ row[0] }}">
                                     <button type="submit" class="btn btn-remove">Remove</button>
                                 </form>
                             </td>

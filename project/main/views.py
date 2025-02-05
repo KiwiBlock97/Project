@@ -231,12 +231,16 @@ async def admin_home(request: web.Request):
 async def admin_home(request: web.Request):
     if request.method == "GET":
         students=db.get_students()
+        staff=db.get_students(1)
         return aiohttp_jinja2.render_template("admin_students.html", request, {
-            "students": students
+            "students": students,
+            "staff": staff
         })
     data=await request.post()
     if (admid:=data.get("admid")):
         db.remove_student(int(admid))
+    elif (aadhar:=data.get("aadhar")):
+        db.remove_student(int(aadhar), 2)
         return web.HTTPSeeOther("/admin/students")
     return web.HTTPMethodNotAllowed("POST", ["GET"])
 
@@ -280,20 +284,27 @@ async def admin_stops_post(request: web.Request):
 
 @routes.get("/admin/details")
 async def admin_details(request: web.Request):
+    user_type=request.rel_url.query.get("type")
     if ticket:=request.rel_url.query.get("pass"):
-        db.remove_pass(uuid4=ticket)
+        db.remove_pass(uuid4=ticket, utype=user_type)
     if not (admid:=request.rel_url.query.get("id")):
         return web.HTTPBadRequest()
-    user=db.get_user(admid=admid)
-    bus_pass = db.get_pass(user[0])
-    valid_pass=[ x for x in bus_pass if x[4] >= datetime.now().date()]
-
+    utype=1
+    if not (user:=db.get_user(admid=admid)):
+        utype=2
+        user=db.get_user(admid=admid, user_type="Staff")
+    bus_pass = db.get_pass(user[0], utype=utype)
+    if utype==1:
+        valid_pass=[ x for x in bus_pass if x[4] >= datetime.now().date()]
+    else:
+        valid_pass=[ x for x in bus_pass if x[3] > len(x[4])]
     return aiohttp_jinja2.render_template("admin_details.html", request, {
         "AdmissionId": user[0],
         "Name": user[1],
         "Email": user[2],
         "Department": user[4],
         "bus_pass": valid_pass,
+        "utype": utype
     })
     
 @routes.get("/admin/departments")
