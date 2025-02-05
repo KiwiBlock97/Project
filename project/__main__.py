@@ -29,6 +29,7 @@ async def cleanup():
 
 def main() -> None:
     app = init_app()
+    print("Started server on", Var.URL)
     web.run_app(
         app,
         host=Var.HOST,
