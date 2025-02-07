@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Display</title>
+    <link rel="stylesheet" href="/static/styles/global.css">
+    <style>
+        .message-box {
+            padding: 1rem;
+            margin: 1rem auto;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .status { background-color: home-button#0078D7; color: white; }
+        .warning { background-color: #ffcc00; color: black; }
+        .error { background-color: home-button#ff4b5c; color: white; }
+        .checkout-button {
+            display: block;
+            width: 30vb;
+            margin: 2rem auto;
+            padding: 0.75rem;
+            background-color: #0078D7;
+            color: white;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <section>
+            <div id="message-container" class="message-box {{ level }}">{{text}}</div>
+            <a href="/" class="checkout-button">Go to Home</a>
+        </section>
+    </main>
+</body>
+</html>

@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <link rel="stylesheet" href="/static/styles/global.css">
+    <style>
+        body{
+            background: url("/static/styles/4057903.jpg") no-repeat fixed center;
+            background-size: cover;
+        }
+        .checkout-container, .checkout-button{
+            box-shadow: 0 15px 25px rgba(129, 124, 124, 0.2);
+            backdrop-filter: blur(14px);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .create-account{
+            background-color: rgba(0, 120, 215, 0.7);
+            margin-left: 1rem;
+        }
+        .login{
+            background-color: rgba(40, 167, 69, 0.7);
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -17,13 +35,10 @@
                 Stay organized with your bus passes and manage them with ease. Get started by logging in or creating an account.
             </p>
             <div class="checkout-action">
-                <a href="/login" class="checkout-button">Login</a>
-                <a href="/signup" class="checkout-button" style="background-color: #0078D7; margin-left: 1rem;">Create Account</a>
+                <a href="/login" class="checkout-button login">Login</a>
+                <a href="/signup" class="checkout-button create-account">Create Account</a>
             </div>
         </section>
     </main>
-    <footer>
-        Bus Pass System
-    </footer>
 </body>
 </html>
