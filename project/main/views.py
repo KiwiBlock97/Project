@@ -29,7 +29,10 @@ async def get_create_account(request: web.Request):
     file_name=data["admission-number"]
     status = db.create_user(data["admission-number"], data["name"], data["email"], file_name, data["department"], data["pass"], data['user-type'])
     if status=="exist":
-        return web.Response(body="User Already Exist")
+        return aiohttp_jinja2.render_template("message.html", request, {
+            "text": "User Already Exist",
+            "level": "error"
+        })
     else:
         with open(f"photo/{data['admission-number']}", "wb") as f:
             f.write(photo.file.read())
@@ -50,12 +53,18 @@ async def login_post(request: web.Request):
         return web.HTTPSeeOther("/login")
     Resp, Type = db.auth_user(email, password)
     if not Resp:
-        return web.Response(body="Invalid Email or Password")
+        return aiohttp_jinja2.render_template("message.html", request, {
+            "text": "Invalid Email or Password",
+            "level": "error"
+        })
     if Type in ["Student", "Staff"] and Resp[1]==0:
         code=db.gen_code(email)
         text=f"<html><head></head><body><p>Verify your email address by opening this link<br>{Var.URL}/verify?code={code}</p></body></html>"
         await send_mail(Resp[2], email, text, "Email Verification")
-        return web.Response(text="Refresh this page or Login again after verifying your Email by Opening Link sent to Provided Email Address")
+        return aiohttp_jinja2.render_template("message.html", request, {
+            "text": "Refresh this page or Login again after verifying your Email by Opening Link sent to Provided Email Address",
+            "level": "status"
+        })
     session = await get_session(request)
     session["email"]=email
     session["type"]=Type
@@ -390,10 +399,17 @@ async def verify_email(request: web.Request):
     code=request.rel_url.query.get("code")
     resp=db.verify_code(code)
     if resp:
-        return web.Response(text="Email Verified successfully. Please Login Again")
+        return aiohttp_jinja2.render_template("message.html", request, {
+            "text": "Email Verified successfully. Please Login Again",
+            "level": "status"
+        })
     else:
-        return web.Response(text="invalid Link or Account already verified")
-    
+        return aiohttp_jinja2.render_template("message.html", request, {
+            "text": "Invalid Link or Account already verified",
+            "level": "error"
+        })
+
+
 # -------------------------------------------
 
 @routes.get("/staff")

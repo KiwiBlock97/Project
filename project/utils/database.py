@@ -351,6 +351,7 @@ class MySQLConnection:
                 if result:
                     cursor.execute("delete from verification where Email=%s", (result[0],))
                     cursor.execute("update student set Verified=1 where Email=%s", (result[0], ))
+                    cursor.execute("update staff set Verified=1 where Email=%s", (result[0], ))
                     self.connection.commit()
                     return True
                 return False
