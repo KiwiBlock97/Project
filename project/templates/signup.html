@@ -137,7 +137,7 @@
             let otpContainer = document.getElementById("otp-container");
 
             otpError.textContent = ""; // Clear previous errors
-            console.log({ email: email })
+
             fetch("/api/request-otp", {
                 method: "POST",
                 headers: {
@@ -167,7 +167,7 @@
 
             idError.textContent = ""; // Clear previous errors
             submitButton.disabled = true; // Disable submit until check is done
-                
+
             if (userId.trim() === "") {
                 return; // Don't check if input is empty
             }

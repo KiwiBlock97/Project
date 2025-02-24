@@ -242,18 +242,27 @@ async def admin_home(request: web.Request):
 @routes.post("/admin/students")
 async def admin_home(request: web.Request):
     if request.method == "GET":
-        students=db.get_students()
-        staff=db.get_students(1)
+        query=request.rel_url.query.get("query")
+        students=db.get_students(query=query)
+        staff=db.get_students(1, query)
         return aiohttp_jinja2.render_template("admin_students.html", request, {
             "students": students,
             "staff": staff
         })
     data=await request.post()
+    method=data["method"]
+
     if (admid:=data.get("admid")):
-        db.remove_student(int(admid))
+        if method=="delete":
+            db.remove_student(int(admid))
+        elif method == "approve":
+            db.verify_user(int(admid))
         return web.HTTPSeeOther("/admin/students")
     elif (aadhar:=data.get("aadhar")):
-        db.remove_student(int(aadhar), 2)
+        if method=="delete":
+            db.remove_student(int(aadhar), 2)
+        elif method == "approve":
+            db.verify_user(int(aadhar), 2)
         return web.HTTPSeeOther("/admin/students")
     return web.HTTPMethodNotAllowed("POST", ["GET"])
 

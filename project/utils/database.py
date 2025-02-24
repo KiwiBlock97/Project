@@ -194,20 +194,28 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
-    def get_students(self, utype=0):
+    def get_students(self, utype=0, query=None):
         if self.connection.is_connected():
             try:
-                cursor=self.connection.cursor()
-                if utype==1:
-                    cursor.execute("select * from staff")
+                cursor = self.connection.cursor()  # Fetch results as dictionaries
+                sql = "SELECT * FROM " + ("staff" if utype == 1 else "student")
+
+                # Apply filter if query is provided
+                if query:
+                    sql += " WHERE name LIKE %s"
+                    query_param = (query + "%",)
                 else:
-                    cursor.execute("select * from student")
-                result=cursor.fetchall()
+                    query_param = ()
+
+                cursor.execute(sql, query_param)
+                result = cursor.fetchall()
                 return result
             except Exception as e:
-                print(e)
+                print("Error:", e)
+                return []
             finally:
                 cursor.close()
+
 
     def create_order(self, OrderId:str, email: str, place: str, fromtime: str=None, totime: str=None, renew: int=None, ukey:str=None, status: str=None, price: int=0, days: int=None):
         if self.connection.is_connected():
@@ -425,6 +433,20 @@ class MySQLConnection:
     OR EXISTS (SELECT 1 FROM staff WHERE Email = %s)
     OR EXISTS (SELECT 1 FROM student WHERE Email = %s)""", (email, email, email))
                 return cursor.fetchall()
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def verify_user(self, uid, utype=1):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                if utype==1:
+                    cursor.execute("update student set Verified=1 where AdmissionId=%s", (uid, ))
+                else:
+                    cursor.execute("update staff set Verified=1 where Aadhar=%s", (uid, ))
+                self.connection.commit()
             except Exception as e:
                 print(e)
             finally:
