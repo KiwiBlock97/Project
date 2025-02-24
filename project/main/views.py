@@ -25,6 +25,12 @@ async def get_create_account(request: web.Request):
         })
     # If method is POST
     data=await request.post()
+    resp=db.verify_code(data["email"], data["otp"])
+    if not resp:
+        return aiohttp_jinja2.render_template("message.html", request, {
+            "text": "Invalid OTP",
+            "level": "error"
+        })
     photo=data["photo"]
     file_name=data["admission-number"]
     status = db.create_user(data["admission-number"], data["name"], data["email"], file_name, data["department"], data["pass"], data['user-type'])
@@ -58,11 +64,8 @@ async def login_post(request: web.Request):
             "level": "error"
         })
     if Type in ["Student", "Staff"] and Resp[1]==0:
-        code=db.gen_code(email)
-        text=f"<html><head></head><body><p>Verify your email address by opening this link<br>{Var.URL}/verify?code={code}</p></body></html>"
-        await send_mail(Resp[2], email, text, "Email Verification")
         return aiohttp_jinja2.render_template("message.html", request, {
-            "text": "Refresh this page or Login again after verifying your Email by Opening Link sent to Provided Email Address",
+            "text": "Your account not approved yet, Please wait for admin to approve your account",
             "level": "status"
         })
     session = await get_session(request)
@@ -547,3 +550,26 @@ async def forgot_password(request: web.Request):
         "error": error,
         "btn_name": "Update Password" if otp else "Verify OTP" if email else "Generate OTP"
     })
+
+@routes.post("/api/request-otp")
+async def generate_otp(request: web.Request):
+    data: dict=await request.json()
+    if not data.get("email"):
+        return web.json_response({"error": "Please provide Email"})
+    result=db.email_exist(data["email"])
+    if result:
+        return web.json_response({"error": "Email Already exist"})
+    code=db.gen_code(data["email"])
+    text=f"OTP to verify your Email address is {code}"
+    await send_mail(data["email"], data["email"], text, "Email Verification")
+    return web.json_response({"status": "ok"})
+
+@routes.post("/api/check-id")
+async def check_id(request: web.Request):
+    data: dict=await request.json()
+    user_id=data.get("id")
+    utype=data.get("user_type")
+    result=db.get_user(admid=user_id, user_type=utype)
+    if result:
+        return web.json_response({"error": "ID Already exist"})
+    return web.json_response({"status": "ok"})

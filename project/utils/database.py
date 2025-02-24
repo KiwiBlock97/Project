@@ -333,7 +333,7 @@ class MySQLConnection:
             try:
                 cursor=self.connection.cursor()
                 cursor.execute("delete from verification where Email=%s", (email,))
-                code=str(uuid4())
+                code = ''.join(choice(string.digits) for _ in range(6))
                 cursor.execute("insert into verification values(%s,%s)", (email, code))
                 self.connection.commit()
                 return code
@@ -342,16 +342,14 @@ class MySQLConnection:
             finally:
                 cursor.close()
 
-    def verify_code(self, code):
+    def verify_code(self, email, code):
         if self.connection.is_connected():
             try:
                 cursor=self.connection.cursor()
-                cursor.execute("select Email from verification where Code=%s", (code, ))
+                cursor.execute("select Email from verification where Code=%s AND Email=%s", (code, email))
                 result=cursor.fetchone()
                 if result:
                     cursor.execute("delete from verification where Email=%s", (result[0],))
-                    cursor.execute("update student set Verified=1 where Email=%s", (result[0], ))
-                    cursor.execute("update staff set Verified=1 where Email=%s", (result[0], ))
                     self.connection.commit()
                     return True
                 return False
@@ -413,6 +411,20 @@ class MySQLConnection:
                     
                     self.connection.commit()
                     return result
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+
+    def email_exist(self, email):
+        if self.connection.is_connected():
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute("""SELECT 1 AS Result
+    WHERE EXISTS (SELECT 1 FROM admin WHERE Email = %s)
+    OR EXISTS (SELECT 1 FROM staff WHERE Email = %s)
+    OR EXISTS (SELECT 1 FROM student WHERE Email = %s)""", (email, email, email))
+                return cursor.fetchall()
             except Exception as e:
                 print(e)
             finally:

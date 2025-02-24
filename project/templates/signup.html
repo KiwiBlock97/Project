@@ -42,9 +42,18 @@
                     <input type="text" id="name" name="name" class="form-control" placeholder="Full Name" required>
                 </div>
 
-                <!-- Email -->
+                <!-- Email & OTP Request -->
                 <div class="mb-3">
-                    <input type="email" id="email" name="email" class="form-control" placeholder="E-Mail" required>
+                    <div class="input-group">
+                        <input type="email" id="email" name="email" class="form-control" placeholder="E-Mail" required oninput="showOTPButton()">
+                        <button type="button" id="get-otp" class="btn btn-primary d-none" onclick="requestOTP()">Get OTP</button>
+                    </div>
+                    <small id="otp-error" class="text-danger"></small>
+                </div>
+
+                <!-- OTP Input Field -->
+                <div class="mb-3 d-none" id="otp-container">
+                    <input type="text" id="otp" name="otp" class="form-control" placeholder="Enter OTP" required>
                 </div>
 
                 <!-- Password -->
@@ -59,7 +68,8 @@
 
                 <!-- Admission/Aadhar Number -->
                 <div class="mb-3">
-                    <input type="text" id="admission-number" name="admission-number" class="form-control" placeholder="Admission Number" required>
+                    <input type="text" id="admission-number" name="admission-number" class="form-control" placeholder="Admission Number" required oninput="checkId()">
+                    <small id="id-error" class="text-danger"></small>
                 </div>
 
                 <!-- Department Selection -->
@@ -73,7 +83,7 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" id="submit" class="btn btn-primary w-100">Create Account</button>
+                <button type="submit" id="submit" class="btn btn-primary w-100" disabled>Create Account</button>
             </form>
 
             <div class="text-center mt-3">
@@ -110,6 +120,76 @@
                     cnfPassField.style.borderColor = "red";
                     alert("Passwords do not match");
                 }
+            }
+        }
+
+        // Show Get OTP button when email is typed
+        function showOTPButton() {
+            let email = document.getElementById("email");
+            let getOtpButton = document.getElementById("get-otp");
+            getOtpButton.classList.toggle("d-none", !email.checkValidity());
+        }
+
+        // Call server API to request OTP
+        function requestOTP() {
+            let email = document.getElementById("email").value;
+            let otpError = document.getElementById("otp-error");
+            let otpContainer = document.getElementById("otp-container");
+
+            otpError.textContent = ""; // Clear previous errors
+            console.log({ email: email })
+            fetch("/api/request-otp", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email: email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    otpError.textContent = data.error;
+                } else if (data.status === "ok") {
+                    otpContainer.classList.remove("d-none"); // Show OTP field
+                }
+            })
+            .catch(() => {
+                otpError.textContent = "Failed to connect to the server.";
+            });
+        }
+
+        // Call server API to Check Admission or Aadhar Number
+        async function checkId() {
+            let userId = document.getElementById("admission-number").value;
+            let isStudent = document.getElementById("student").checked;
+            let idError = document.getElementById("id-error");
+            let submitButton = document.getElementById("submit");
+
+            idError.textContent = ""; // Clear previous errors
+            submitButton.disabled = true; // Disable submit until check is done
+                
+            if (userId.trim() === "") {
+                return; // Don't check if input is empty
+            }
+
+            try {
+                let response = await fetch("/api/check-id", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: userId, user_type: isStudent ? "Student" : "Staff" })
+                });
+
+                let data = await response.json();
+                if (data.error) {
+                    idError.textContent = data.error;
+                    submitButton.disabled = true; // Keep submit disabled if ID exists
+                } else {
+                    idError.textContent = ""; // No error, allow submission
+                    submitButton.disabled = false;
+                }
+            } catch (error) {
+                idError.textContent = "Failed to connect to the server.";
+                submitButton.disabled = true;
             }
         }
 
