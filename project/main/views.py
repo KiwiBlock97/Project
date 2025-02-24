@@ -111,6 +111,24 @@ async def student_home(request: web.Request):
         "bus_pass": valid_pass,
     })
 
+@routes.get("/student/expired")
+async def student_home(request: web.Request):
+    user=request["user"]
+    bus_pass = db.get_pass(user[0])
+    valid_pass=[ x for x in bus_pass if x[4] < datetime.now().date()]
+    if not valid_pass:
+        return aiohttp_jinja2.render_template("message.html", request, {
+            "text": "No expired tickets found",
+            "level": "status",
+            "home": "/student"
+        })
+    return aiohttp_jinja2.render_template("student_expired.html", request, {
+        "name": user[1],
+        "department": user[4],
+        "admission": user[0],
+        "bus_pass": valid_pass,
+    })
+
 @routes.get("/student/print")
 async def student_home(request: web.Request):
     bus_pass = db.get_pass(key=request.rel_url.query.get("key"))
@@ -432,6 +450,24 @@ async def student_home(request: web.Request):
     valid_pass=[ x for x in bus_pass if x[3] > len(x[4])]
     if not valid_pass:
         return web.HTTPSeeOther("/staff/apply")
+    return aiohttp_jinja2.render_template("staff_home.html", request, {
+        "name": user[1],
+        "department": user[4],
+        "aadhar": user[0],
+        "bus_pass": valid_pass,
+    })
+
+@routes.get("/staff/expired")
+async def student_home(request: web.Request):
+    user=request["user"]
+    bus_pass = db.get_pass(user[0], utype=2)
+    valid_pass=[ x for x in bus_pass if x[3] <= len(x[4])]
+    if not valid_pass:
+        return aiohttp_jinja2.render_template("message.html", request, {
+            "text": "No expired tickets found",
+            "level": "status",
+            "home": "/staff"
+        })
     return aiohttp_jinja2.render_template("staff_home.html", request, {
         "name": user[1],
         "department": user[4],

@@ -11,9 +11,9 @@
 <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="#">Bus Pass System</a>
+            <a class="navbar-brand" href="/staff">Bus Pass System</a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link text-white" href="/staff/apply">New Pass</a>
+                <a class="nav-link text-white" href="/staff">Home</a>
                 <a class="nav-link text-white" href="/staff/expired">Expired Pass</a>
                 <a class="nav-link text-white" href="/logout">Logout</a>
             </div>
@@ -22,26 +22,6 @@
 
     <main class="container mt-4">
         <div class="card shadow-lg p-4">
-            <div class="text-center">
-                <img class="img-fluid border rounded-3" src="/photo" alt="Student Photo" style="max-width: 200px; height: auto;">
-            </div>
-            <h2 class="text-center text-primary mt-3">Student Details</h2>
-            <table class="table table-bordered mt-3">
-                <tr>
-                    <th>Name</th>
-                    <td>{{ name }}</td>
-                </tr>
-                <tr>
-                    <th>Department</th>
-                    <td>{{ department }}</td>
-                </tr>
-                <tr>
-                    <th>Aadhar No</th>
-                    <td>{{ aadhar }}</td>
-                </tr>
-            </table>
-
-            <h4 class="text-primary mt-4">Tickets</h4>
             {% for ticket in bus_pass %}
             <div class="card mt-3">
                 <div class="card-body">
@@ -62,8 +42,11 @@
                             <th>Ticket ID</th>
                             <td>{{ ticket[2] }}</td>
                         </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>Expired</td>
+                        </tr>
                     </table>
-                    <a class="btn btn-success w-100" href="/staff/print?key={{ ticket[2] }}">Print Ticket</a>
                 </div>
             </div>
             {% endfor %}

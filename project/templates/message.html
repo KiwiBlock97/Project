@@ -37,7 +37,7 @@
     <main>
         <section>
             <div id="message-container" class="message-box {{ level }}"><p>{{text}}</p></div>
-            <a href="/" class="checkout-button">Go to Home</a>
+            <a href="{% if home %}{{home}}{% else %}/{% endif %}" class="checkout-button">Go to Home</a>
         </section>
     </main>
 </body>
