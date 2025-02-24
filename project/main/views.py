@@ -129,6 +129,29 @@ async def student_home(request: web.Request):
         "bus_pass": valid_pass,
     })
 
+@routes.post("/student/profile")
+@routes.get("/student/profile")
+async def student_home(request: web.Request):
+    user=request["user"]
+    if request.method == "POST":
+        if request["user_type"]=="Student":
+            utype=1
+        elif request["user_type"]=="Staff":
+            utype=2
+        data=await request.post()
+        if isinstance(data["photo"], web.FileField):
+            photo=data["photo"]
+            with open(f"photo/{user[0]}", "wb") as f:
+                f.write(photo.file.read())
+            
+    return aiohttp_jinja2.render_template("student_profile.html", request, {
+        "name": user[1],
+        "admission": user[0],
+        "department": user[4],
+        "email": user[2],
+        "user_type": request["user_type"]
+    })
+
 @routes.get("/student/print")
 async def student_home(request: web.Request):
     bus_pass = db.get_pass(key=request.rel_url.query.get("key"))
@@ -473,6 +496,29 @@ async def student_home(request: web.Request):
         "department": user[4],
         "aadhar": user[0],
         "bus_pass": valid_pass,
+    })
+
+@routes.post("/staff/profile")
+@routes.get("/staff/profile")
+async def student_home(request: web.Request):
+    user=request["user"]
+    if request.method == "POST":
+        if request["user_type"]=="Student":
+            utype=1
+        elif request["user_type"]=="Staff":
+            utype=2
+        data=await request.post()
+        if isinstance(data["photo"], web.FileField):
+            photo=data["photo"]
+            with open(f"photo/{user[0]}", "wb") as f:
+                f.write(photo.file.read())
+            
+    return aiohttp_jinja2.render_template("student_profile.html", request, {
+        "name": user[1],
+        "admission": user[0],
+        "department": user[4],
+        "email": user[2],
+        "user_type": request["user_type"]
     })
 
 @routes.get("/staff/print")
