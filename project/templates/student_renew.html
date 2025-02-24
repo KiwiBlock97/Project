@@ -4,73 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Renew Ticket</title>
-    <link rel="stylesheet" href="/static/styles/global.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <nav>
-        <ul>
-            <li><a href="/student">Home</a></li>
-            <li><a href="/logout">Logout</a></li>
-        </ul>
+<body class="bg-light d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/student">Bus Pass System</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link text-white" href="/student">Home</a>
+                <a class="nav-link text-white" href="/logout">Logout</a>
+            </div>
+        </div>
     </nav>
 
-    <div class="renew-ticket">
-        <form class="ticket-form" method="post" action="/student/order/confirm">
-            <input type="hidden" name="ukey" value="{{ ukey }}">
+    <main class="flex-grow-1 d-flex justify-content-center align-items-center">
+        <section class="p-4 border rounded-4 shadow bg-white w-75 w-md-50 w-lg-40">
+            <h2 class="text-center text-primary fw-semibold mb-4">Renew Ticket</h2>
 
-            <div class="form-group">
-                <label for="name">Name:</label>
-                <p id="name" name="name" class="value">{{ name }}</p>
-            </div>
+            <form class="ticket-form" method="post" action="/student/order/confirm">
+                <input type="hidden" name="ukey" value="{{ ukey }}">
 
-            <div class="form-group">
-                <label for="department">Department:</label>
-                <p id="department" name="department" class="value">{{ department }}</p>
-            </div>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label fw-semibold">Name</label>
+                    <div class="col-sm-8">
+                        <p class="form-control-plaintext">{{ name }}</p>
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label for="from-to">From/To:</label>
-                <p id="from-to" name="from-to" class="value">{{ place }}</p>
-            </div>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label fw-semibold">Department</label>
+                    <div class="col-sm-8">
+                        <p class="form-control-plaintext">{{ department }}</p>
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label for="datefrom">From Date:</label>
-                <input type="date" id="datefrom" name="datefrom" value="{{ fromdate }}" readonly>
-            </div>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label fw-semibold">Admin No</label>
+                    <div class="col-sm-8">
+                        <p class="form-control-plaintext">{{ adm_no }}</p>
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label for="dateto">To Date:</label>
-                <input type="date" id="dateto" name="dateto" min="{{ fromdate }}" onchange="update_price()">
-            </div>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label fw-semibold">From/To</label>
+                    <div class="col-sm-8">
+                        <p class="form-control-plaintext">{{ place }}</p>
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label for="admin-no">Admin No:</label>
-                <p id="admin-no" name="admin-no" class="value">{{ adm_no }}</p>
-            </div>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label fw-semibold">From Date</label>
+                    <div class="col-sm-8">
+                        <input type="date" id="datefrom" name="datefrom" class="form-control" value="{{ fromdate }}" readonly>
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label for="ticket-price">Ticket Price:</label>
-                <p id="ticket-price" name="ticket-price" class="value" data-price="{{ price }}">{{ price }}</p>
-            </div>
-            
-            <div class="form-group">
-                <label for="phone">Phone Number:</label>
-                <input type="tel" id="phone" name="phone" class="value" required>
-            </div>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label fw-semibold">To Date</label>
+                    <div class="col-sm-8">
+                        <input type="date" id="dateto" name="dateto" class="form-control" min="{{ fromdate }}" onchange="update_price()" required>
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <button type="submit" id="pay" class="pay-button" style="display: none;">Pay</button>
-            </div>
-        </form>
-    </div>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label fw-semibold">Ticket Price</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="ticket-price" name="ticket-price" class="form-control" value="{{ price }}" readonly>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label fw-semibold">Phone</label>
+                    <div class="col-sm-8">
+                        <input type="tel" id="phone" name="phone" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" id="pay" class="btn btn-success w-100" style="display: none;">Pay</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
+        <p class="mb-0">Bus Pass System</p>
+    </footer>
 
     <script>
         function update_price() {
             var fromDate = document.getElementById("datefrom").value;
             var toDate = document.getElementById("dateto").value;
-            var payButton = document.getElementById("pay");
-            // var ticketPriceElement = document.getElementById("ticket-price");
-            // var ticketPrice = parseFloat(ticketPriceElement.getAttribute("data-price"));
+            var pay = document.getElementById("pay");
+            var ticket_price = document.getElementById("ticket-price");
+            var basePrice = parseFloat(ticket_price.value);
 
             if (fromDate && toDate) {
                 var startDate = new Date(fromDate);
@@ -79,17 +106,18 @@
                 var validity = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)) + 1;
 
                 if (validity > 0) {
-                    // var totalAmount = ticketPrice * validity;
-                    payButton.innerHTML = `Pay`;
-                    payButton.style.display = "block";
+                    pay.innerHTML = "Pay";
+                    pay.style.display = "block";
                 } else {
-                    payButton.innerHTML = "Invalid date range. Please select a valid To Date.";
-                    payButton.style.display = "block";
+                    pay.innerHTML = "Invalid date range. Please select a valid To Date.";
+                    pay.style.display = "block";
                 }
             } else {
-                payButton.style.display = "none";
+                pay.style.display = "none";
             }
         }
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

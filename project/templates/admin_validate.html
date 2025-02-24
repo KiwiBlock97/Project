@@ -3,92 +3,107 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Validate Ticket - Admin Page</title>
-    <link rel="stylesheet" href="/static/styles/global.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="bg-light">
+
     <!-- Navigation -->
-    <nav>
-        <ul>
-            <li><a href="/admin">Home</a></li>
-            <li><a href="/logout" class="nav-link">Logout</a></li>
-        </ul>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/admin">Admin Dashboard</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link text-white" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+            </div>
+        </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="admin-content">
-        <!-- Ticket Validation Section -->
-        <section id="validate-ticket-section" class="validate-ticket">
-            <h2 class="section-title">Validate Ticket</h2>
+    <main class="container my-5">
+        <section class="card shadow-sm p-4">
+            <h2 class="text-primary fw-bold text-center">Validate Ticket</h2>
 
             <!-- Validation Form -->
-            <form class="validate-form">
-                <label for="ticket-id" class="form-label">Ticket ID:</label>
-                <input type="text" id="ticket-id" name="ticket-id" class="form-input" required>
-
-                <button type="submit" class="btn btn-validate">Validate</button>
+            <form class="row g-3">
+                <div class="col-md-6 mx-auto">
+                    <label for="ticket-id" class="form-label fw-bold">Ticket ID:</label>
+                    <input type="text" id="ticket-id" name="ticket-id" class="form-control" required>
+                </div>
+                <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check-circle"></i> Validate
+                    </button>
+                </div>
             </form>
 
             <!-- Validation Status -->
-            <div id="status" class="ticket-status">
+            <div id="status" class="mt-4">
                 {% if key %}
                     {% if ticket %}
-                        <div class="ticket-details">
-                            <h3 class="section-subtitle">Ticket Information</h3>
-                            <table class="details-table">
-                                <tr>
-                                    <td class="label">Photo:</td>
-                                    <td><img height="200px" src="/photo?id={{ticket[0]}}" alt="User Photo" class="user-photo"></td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Name:</td>
-                                    <td>{{ user[1] }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Department:</td>
-                                    <td>{{ user[4] }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Admission No:</td>
-                                    <td>{{ ticket[0] }}</td>
-                                </tr>
-                                {% if usertype == "Student" %}
-                                <tr>
-                                    <td class="label">From Date:</td>
-                                    <td>{{ ticket[3] }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="label">To Date:</td>
-                                    <td>{{ ticket[4] }}</td>
-                                </tr>
-                                {% elif usertype == "Staff" %}
-                                <tr>
-                                    <td class="label">Total Days:</td>
-                                    <td>{{ ticket[3] }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Days Left:</td>
-                                    <td>{{ ticket[3] - ticket[4]|length }}</td>
-                                </tr>
-                                {% endif %}
-                                <tr>
-                                    <td class="label">From/To:</td>
-                                    <td>{{ ticket[1] }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Ticket ID:</td>
-                                    <td>{{ ticket[2] }}</td>
-                                </tr>
+                        <div class="ticket-details mt-4">
+                            <h3 class="text-success fw-bold text-center">✅ Ticket Information</h3>
+                            <div class="text-center my-3">
+                                <img class="img-fluid border rounded-3" src="/photo?id={{ticket[0]}}" alt="User Photo" style="max-width: 200px; height: auto;">
+                            </div>
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <th class="bg-light">Name</th>
+                                        <td>{{ user[1] }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-light">Department</th>
+                                        <td>{{ user[4] }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-light">Admission No</th>
+                                        <td>{{ ticket[0] }}</td>
+                                    </tr>
+                                    {% if usertype == "Student" %}
+                                    <tr>
+                                        <th class="bg-light">From Date</th>
+                                        <td>{{ ticket[3] }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-light">To Date</th>
+                                        <td>{{ ticket[4] }}</td>
+                                    </tr>
+                                    {% elif usertype == "Staff" %}
+                                    <tr>
+                                        <th class="bg-light">Total Days</th>
+                                        <td>{{ ticket[3] }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-light">Days Left</th>
+                                        <td>{{ ticket[3] - ticket[4]|length }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <th class="bg-light">From/To</th>
+                                        <td>{{ ticket[1] }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-light">Ticket ID</th>
+                                        <td class="fw-bold">{{ ticket[2] }}</td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     {% else %}
-                        <p class="error-message">❌ Ticket is Invalid</p>
+                        <div class="alert alert-danger text-center mt-4">
+                            ❌ Ticket is Invalid
+                        </div>
                     {% endif %}
                 {% endif %}
             </div>
         </section>
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>

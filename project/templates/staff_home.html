@@ -5,65 +5,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Details</title>
-    <link rel="stylesheet" href="/static/styles/global.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body>
-    <nav>
-        <ul>
-            <li><a href="/staff/apply">New Pass</a></li>
-            <li><a href="/logout">Logout</a></li>
-        </ul>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Bus Pass System</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link text-white" href="/staff/apply">New Pass</a>
+                <a class="nav-link text-white" href="/logout">Logout</a>
+            </div>
+        </div>
     </nav>
 
-    <div class="student-details">
-        <table class="student-info" id="student-pass">
-            <tr>
-                <td colspan="2" class="photo-container">
-                    <img class="student-photo" src="/photo" alt="Student Photo" height="200">
-                </td>
-            </tr>
-            <tr>
-                <td class="label">Name</td>
-                <td class="value">{{ name }}</td>
-            </tr>
-            <tr>
-                <td class="label">Department</td>
-                <td class="value">{{ department }}</td>
-            </tr>
-            <tr>
-                <td class="label">Aadhar No</td>
-                <td class="value">{{ aadhar }}</td>
-            </tr>
-        </table>
-
-        <h4 class="section-heading">Tickets</h4>
-        {% for ticket in bus_pass %}
-            <table class="ticket-info" id="ticket-{{ ticket[2] }}">
+    <main class="container mt-4">
+        <div class="card shadow-lg p-4">
+            <div class="text-center">
+                <img class="img-fluid border rounded-3" src="/photo" alt="Student Photo" style="max-width: 200px; height: auto;">
+            </div>
+            <h2 class="text-center text-primary mt-3">Student Details</h2>
+            <table class="table table-bordered mt-3">
                 <tr>
-                    <td class="label">Total Days</td>
-                    <td class="value">{{ ticket[3] }}</td>
+                    <th>Name</th>
+                    <td>{{ name }}</td>
                 </tr>
                 <tr>
-                    <td class="label">Days Left</td>
-                    <td class="value">{{ ticket[3] - ticket[4]|length }}</td>
+                    <th>Department</th>
+                    <td>{{ department }}</td>
                 </tr>
                 <tr>
-                    <td class="label">From/To Place</td>
-                    <td class="value">{{ ticket[1] }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Ticket ID</td>
-                    <td class="value">{{ ticket[2] }}</td>
-                </tr>
-                <tr>
-                    <td>
-                        <a class="print-button" href="/staff/print?key={{ ticket[2] }}">Print Ticket</button>
-                    </td>
+                    <th>Aadhar No</th>
+                    <td>{{ aadhar }}</td>
                 </tr>
             </table>
-        {% endfor %}
-    </div>
+
+            <h4 class="text-primary mt-4">Tickets</h4>
+            {% for ticket in bus_pass %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                            <th>Total Days</th>
+                            <td>{{ ticket[3] }}</td>
+                        </tr>
+                        <tr>
+                            <th>Days Left</th>
+                            <td>{{ ticket[3] - ticket[4]|length }}</td>
+                        </tr>
+                        <tr>
+                            <th>From/To</th>
+                            <td>{{ ticket[1] }}</td>
+                        </tr>
+                        <tr>
+                            <th>Ticket ID</th>
+                            <td>{{ ticket[2] }}</td>
+                        </tr>
+                    </table>
+                    <a class="btn btn-success w-100" href="/staff/print?key={{ ticket[2] }}">Print Ticket</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p class="mb-0">Bus Pass System</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

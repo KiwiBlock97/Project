@@ -4,76 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signup</title>
-    <link rel="stylesheet" href="/static/styles/create.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="signup-container">
-        <h1 class="signup-title">Create Account</h1>
-        <form class="signup-form" method="post" action="/signup" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="photo" class="form-label">Photo</label>
-                <input type="file" id="photo" name="photo" class="form-input" accept="image/*" required>
-            </div>
+<body class="bg-light d-flex flex-column min-vh-100">
+    <header class="bg-primary text-white text-center py-4 shadow-sm">
+        <h1 class="fw-bold">Create Account</h1>
+    </header>
 
-            <div class="form-group">
-                <label class="form-label">Type</label>
-                <div class="form-radio-group">
-                    <div>
-                        <input type="radio" id="student" name="user-type" value="Student" checked onclick="toggleFields()"> 
-                        <label for="student">Student</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="staff" name="user-type" value="Staff" onclick="toggleFields()"> 
-                        <label for="staff">Staff</label>
+    <main class="flex-grow-1 d-flex justify-content-center align-items-center">
+        <section class="p-4 border rounded-4 shadow bg-white w-75 w-md-50 w-lg-40">
+            <form method="post" action="/signup" enctype="multipart/form-data">
+                <!-- Photo Upload -->
+                <div class="mb-3">
+                    <label class="form-label">Upload Photo</label>
+                    <div class="input-group">
+                        <input type="file" id="photo" name="photo" class="form-control d-none" accept="image/*" required>
+                        <label for="photo" class="btn btn-outline-primary" id="photo-label">Upload Photo</label>
                     </div>
                 </div>
-            </div>
-            
-            
 
-            <div class="form-group">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" id="name" name="name" class="form-input" required>
-            </div>
+                <!-- User Type Selection -->
+                <div class="mb-3">
+                    <div class="d-flex gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="student" name="user-type" value="Student" checked onclick="toggleFields()">
+                            <label class="form-check-label" for="student">Student</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="staff" name="user-type" value="Staff" onclick="toggleFields()">
+                            <label class="form-check-label" for="staff">Staff</label>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label for="email" class="form-label">E-Mail</label>
-                <input type="email" id="email" name="email" class="form-input" required>
-            </div>
+                <!-- Name -->
+                <div class="mb-3">
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Full Name" required>
+                </div>
 
-            <div class="form-group">
-                <label for="pass" class="form-label">Password</label>
-                <input type="password" id="pass" name="pass" class="form-input" onchange="check_pass()" required>
-            </div>
+                <!-- Email -->
+                <div class="mb-3">
+                    <input type="email" id="email" name="email" class="form-control" placeholder="E-Mail" required>
+                </div>
 
-            <div class="form-group">
-                <label for="cnf-pass" class="form-label">Confirm Password</label>
-                <input type="password" id="cnf-pass" name="cnf-pass" class="form-input" onchange="check_pass()" required>
-            </div>
+                <!-- Password -->
+                <div class="mb-3">
+                    <input type="password" id="pass" name="pass" class="form-control" placeholder="Password" onchange="check_pass()" required>
+                </div>
 
-            <div class="form-group">
-                <label for="admission-number" id="admission-label" class="form-label">Admission Number</label>
-                <input type="text" id="admission-number" name="admission-number" class="form-input" required>
-            </div>
+                <!-- Confirm Password -->
+                <div class="mb-3">
+                    <input type="password" id="cnf-pass" name="cnf-pass" class="form-control" placeholder="Confirm Password" onchange="check_pass()" required>
+                </div>
 
-            <div class="form-group">
-                <label for="department" class="form-label">Department</label>
-                <select id="department" name="department" class="form-select" required>
-                    {% for row in departments %}
-                        <option value="{{ row[0] }}">{{ row[0] }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+                <!-- Admission/Aadhar Number -->
+                <div class="mb-3">
+                    <input type="text" id="admission-number" name="admission-number" class="form-control" placeholder="Admission Number" required>
+                </div>
 
-            <button type="submit" id="submit" class="form-button">Create Account</button>
-        </form>
-    </div>
+                <!-- Department Selection -->
+                <div class="mb-3">
+                    <select id="department" name="department" class="form-select" required>
+                        <option value="" disabled selected>Select Department</option>
+                        {% for row in departments %}
+                            <option value="{{ row[0] }}">{{ row[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submit" class="btn btn-primary w-100">Create Account</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <p class="mb-1">Already have an account? <a href="/login" class="text-decoration-none">Login here</a>.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
+        <p class="mb-0">Bus Pass System</p>
+    </footer>
 
     <script>
         function toggleFields() {
             var isStudent = document.getElementById("student").checked;
-            var admissionLabel = document.getElementById("admission-label");
-            admissionLabel.innerText = isStudent ? "Admission Number" : "Aadhar Number";
+            var admissionInput = document.getElementById("admission-number");
+            admissionInput.placeholder = isStudent ? "Admission Number" : "Aadhar Number";
         }
 
         function check_pass() {
@@ -96,8 +113,16 @@
             }
         }
 
+        // Update file input label
+        document.getElementById("photo").addEventListener("change", function () {
+            var fileName = this.files[0] ? this.files[0].name : "Upload Photo";
+            document.getElementById("photo-label").textContent = fileName;
+        });
+
         // Initialize fields on page load
         document.addEventListener("DOMContentLoaded", toggleFields);
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -4,64 +4,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Regular Student</title>
-    <link rel="stylesheet" href="/static/styles/global.css">
+    <title>Regular Students</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="bg-light">
+
     <!-- Navigation -->
-    <nav>
-        <ul>
-            <li><a href="/admin">Home</a></li>
-            <li><a href="/logout" class="nav-link">Logout</a></li>
-        </ul>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/admin">Admin Dashboard</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link text-white" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+            </div>
+        </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="admin-content">
-        <section class="admin-section">
-            <h2 class="section-title">Regular Students</h2>
+    <main class="container my-5">
+        <section class="card shadow-sm p-4">
+            <h2 class="text-primary fw-bold text-center">Regular Students</h2>
 
             <!-- Search Form -->
-            <form method="get" class="search-form">
-                <div class="form-group">
+            <form method="get" class="row g-3">
+                <div class="col-md-5">
                     <label for="fromdate" class="form-label">From Date</label>
-                    <input type="date" name="fromdate" id="fromdate" value="{{fromdate}}" class="form-input" required>
+                    <input type="date" name="fromdate" id="fromdate" value="{{fromdate}}" class="form-control" required>
                 </div>
-                <div class="form-group">
+                <div class="col-md-5">
                     <label for="todate" class="form-label">To Date</label>
-                    <input type="date" name="todate" id="todate" value="{{todate}}" class="form-input" required>
+                    <input type="date" name="todate" id="todate" value="{{todate}}" class="form-control" required>
                 </div>
-                <div class="form-group">
-                    <input type="submit" value="Search" class="form-button">
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Search</button>
                 </div>
             </form>
 
             <!-- Results Table -->
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Sl No</th>
-                        <th>Place</th>
-                        <th>From</th>
-                        <th>To</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for no, row in passes %}
-                    <tr>
-                        <td>
-                            <a href="/admin/validate?ticket-id={{row[2]}}" class="link-ticket">{{no}}</a>
-                        </td>
-                        <td>{{row[1]}}</td>
-                        <td>{{row[3]}}</td>
-                        <td>{{row[4]}}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="table-responsive mt-4">
+                <table class="table table-striped table-hover text-center align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Sl No</th>
+                            <th>Place</th>
+                            <th>From</th>
+                            <th>To</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for no, row in passes %}
+                        <tr>
+                            <td>
+                                <a href="/admin/validate?ticket-id={{row[2]}}" class="text-decoration-none fw-bold text-primary">{{no}}</a>
+                            </td>
+                            <td>{{row[1]}}</td>
+                            <td>{{row[3]}}</td>
+                            <td>{{row[4]}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </section>
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>

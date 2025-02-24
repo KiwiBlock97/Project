@@ -248,6 +248,7 @@ async def admin_home(request: web.Request):
     data=await request.post()
     if (admid:=data.get("admid")):
         db.remove_student(int(admid))
+        return web.HTTPSeeOther("/admin/students")
     elif (aadhar:=data.get("aadhar")):
         db.remove_student(int(aadhar), 2)
         return web.HTTPSeeOther("/admin/students")
@@ -295,7 +296,7 @@ async def admin_stops_post(request: web.Request):
 async def admin_details(request: web.Request):
     user_type=request.rel_url.query.get("type")
     if ticket:=request.rel_url.query.get("pass"):
-        db.remove_pass(uuid4=ticket, utype=user_type)
+        db.remove_pass(uuid4=ticket, utype=int(user_type))
     if not (admid:=request.rel_url.query.get("id")):
         return web.HTTPBadRequest()
     utype=1
