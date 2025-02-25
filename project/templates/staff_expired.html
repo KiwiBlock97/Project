@@ -12,10 +12,20 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" href="/staff">Bus Pass System</a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link text-white" href="/staff">Home</a>
-                <a class="nav-link text-white" href="/staff/expired">Expired Pass</a>
-                <a class="nav-link text-white" href="/logout">Logout</a>
+            <!-- Navbar Toggler -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Collapsible Navbar -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link text-white fw-medium px-3" href="/staff">Home</a>
+                    <a class="nav-link text-white fw-medium px-3" href="/staff/profile">Profile</a>
+                    <a class="nav-link text-white fw-medium px-3" href="/staff/apply">New Pass</a>
+                    <a class="nav-link text-white fw-medium px-3" href="/logout">Logout</a>
+                </div>
             </div>
         </div>
     </nav>
