@@ -1,6 +1,10 @@
 import uuid
 import aiohttp_jinja2
 
+import hmac
+import hashlib
+import base64
+
 from datetime import datetime, date, timedelta
 from aiohttp import web
 from aiohttp_session import get_session
@@ -224,7 +228,7 @@ async def order_confirm(request: web.Request):
     
     amount = price * validity
 
-    payment_id=await create_order(str(admid), str(phoneno), name, email, str(uuid4), amount, "/student/order/checkout")
+    payment_id=await create_order(str(admid), str(phoneno), name, email, str(uuid4), amount, "/student/order/checkout", "Student")
     if payment_id:
         db.create_order(str(uuid4), email, place, datefrom, dateto, 1 if ukey else 0, ukey if ukey else None, None, amount)
         return aiohttp_jinja2.render_template("student_order_confirm.html", request, {
@@ -246,29 +250,29 @@ async def checkout(request: web.Request):
     if not order_id:
         return web.HTTPMethodNotAllowed()
     resp=(await fetch_payment(order_id))[0]
-    if resp.get("payment_status")=="SUCCESS":
-        order=db.get_order(order_id)
-        if order[8] in ["SUCCESS", "PROCESSED"]:
-            return aiohttp_jinja2.render_template("student_order_checkout.html", request, {
-                "status": resp.get("payment_status"),
-                "payment_id": resp.get("cf_payment_id"),
-                "order_id": resp.get("order_id")
-            })
-        db.modify_order(order_id, str(resp.get("payment_status")))
-        user=db.get_user(email=order[1], user_type="Student")
-        place=db.get_place(place=order[2])
-        fromtime: date=order[3]
-        totime: date=order[4]
-        if order[5]==0:
-            db.create_pass(user[0], place[0], order_id, fromtime, totime)
-        elif order[5]==1:
-            db.extend_pass(totime, order[6])
-        db.modify_order(order_id, "PROCESSED")
-    elif resp.get("payment_status"):
-        db.modify_order(order_id, str(resp.get("payment_status")))
-        # [PENDING, USER_DROPPED, FAILED]
-    else:
-        return web.HTTPBadRequest()
+    # if resp.get("payment_status")=="SUCCESS":
+    #     order=db.get_order(order_id)
+    #     if order[8] in ["SUCCESS", "PROCESSED"]:
+    #         return aiohttp_jinja2.render_template("student_order_checkout.html", request, {
+    #             "status": resp.get("payment_status"),
+    #             "payment_id": resp.get("cf_payment_id"),
+    #             "order_id": resp.get("order_id")
+    #         })
+    #     db.modify_order(order_id, str(resp.get("payment_status")))
+    #     user=db.get_user(email=order[1], user_type="Student")
+    #     place=db.get_place(place=order[2])
+    #     fromtime: date=order[3]
+    #     totime: date=order[4]
+    #     if order[5]==0:
+    #         db.create_pass(user[0], place[0], order_id, fromtime, totime)
+    #     elif order[5]==1:
+    #         db.extend_pass(totime, order[6])
+    #     db.modify_order(order_id, "PROCESSED")
+    # elif resp.get("payment_status"):
+    #     db.modify_order(order_id, str(resp.get("payment_status")))
+    #     # [PENDING, USER_DROPPED, FAILED]
+    # else:
+    #     return web.HTTPBadRequest()
     return aiohttp_jinja2.render_template("student_order_checkout.html", request, {
         "status": resp.get("payment_status"),
         "payment_id": resp.get("cf_payment_id"),
@@ -561,7 +565,7 @@ async def order_confirm(request: web.Request):
     
     amount = price * days
 
-    payment_id=await create_order(str(aadhar), str(phoneno), name, email, str(uuid4), amount, "/staff/order/checkout")
+    payment_id=await create_order(str(aadhar), str(phoneno), name, email, str(uuid4), amount, "/staff/order/checkout", "Staff")
     if payment_id:
         db.create_order(str(uuid4), email, place, price=amount, days=days)
         return aiohttp_jinja2.render_template("staff_order_confirm.html", request, {
@@ -581,25 +585,25 @@ async def checkout(request: web.Request):
     if not order_id:
         return web.HTTPMethodNotAllowed()
     resp=(await fetch_payment(order_id))[0]
-    if resp.get("payment_status")=="SUCCESS":
-        order=db.get_order(order_id, utype=2)
-        if order[5] in ["SUCCESS", "PROCESSED"]:
-            return aiohttp_jinja2.render_template("student_order_checkout.html", request, {
-                "status": resp.get("payment_status"),
-                "payment_id": resp.get("cf_payment_id"),
-                "order_id": resp.get("order_id")
-            })
-        db.modify_order(order_id, str(resp.get("payment_status")), utype=2)
-        user=db.get_user(email=order[1], user_type="Staff")
-        place=db.get_place(place=order[2])
-        days: int=order[3]
-        db.create_pass(user[0], place[0], order_id, days=days)
-        db.modify_order(order_id, "PROCESSED", utype=2)
-    elif resp.get("payment_status"):
-        db.modify_order(order_id, str(resp.get("payment_status")), utype=2)
-        # [PENDING, USER_DROPPED, FAILED]
-    else:
-        return web.HTTPBadRequest()
+    # if resp.get("payment_status")=="SUCCESS":
+    #     order=db.get_order(order_id, utype=2)
+    #     if order[5] in ["SUCCESS", "PROCESSED"]:
+    #         return aiohttp_jinja2.render_template("student_order_checkout.html", request, {
+    #             "status": resp.get("payment_status"),
+    #             "payment_id": resp.get("cf_payment_id"),
+    #             "order_id": resp.get("order_id")
+    #         })
+    #     db.modify_order(order_id, str(resp.get("payment_status")), utype=2)
+    #     user=db.get_user(email=order[1], user_type="Staff")
+    #     place=db.get_place(place=order[2])
+    #     days: int=order[3]
+    #     db.create_pass(user[0], place[0], order_id, days=days)
+    #     db.modify_order(order_id, "PROCESSED", utype=2)
+    # elif resp.get("payment_status"):
+    #     db.modify_order(order_id, str(resp.get("payment_status")), utype=2)
+    #     # [PENDING, USER_DROPPED, FAILED]
+    # else:
+    #     return web.HTTPBadRequest()
     return aiohttp_jinja2.render_template("student_order_checkout.html", request, {
         "status": resp.get("payment_status"),
         "payment_id": resp.get("cf_payment_id"),
@@ -664,3 +668,55 @@ async def check_id(request: web.Request):
     if result:
         return web.json_response({"error": "ID Already exist"})
     return web.json_response({"status": "ok"})
+
+@routes.post("/api/webhook")
+async def webhook(request: web.Request):
+    if (request.headers.get("x-webhook-version") != Var.CF_VERSION):
+        return web.HTTPOk()
+    
+    raw_body = await request.text()
+    ts = request.headers.get("x-webhook-timestamp", "")
+    signature = request.headers.get("x-webhook-signature", "")
+    sign=verify_signature(raw_body, ts)
+    if sign!=signature:
+        return web.Response(text="Failed", status=400)
+    
+    cfdata=await request.json()
+    if cfdata["type"]!="PAYMENT_SUCCESS_WEBHOOK":
+        return web.HTTPOk()
+
+    order_id=cfdata["data"]["order"]["order_id"]
+    payment=cfdata["data"]["payment"]
+
+    user_type=cfdata["data"]["order"]["order_tags"]["user_type"]
+    status_index=8 if user_type=="Student" else 5
+    user_type_no=1 if user_type=="Student" else 2
+
+    if payment["payment_status"]=="SUCCESS":
+        order=db.get_order(order_id, utype=user_type_no)
+        if order[status_index] not in ["SUCCESS", "PROCESSED"]:
+            db.modify_order(order_id, str(payment["payment_status"]), utype=user_type_no)
+            user=db.get_user(email=order[1], user_type=user_type)
+            place=db.get_place(place=order[2])
+
+            if user_type_no==1:
+                fromtime: date=order[3]
+                totime: date=order[4]
+                if order[5]==0:
+                    db.create_pass(user[0], place[0], order_id, fromtime, totime)
+                elif order[5]==1:
+                    db.extend_pass(totime, order[6])
+            elif user_type_no==2:
+                days: int=order[3]
+                db.create_pass(user[0], place[0], order_id, days=days)
+            db.modify_order(order_id, "PROCESSED", utype=user_type_no)
+    elif payment["payment_status"]:
+        db.modify_order(order_id, str(payment["payment_status"]), utype=user_type_no)
+        # [PENDING, USER_DROPPED, FAILED]
+
+    return web.HTTPOk()
+
+def verify_signature(body, ts):
+    body = ts + body
+    gen_signature = hmac.new(Var.CF_CLIENTSECRET.encode(), body.encode(), hashlib.sha256).digest()
+    return base64.b64encode(gen_signature).decode()
