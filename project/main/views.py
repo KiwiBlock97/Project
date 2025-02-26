@@ -426,7 +426,7 @@ async def admin_tickets_regular(request: web.Request):
     params={"fromdate": fromdate, "todate": todate}
     if fromdate and todate:
         passes=db.get_pass(regular=True, fromdate=fromdate, todate=todate)
-        params["passes"]=enumerate(passes, 1)
+        params["passes"]=passes
     return aiohttp_jinja2.render_template("admin_tickets_regular.html", request, params)
 
 @routes.post("/admin/tickets/today")

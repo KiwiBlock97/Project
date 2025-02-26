@@ -9,7 +9,7 @@ from mysql.connector import Error
 from project.utils.vars import Var
 
 def to_json(result):
-    if len(result)==5:
+    if len(result) in [5, 7]:
         key_id=4
     else:
         key_id=5
@@ -25,6 +25,8 @@ class MySQLConnection:
     def is_connected(self):
         if not self.connection.is_connected():
             self.connect_to_db()
+            return self.connection.is_connected()
+        return True
 
     def connect_to_db(self):
         try:
@@ -117,9 +119,9 @@ class MySQLConnection:
                     result=cursor.fetchone()
                 elif regular:
                     if utype==1:
-                        cursor.execute("select * from pass where (fromtime <= %s AND totime >= %s) ", (fromdate, todate))
+                        cursor.execute("select p.*, s.Name, s.Department from pass p join student s where (p.fromtime <= %s AND p.totime >= %s) ", (fromdate, todate))
                     elif utype==2:
-                        cursor.execute("select * from staff_pass where JSON_LENGTH(Traveled) < Days")
+                        cursor.execute("select p.*, s.Name, s.Department from staff_pass p join staff s where JSON_LENGTH(p.Traveled) < p.Days")
                     result=cursor.fetchall()
                 if result:
                     if key:
