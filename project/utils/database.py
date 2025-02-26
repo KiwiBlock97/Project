@@ -22,6 +22,10 @@ class MySQLConnection:
         self.connection = None
         self.connect_to_db()
 
+    def is_connected(self):
+        if not self.connection.is_connected():
+            self.connect_to_db()
+
     def connect_to_db(self):
         try:
             self.connection = mysql.connector.connect(
@@ -35,7 +39,7 @@ class MySQLConnection:
             print(f"The error '{e}' occurred")
 
     def create_user(self, admission_number, name, email, photo, department, password, user_type):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if user_type=="Student":
@@ -50,7 +54,7 @@ class MySQLConnection:
                 raise
 
     def auth_user(self, email, password):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 cursor.execute("select AdmissionId, Verified, Name from student where Email=%s and Password=%s", (email, password))
@@ -74,7 +78,7 @@ class MySQLConnection:
                 cursor.close()
     
     def get_user(self, email: str = None, admid: int = None, user_type: str = "Student"):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if admid:
@@ -96,7 +100,7 @@ class MySQLConnection:
                 cursor.close()
 
     def get_pass(self, admid:int=None, key: str=None, regular=None, fromdate=None, todate=None, utype=1):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if admid:
@@ -129,7 +133,7 @@ class MySQLConnection:
                 cursor.close()
 
     def create_pass(self, admid: int, place: str, uuid4:str, fromtime: date=None, totime:date=None, days: int=0):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if fromtime:
@@ -143,7 +147,7 @@ class MySQLConnection:
                 cursor.close()
 
     def extend_pass(self, todate: date, UKey: str):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 cursor.execute("update pass set totime=%s where UKey=%s", (todate, UKey))
@@ -154,7 +158,7 @@ class MySQLConnection:
                 cursor.close()
 
     def get_place(self, place: str=None, price: int=None):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if place:
@@ -173,7 +177,7 @@ class MySQLConnection:
                 cursor.close()
 
     def remove_place(self, place:str):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 cursor.execute("delete from place where place=%s", (place,))
@@ -184,7 +188,7 @@ class MySQLConnection:
                 cursor.close()
 
     def add_place(self, place:str, price: int):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 cursor.execute("insert into place values(%s, %s)", (place, price))
@@ -195,7 +199,7 @@ class MySQLConnection:
                 cursor.close()
 
     def get_students(self, utype=0, query=None):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor = self.connection.cursor()  # Fetch results as dictionaries
                 sql = "SELECT * FROM " + ("staff" if utype == 1 else "student")
@@ -218,7 +222,7 @@ class MySQLConnection:
 
 
     def create_order(self, OrderId:str, email: str, place: str, fromtime: str=None, totime: str=None, renew: int=None, ukey:str=None, status: str=None, price: int=0, days: int=None):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if fromtime:
@@ -232,7 +236,7 @@ class MySQLConnection:
                 cursor.close()
 
     def get_order(self, OrderId:str= None, fromdate=None, todate=None, department=None, utype: int=1):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if OrderId:
@@ -261,7 +265,7 @@ class MySQLConnection:
                 cursor.close()
 
     def modify_order(self, OrderId:str, Status, utype: int=1):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if utype==1:
@@ -275,7 +279,7 @@ class MySQLConnection:
                 cursor.close()
 
     def remove_student(self, admission_number, utype=1):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if utype==1:
@@ -289,7 +293,7 @@ class MySQLConnection:
                 cursor.close()
 
     def remove_pass(self, uuid4:str, utype:int=1):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if utype==1:
@@ -303,7 +307,7 @@ class MySQLConnection:
                 cursor.close()
 
     def get_departments(self):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 cursor.execute("select * from departments")
@@ -315,7 +319,7 @@ class MySQLConnection:
                 cursor.close()
 
     def remove_department(self, department:str):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 cursor.execute("delete from departments where department=%s", (department,))
@@ -326,7 +330,7 @@ class MySQLConnection:
                 cursor.close()
 
     def add_department(self, department:str):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 cursor.execute("insert into departments values(%s)", (department, ))
@@ -337,7 +341,7 @@ class MySQLConnection:
                 cursor.close()
 
     def gen_code(self, email):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 cursor.execute("delete from verification where Email=%s", (email,))
@@ -351,7 +355,7 @@ class MySQLConnection:
                 cursor.close()
 
     def verify_code(self, email, code):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 cursor.execute("select Email from verification where Code=%s AND Email=%s", (code, email))
@@ -367,7 +371,7 @@ class MySQLConnection:
                 cursor.close()
 
     def update_pass(self, uuid4:str, date, utype:int=1):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if utype==1:
@@ -390,7 +394,7 @@ class MySQLConnection:
                 cursor.close()
 
     def gen_otp(self, email: str, utype: str):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 cursor.execute(f"select Email from {utype} where Email=%s", (email, ))
@@ -407,7 +411,7 @@ class MySQLConnection:
                 cursor.close()
 
     def update_password(self, email, otp, password=None):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 cursor.execute("select * from forget where Email=%s and OTP=%s", (email, otp))
@@ -425,7 +429,7 @@ class MySQLConnection:
                 cursor.close()
 
     def email_exist(self, email):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 cursor.execute("""SELECT 1 AS Result
@@ -439,7 +443,7 @@ class MySQLConnection:
                 cursor.close()
 
     def verify_user(self, uid, utype=1):
-        if self.connection.is_connected():
+        if self.is_connected():
             try:
                 cursor=self.connection.cursor()
                 if utype==1:
@@ -453,5 +457,5 @@ class MySQLConnection:
                 cursor.close()
 
     def close_connection(self):
-        if self.connection.is_connected():
+        if self.is_connected():
             self.connection.close()
