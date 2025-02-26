@@ -437,7 +437,7 @@ async def admin_tickets_today(request: web.Request):
         passes=db.get_pass(regular=True, fromdate=today, todate=today)
         staff=db.get_pass(regular=True, utype=2)
         return aiohttp_jinja2.render_template("admin_tickets_today.html", request, {
-            "passes": list(enumerate(passes, 1)) if passes else None,
+            "passes": enumerate(passes, 1) if passes else None,
             "staff": enumerate(staff, 1) if staff else None,
             "today": str(today)
         })

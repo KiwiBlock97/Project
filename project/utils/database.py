@@ -119,9 +119,9 @@ class MySQLConnection:
                     result=cursor.fetchone()
                 elif regular:
                     if utype==1:
-                        cursor.execute("select p.*, s.Name, s.Department from pass p join student s where (p.fromtime <= %s AND p.totime >= %s) ", (fromdate, todate))
+                        cursor.execute("select p.*, s.Name, s.Department from pass p join student s where p.fromtime <= %s AND p.totime >= %s AND p.AdmissionId = s.AdmissionId", (fromdate, todate))
                     elif utype==2:
-                        cursor.execute("select p.*, s.Name, s.Department from staff_pass p join staff s where JSON_LENGTH(p.Traveled) < p.Days")
+                        cursor.execute("select p.*, s.Name, s.Department from staff_pass p join staff s where JSON_LENGTH(p.Traveled) < p.Days AND p.Aadhar = s.Aadhar")
                     result=cursor.fetchall()
                 if result:
                     if key:
