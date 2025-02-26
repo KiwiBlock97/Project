@@ -5,7 +5,7 @@ from aiohttp import web
 from project.utils.vars import Var
 from project.main.views import db
 from project.utils.cashfree import session as cf_session
-from project.utils.utils import session as email_session
+from project.utils import utils
 
 from .app import init_app
 
@@ -20,9 +20,14 @@ def create_app() -> web.Application:
 
 async def cleanup():
     if cf_session and not cf_session.closed:
+        print("Closing Cashfree Session")
         await cf_session.close()
-    if email_session and not email_session.closed:
-        await email_session.close()
+    if utils.session and not utils.session.closed:
+        print("Closing Brevo API Session")
+        await utils.session.close()
+    if utils.server:
+        print("Closing SMTP Server")
+        utils.server.close()
     db.close_connection()
     print("Closing Connections")
 

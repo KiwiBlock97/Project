@@ -18,3 +18,8 @@ class Var:
     CF_CLIENTSECRET: str = environ.get("CF_CLIENTSECRET")
     CF_VERSION: str = environ.get("CF_VERSION", "2023-08-01")
     BREVO_API: str = environ.get("BREVO_API", None)
+    SMTP_HOST: str = environ.get("SMTP_HOST", None)
+    SMTP_USER: str = environ.get("SMTP_USER", None)
+    SMTP_PASS: str = environ.get("SMTP_PASS", None)
+    SMTP_PORT: str = int(environ.get("SMTP_PORT", 0))
+    SMTP_MAIL: str = environ.get("SMTP_MAIL", None)

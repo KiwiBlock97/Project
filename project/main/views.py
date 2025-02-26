@@ -656,7 +656,7 @@ async def generate_otp(request: web.Request):
         return web.json_response({"error": "Email Already exist"})
     code=db.gen_code(data["email"])
     text=f"OTP to verify your Email address is {code}"
-    await send_mail(data["email"], data["email"], text, "Email Verification")
+    await send_mail(data["email"], data["email"], text, "OTP for Email Verification")
     return web.json_response({"status": "ok"})
 
 @routes.post("/api/check-id")
