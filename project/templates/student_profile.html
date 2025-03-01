@@ -21,9 +21,9 @@
             <!-- Collapsible Navbar -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav ms-auto">
-                    <a class="nav-link text-white fw-medium px-3" href="/{{user_type|lower}}">Home</a>
-                    <a class="nav-link text-white fw-medium px-3" href="/{{user_type|lower}}/apply">New Pass</a>
-                    <a class="nav-link text-white fw-medium px-3" href="/{{user_type|lower}}/expired">Expired Pass</a>
+                    <a class="nav-link text-white fw-medium px-3" href="/student">Home</a>
+                    <a class="nav-link text-white fw-medium px-3" href="/student/apply">New Pass</a>
+                    <a class="nav-link text-white fw-medium px-3" href="/student/expired">Expired Pass</a>
                     <a class="nav-link text-white fw-medium px-3" href="/logout">Logout</a>
                 </div>
             </div>
@@ -48,7 +48,7 @@
                         <td><input type="text" class="form-control bg-light text-muted" value="{{ name }}" readonly></td>
                     </tr>
                     <tr>
-                        <th>{% if user_type=="Student" %}Admission No{% else %}Aadhar No{% endif %}</th>
+                        <th>{% if user_type=="student" %}Admission No{% else %}Aadhar No{% endif %}</th>
                         <td><input type="text" class="form-control bg-light text-muted" value="{{ admission }}" readonly></td>
                     </tr>
                     <tr>
@@ -64,7 +64,7 @@
                         <td><input type="email" class="form-control bg-light text-muted" value="{{ email }}" readonly></td>
                     </tr>
                     <tr><td>
-                        <a href="/forgot?user-type={{user_type|lower}}&email={{email|safe}}" class="btn btn-warning">Change Password</a>
+                        <a href="/forgot?user-type={{user_type}}&email={{email|safe}}" class="btn btn-warning">Change Password</a>
                     </td>
                     <td>
                         <button type="submit" class="btn btn-success">Update Profile</button>

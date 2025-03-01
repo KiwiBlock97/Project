@@ -39,9 +39,14 @@
                         <th scope="row">From/To</th>
                         <td>{{ place }}</td>
                     </tr>
+                    {% if uid==1 %}
                     <tr>
-                        <th scope="row">Validity</th>
-                        <td>{{ validity }}</td>
+                        <th scope="row">From</th>
+                        <td>{{ fromdate }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">To</th>
+                        <td>{{ todate }}</td>
                     </tr>
                     <tr>
                         <th scope="row">Admin No</th>
@@ -51,6 +56,16 @@
                         <th scope="row">Renew</th>
                         <td>{{ renew }}</td>
                     </tr>
+                    {% else %}
+                    <tr>
+                        <th scope="row">Days</th>
+                        <td>{{ days }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Aadhar No</th>
+                        <td>{{ adm_no }}</td>
+                    </tr>
+                    {% endif %}
                 </tbody>
             </table>
 

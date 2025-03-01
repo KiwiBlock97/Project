@@ -36,6 +36,7 @@
             <div class="card mt-3">
                 <div class="card-body">
                     <table class="table">
+                        {% if uid==1 %}
                         <tr>
                             <th>From</th>
                             <td>{{ ticket[3] }}</td>
@@ -44,6 +45,16 @@
                             <th>To</th>
                             <td>{{ ticket[4] }}</td>
                         </tr>
+                        {% else %}
+                        <tr>
+                            <th>Total Days</th>
+                            <td>{{ ticket[3] }}</td>
+                        </tr>
+                        <tr>
+                            <th>Days Left</th>
+                            <td>{{ ticket[3] - ticket[4]|length }}</td>
+                        </tr>
+                        {% endif %}
                         <tr>
                             <th>From/To Place</th>
                             <td>{{ ticket[1] }}</td>

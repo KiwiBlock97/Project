@@ -121,7 +121,7 @@
                     <td class="value">{{ department }}</td>
                 </tr>
                 <tr>
-                    <td class="label">Admission No</td>
+                    <td class="label">{% if uid==1 %}Admission No{% else %}Aadhar No{% endif %}</td>
                     <td class="value">{{ admission }}</td>
                 </tr>
             </table>
@@ -130,6 +130,7 @@
         <!-- Right Side: Ticket Details -->
         <div class="ticket-details">
             <table class="ticket-info">
+                {% if uid==1 %}
                 <tr>
                     <td class="label">From</td>
                     <td class="value">{{ ticket[3] }}</td>
@@ -138,6 +139,16 @@
                     <td class="label">To</td>
                     <td class="value">{{ ticket[4] }}</td>
                 </tr>
+                {% else %}
+                <tr>
+                    <td class="label">Total Days</td>
+                    <td class="value">{{ ticket[3] }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Days Left</td>
+                    <td class="value">{{ ticket[3] - ticket[4]|length }}</td>
+                </tr>
+                {% endif %}
                 <tr>
                     <td class="label">From/To Place</td>
                     <td class="value">{{ ticket[1] }}</td>

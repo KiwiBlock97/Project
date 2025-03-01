@@ -37,7 +37,7 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label class="col-sm-4 col-form-label fw-semibold">Admin No</label>
+                    <label class="col-sm-4 col-form-label fw-semibold">{% if uid==1 %}Admin No{% else %}Aadhar No{% endif %}</label>
                     <div class="col-sm-8">
                         <p class="form-control-plaintext">{{ adm_no }}</p>
                     </div>
@@ -61,7 +61,7 @@
                         <input type="text" id="ticket-price" name="ticket-price" class="form-control" readonly>
                     </div>
                 </div>
-
+                {% if uid==1 %}
                 <div class="row mb-3">
                     <label class="col-sm-4 col-form-label fw-semibold">From Date</label>
                     <div class="col-sm-8">
@@ -75,6 +75,14 @@
                         <input type="date" id="dateto" name="dateto" class="form-control" onchange="update_price()" required>
                     </div>
                 </div>
+                {% else %}
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label fw-semibold">Days</label>
+                    <div class="col-sm-8">
+                        <input type="number" id="days" name="days" class="form-control" onchange="update_price()" required>
+                    </div>
+                </div>
+                {% endif %}
 
                 <div class="row mb-3">
                     <label class="col-sm-4 col-form-label fw-semibold">Phone</label>
@@ -96,8 +104,14 @@
 
     <script>
         function update_price() {
-            var fromDate = document.getElementById("datefrom").value;
-            var toDate = document.getElementById("dateto").value;
+            uid={{uid}};
+            if (uid==1){
+                var fromDate = document.getElementById("datefrom").value;
+                var toDate = document.getElementById("dateto").value;
+            }
+            else{
+                var days = document.getElementById("days").value;
+            }
             var pay = document.getElementById("pay");
             var ticket_price = document.getElementById("ticket-price");
 
@@ -111,6 +125,7 @@
                 ticket_price.value = "";
             }
 
+            if (uid==1){
             document.getElementById("datefrom").min = new Date().toISOString().slice(0, 10);
 
             if (fromDate) {
@@ -135,6 +150,15 @@
                 }
             } else {
                 pay.style.display = "none";
+            }
+            }else{
+                if (days > 0 && ticket_price.value) {
+                var amount = parseFloat(ticket_price.value) * days;
+                pay.innerHTML = `Pay ₹${amount}`;
+                pay.style.display = "block";
+                } else {
+                    pay.style.display = "none";
+                }
             }
         }
 

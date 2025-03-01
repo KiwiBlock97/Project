@@ -36,7 +36,7 @@
             <div class="text-center">
                 <img class="img-fluid border rounded-3" src="/photo" alt="Student Photo" style="max-width: 200px; height: auto;">
             </div>
-            <h2 class="text-center text-primary mt-3">Student Details</h2>
+            <h2 class="text-center text-primary mt-3">{% if uid==1 %}Student{% else %}Staff{% endif %} Details</h2>
             <table class="table table-bordered mt-3">
                 <tr>
                     <th>Name</th>
@@ -47,7 +47,7 @@
                     <td>{{ department }}</td>
                 </tr>
                 <tr>
-                    <th>Admission No</th>
+                    <th>{% if uid==1 %}Admission No{% else %}Aadhar No{% endif %}</th>
                     <td>{{ admission }}</td>
                 </tr>
             </table>
@@ -57,6 +57,7 @@
             <div class="card mt-3">
                 <div class="card-body">
                     <table class="table">
+                        {% if uid==1 %}
                         <tr>
                             <th>From</th>
                             <td>{{ ticket[3] }}</td>
@@ -65,6 +66,16 @@
                             <th>To</th>
                             <td>{{ ticket[4] }}</td>
                         </tr>
+                        {% else %}
+                        <tr>
+                            <th>Total Days</th>
+                            <td>{{ ticket[3] }}</td>
+                        </tr>
+                        <tr>
+                            <th>Days Left</th>
+                            <td>{{ ticket[3] - ticket[4]|length }}</td>
+                        </tr>
+                        {% endif %}
                         <tr>
                             <th>From/To Place</th>
                             <td>{{ ticket[1] }}</td>
@@ -76,13 +87,17 @@
                     </table>
                     <div class="d-flex justify-content-between">
                         <a class="btn btn-success w-50 me-2" href="/student/print?key={{ ticket[2] }}">Print Ticket</a>
+                        {% if uid==1 %}
                         <form class="w-50" method="get" action="/student/renew">
                             <input type="hidden" name="key" value="{{ ticket[2] }}">
                             <button class="btn btn-warning w-100" type="submit">Extend Pass</button>
                         </form>
+                        {%endif%}
                     </div>
                 </div>
             </div>
+            {% else %}
+            No Tickets Available
             {% endfor %}
         </div>
     </main>
