@@ -291,8 +291,8 @@ async def admin_home(request: web.Request):
         students=db.get_students(query=query)
         staff=db.get_students(1, query)
         return aiohttp_jinja2.render_template("admin_students.html", request, {
-            "students": students,
-            "staff": staff
+            "students": students if students else [],
+            "staff": staff if students else []
         })
     data=await request.post()
     method=data["method"]
